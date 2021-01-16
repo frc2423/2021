@@ -7,6 +7,16 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANEncoder;
+import com.revrobotics.CANPIDController;
+
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import com.revrobotics.ControlType;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -20,16 +30,136 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
+
+    private DoubleSolenoid gear_switcher;
+
+    private CANPIDController m_l_PIDController; 
+    private CANPIDController m_r_PIDController; 
+    private CANEncoder m_l_encoder; 
+    private CANEncoder m_r_encoder;
+    private int maxRPM = 5676;
+
+    private CANSparkMax lf_motor;  //left front motor
+    private CANSparkMax lb_motor;  //left back motor
+    private CANSparkMax rf_motor;  //right front motor
+    private CANSparkMax rb_motor;  //right back motor
+
+    private boolean previous_button = false;
+    private double joystickDeadband = 0.17;
+
+
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
+
   @Override
   public void robotInit() {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
+
+    lf_motor = new CANSparkMax(1, MotorType.kBrushless);
+    lb_motor = new CANSparkMax(4, MotorType.kBrushless);
+    rf_motor = new CANSparkMax(6, MotorType.kBrushless);
+    rb_motor = new CANSparkMax(5, MotorType.kBrushless);
+
+    lf_motor.follow(lb_motor);
+    rf_motor.follow(rb_motor);
+
+    lb_motor.restoreFactoryDefaults();
+    rb_motor.restoreFactoryDefaults();
+
+    m_l_encoder = lf_motor.getEncoder();
+    m_r_encoder = rf_motor.getEncoder();
+
+    m_l_PIDController = lb_motor.getPIDController();
+    m_r_PIDController = rb_motor.getPIDController();
+    m_l_PIDController.setReference(0.0, ControlType.kVoltage);
+    m_r_PIDController.setReference(0.0, ControlType.kVoltage);
+
+    gear_switcher = new DoubleSolenoid(0, 1);
+
   }
+
+  private double[] getSpeeds(double xSpeedInput, double zRotationInput, boolean squareInputs) {
+        var xSpeed = MathUtil.clamp(xSpeedInput, -1.0, 1.0);
+        var zRotation = MathUtil.clamp(zRotationInput, -1.0, 1.0);
+        if (squareInputs) {
+            xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed);
+            zRotation = Math.copySign(zRotation * zRotation, zRotation);
+        }
+        var maxInput = Math.copySign(Math.max(Math.abs(xSpeed), Math.abs(zRotation)), xSpeed);
+        double leftMotorOutput;
+        double rightMotorOutput;
+        if (xSpeed >= 0.0) {
+            if (zRotation >= 0.0) {
+                leftMotorOutput = maxInput;
+                rightMotorOutput = xSpeed - zRotation;
+            } else {
+                leftMotorOutput = xSpeed + zRotation;
+                rightMotorOutput = maxInput;
+            }
+        } else if (zRotation >= 0.0) {
+            leftMotorOutput = xSpeed + zRotation;
+            rightMotorOutput = maxInput;
+        } else {
+            leftMotorOutput = maxInput;
+            rightMotorOutput = xSpeed - zRotation;
+        }
+        var lm_speed = (MathUtil.clamp(leftMotorOutput, -1.0, 1.0) * 1);
+        var rm_speed = (MathUtil.clamp(rightMotorOutput, -1.0, 1.0) * -1);
+        
+        double[] returnArray = { lm_speed, rm_speed };
+        return returnArray;
+    }
+
+
+
+  private static double applyDeadband(double value, double deadband/*default should be 0.1*/){
+    if(Math.abs(value) < deadband){
+      return 0.0;
+    }
+    // if we made it here, we're outside the deadband
+    final double slope = 1.0/(1-deadband);
+    final double xDist = (Math.abs(value) - deadband);
+    final double yVal = xDist * slope;
+      
+    if(value < 0){
+      return -yVal;
+    }
+    return yVal;
+  }  
+
+  public void switchGears() {
+    if (gear_switcher.get() == DoubleSolenoid.Value.kForward) {
+      toLowGear();
+    }
+    else {
+      toHighGear();
+    }
+  }
+
+  private void toHighGear() {
+    gear_switcher.set(DoubleSolenoid.Value.kForward);
+  }
+
+  private void toLowGear() {
+    gear_switcher.set(DoubleSolenoid.Value.kReverse);
+  }
+
+  public void setSpeeds(double speed, double rot) {
+    final double forwardbackNoDeadband = -speed;
+    final double forwardBack = applyDeadband(forwardbackNoDeadband, joystickDeadband);
+    final rotation = applyDeadband(rot, deadband=joystickDeadband)
+    var driveArray = this.getSpeeds(forwardBack, rotation, true)
+    var lSpeed = driveArray[0]
+    var rSpeed = driveArray[1]
+    m_l_PIDController.setReference(lSpeed * maxRPM, ControlType.kVelocity)
+    m_r_PIDController.setReference(rSpeed * maxRPM, ControlType.kVelocity)
+    }
+
 
   /**
    * This function is called every robot packet, no matter the mode. Use this for items like

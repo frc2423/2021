@@ -16,6 +16,9 @@ import com.revrobotics.CANPIDController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import com.revrobotics.ControlType;
+import edu.wpi.first.wpiutil.math.MathUtil;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
+
 
 
 /**
@@ -46,6 +49,9 @@ public class Robot extends TimedRobot {
 
     private boolean previous_button = false;
     private double joystickDeadband = 0.17;
+
+    private XboxController xboxController;
+
 
 
 
@@ -80,6 +86,9 @@ public class Robot extends TimedRobot {
     m_r_PIDController.setReference(0.0, ControlType.kVoltage);
 
     gear_switcher = new DoubleSolenoid(0, 1);
+
+    xboxController = new XboxController(0);
+
 
   }
 
@@ -152,12 +161,12 @@ public class Robot extends TimedRobot {
   public void setSpeeds(double speed, double rot) {
     final double forwardbackNoDeadband = -speed;
     final double forwardBack = applyDeadband(forwardbackNoDeadband, joystickDeadband);
-    final rotation = applyDeadband(rot, deadband=joystickDeadband)
-    var driveArray = this.getSpeeds(forwardBack, rotation, true)
-    var lSpeed = driveArray[0]
-    var rSpeed = driveArray[1]
-    m_l_PIDController.setReference(lSpeed * maxRPM, ControlType.kVelocity)
-    m_r_PIDController.setReference(rSpeed * maxRPM, ControlType.kVelocity)
+    final double rotation = applyDeadband(rot, joystickDeadband);
+    var driveArray = this.getSpeeds(forwardBack, rotation, true);
+    var lSpeed = driveArray[0];
+    var rSpeed = driveArray[1];
+    m_l_PIDController.setReference(lSpeed * maxRPM, ControlType.kVoltage);
+    m_r_PIDController.setReference(rSpeed * maxRPM, ControlType.kVoltage);
     }
 
 
@@ -208,7 +217,14 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    setSpeeds(xboxController.getX(Hand.kLeft), xboxController.getY(Hand.kRight));
+    //nothing bad ever happens to the kennedys
+
+    if (xboxController.getBumperPressed(Hand.kLeft)) {
+      switchGears();
+    }
+  }
 
   /** This function is called once when the robot is disabled. */
   @Override

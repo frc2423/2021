@@ -218,7 +218,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    setSpeeds(xboxController.getX(Hand.kLeft), xboxController.getY(Hand.kRight));
+    setSpeeds(xboxController.getY(Hand.kRight), xboxController.getX(Hand.kRight));
     //nothing bad ever happens to the kennedys
 
     if (xboxController.getBumperPressed(Hand.kLeft)) {

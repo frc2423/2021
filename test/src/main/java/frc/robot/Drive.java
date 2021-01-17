@@ -6,7 +6,6 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import com.revrobotics.ControlType;
 import edu.wpi.first.wpiutil.math.MathUtil;
@@ -40,8 +39,6 @@ class Drive {
 
     private double maxSpeed = 7.0;
 
-    private XboxController xboxController;
-
     public void robotInit() {
         lf_motor = new CANSparkMax(1, MotorType.kBrushless);
         lb_motor = new CANSparkMax(4, MotorType.kBrushless);
@@ -63,8 +60,6 @@ class Drive {
         m_r_PIDController.setReference(0.0, ControlType.kVoltage);
     
         gear_switcher = new DoubleSolenoid(0, 1);
-
-        xboxController = new XboxController(0);
     }
 
     public void init() {

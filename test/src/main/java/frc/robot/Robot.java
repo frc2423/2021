@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import edu.wpi.first.wpilibj.XboxController;
+
 import Drive.java;
 
 /**
@@ -22,8 +24,9 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
+  private XboxController xboxController;
 
-
+  private Drive driveBase;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -36,84 +39,17 @@ public class Robot extends TimedRobot {
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
 
+    xboxController = new XboxController(0);
+
   }
-
-  private double[] getSpeeds(double xSpeedInput, double zRotationInput, boolean squareInputs) {
-        var xSpeed = MathUtil.clamp(xSpeedInput, -1.0, 1.0);
-        var zRotation = MathUtil.clamp(zRotationInput, -1.0, 1.0);
-        if (squareInputs) {
-            xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed);
-            zRotation = Math.copySign(zRotation * zRotation, zRotation);
-        }
-        var maxInput = Math.copySign(Math.max(Math.abs(xSpeed), Math.abs(zRotation)), xSpeed);
-        double leftMotorOutput;
-        double rightMotorOutput;
-        if (xSpeed >= 0.0) {
-            if (zRotation >= 0.0) {
-                leftMotorOutput = maxInput;
-                rightMotorOutput = xSpeed - zRotation;
-            } else {
-                leftMotorOutput = xSpeed + zRotation;
-                rightMotorOutput = maxInput;
-            }
-        } else if (zRotation >= 0.0) {
-            leftMotorOutput = xSpeed + zRotation;
-            rightMotorOutput = maxInput;
-        } else {
-            leftMotorOutput = maxInput;
-            rightMotorOutput = xSpeed - zRotation;
-        }
-        var lm_speed = (MathUtil.clamp(leftMotorOutput, -1.0, 1.0) * 1);
-        var rm_speed = (MathUtil.clamp(rightMotorOutput, -1.0, 1.0) * -1);
-        
-        double[] returnArray = { lm_speed, rm_speed };
-        return returnArray;
-    }
-
-
-
-  private static double applyDeadband(double value, double deadband/*default should be 0.1*/){
-    if(Math.abs(value) < deadband){
-      return 0.0;
-    }
-    // if we made it here, we're outside the deadband
-    final double slope = 1.0/(1-deadband);
-    final double xDist = (Math.abs(value) - deadband);
-    final double yVal = xDist * slope;
-      
-    if(value < 0){
-      return -yVal;
-    }
-    return yVal;
-  }  
 
   public void switchGears() {
-    if (gear_switcher.get() == DoubleSolenoid.Value.kForward) {
-      toLowGear();
-    }
-    else {
-      toHighGear();
-    }
-  }
-
-  private void toHighGear() {
-    gear_switcher.set(DoubleSolenoid.Value.kForward);
-  }
-
-  private void toLowGear() {
-    gear_switcher.set(DoubleSolenoid.Value.kReverse);
+    driveBase.switchGears();
   }
 
   public void setSpeeds(double speed, double rot) {
-    final double forwardbackNoDeadband = -speed;
-    final double forwardBack = applyDeadband(forwardbackNoDeadband, joystickDeadband);
-    final double rotation = applyDeadband(rot, joystickDeadband);
-    var driveArray = this.getSpeeds(forwardBack, rotation, true);
-    var lSpeed = driveArray[0];
-    var rSpeed = driveArray[1];
-    m_l_PIDController.setReference(lSpeed * maxRPM, ControlType.kVoltage);
-    m_r_PIDController.setReference(rSpeed * maxRPM, ControlType.kVoltage);
-    }
+    driveBase.setSpeeds(speed, rot);
+  }
 
 
   /**

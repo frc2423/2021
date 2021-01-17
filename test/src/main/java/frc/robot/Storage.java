@@ -44,50 +44,50 @@ class Storage {
       stop();
     }
 
-    public fun turnBelt(speed : Double) {
-      beltMotorSpeed = speed
+    public void turnBelt(double speed) {
+      beltMotorSpeed = speed;
     }
 
-    public fun stop() {
-      turnBelt(0.0)
+    public void stop() {
+      turnBelt(0.0);
     }
 
-    fun getBallCount() : Int {
-      return NetworkTableInstance.getDefault().getEntry("/ballCount").getNumber(0).toInt()
+    private int getBallCount() {
+      return (int)(NetworkTableInstance.getDefault().getEntry("/ballCount").getNumber(0)); // hopefully casting wont mess anything up :)
     }
 
     private void setBallCount(int count) {
       NetworkTableInstance.getDefault().getEntry("/ballCount").setNumber(count);
     }
     
-    public fun resetCount() {
-    setBallCount(0)
+    public void resetCount() {
+      setBallCount(0); // attempting to break the water-speed world record is the most dangerous activity one can engage in
     }
 
-    public fun addBall() {
-      setBallCount(getBallCount()+1)
+    public void addBall() {
+      setBallCount(getBallCount() + 1);
     }
 
 
-    public fun seesBall() : Boolean {
-        val ballReading = ballSensor.getValue() > 500
-        ballReadings.removeAt(0)
-        ballReadings.add(ballReading)
+    public boolean seesBall() {
+        final boolean ballReading = ballSensor.getValue() > 500;
+        ballReadings.remove(0);
+        ballReadings.add(ballReading);
     
-        var trueReadings = 0
-        var falseReadings = 0
+        int trueReadings = 0;
+        int falseReadings = 0;
     
-        for (reading in ballReadings) {
-          if (reading) {
-            trueReadings++
+        for (int x = 0; x < ballReadings.size(); x++) {
+          if (ballReadings.get(x).equals(true)) {
+            trueReadings++;
           } else {
-            falseReadings++
+            falseReadings++;
           }
         }
-        return trueReadings > falseReadings
+        return trueReadings > falseReadings;
     }
 
-    public fun execute() {
-      beltMotor.set(beltMotorSpeed)
+    public void execute() {
+      beltMotor.set(beltMotorSpeed);
     }
 }

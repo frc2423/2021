@@ -71,16 +71,16 @@ class Intake {
    
     private runIntake(){
       
-        when(state){
-            State.NOTHING -> {
+        switch(state){
+            case NOTHING: 
               motorSpeed = 0.0;
               if(running){
                 state = State.INTAKEBALLS;
               }
-            }
-            State.INTAKEBALLS -> {
+              break;
+            case INTAKEBALLS :
                 motorSpeed = zoom;
-                if(encoder.getVelocity() in -stallZone..stallZone){
+                if(encoder.getVelocity() > -stallZone && encoder.getVelocity() < stallZone){
                   state = State.STALLED;
                   timer.stop();
                   timer.reset();
@@ -89,10 +89,10 @@ class Intake {
                 else if (!running){
                   state = State.NOTHING;
                 }
-            }
-            State.STALLED -> {
+                break;
+            case STALLED :
                 motorSpeed = zoom;
-                if(encoder.getVelocity() !in -stallZone..stallZone){
+                if(encoder.getVelocity() < -stallZone && encoder.getVelocity() > stallZone){
                   state = State.INTAKEBALLS;
                   timer.stop();
                   timer.reset();
@@ -107,8 +107,8 @@ class Intake {
                 else if (!running){
                   state = State.NOTHING;
                 }
-            }
-            State.OUTTAKE -> {
+                break;
+            case OUTTAKE :
                 motorSpeed = -zoom;
                 if(timer.get() > 1){
                   state = State.INTAKEBALLS;
@@ -119,7 +119,7 @@ class Intake {
                 else if(!running){
                   state = State.NOTHING;
                 }
-            }
+                break;
         }
     }
 

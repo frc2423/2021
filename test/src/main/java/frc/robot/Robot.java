@@ -7,19 +7,8 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANPIDController;
 
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import com.revrobotics.ControlType;
-import edu.wpi.first.wpiutil.math.MathUtil;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
-
-
+import Drive.java;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -34,25 +23,6 @@ public class Robot extends TimedRobot {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
 
-    private DoubleSolenoid gear_switcher;
-
-    private CANPIDController m_l_PIDController; 
-    private CANPIDController m_r_PIDController; 
-    private CANEncoder m_l_encoder; 
-    private CANEncoder m_r_encoder;
-    private int maxRPM = 5676;
-
-    private CANSparkMax lf_motor;  //left front motor
-    private CANSparkMax lb_motor;  //left back motor
-    private CANSparkMax rf_motor;  //right front motor
-    private CANSparkMax rb_motor;  //right back motor
-
-    private boolean previous_button = false;
-    private double joystickDeadband = 0.17;
-
-    private XboxController xboxController;
-
-
 
 
   /**
@@ -65,30 +35,6 @@ public class Robot extends TimedRobot {
     m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     m_chooser.addOption("My Auto", kCustomAuto);
     SmartDashboard.putData("Auto choices", m_chooser);
-
-    lf_motor = new CANSparkMax(1, MotorType.kBrushless);
-    lb_motor = new CANSparkMax(4, MotorType.kBrushless);
-    rf_motor = new CANSparkMax(6, MotorType.kBrushless);
-    rb_motor = new CANSparkMax(5, MotorType.kBrushless);
-
-    lf_motor.follow(lb_motor);
-    rf_motor.follow(rb_motor);
-
-    lb_motor.restoreFactoryDefaults();
-    rb_motor.restoreFactoryDefaults();
-
-    m_l_encoder = lf_motor.getEncoder();
-    m_r_encoder = rf_motor.getEncoder();
-
-    m_l_PIDController = lb_motor.getPIDController();
-    m_r_PIDController = rb_motor.getPIDController();
-    m_l_PIDController.setReference(0.0, ControlType.kVoltage);
-    m_r_PIDController.setReference(0.0, ControlType.kVoltage);
-
-    gear_switcher = new DoubleSolenoid(0, 1);
-
-    xboxController = new XboxController(0);
-
 
   }
 

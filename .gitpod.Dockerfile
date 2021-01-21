@@ -10,8 +10,8 @@ RUN sudo apt-get update && \
     mkdir 2021 && cd 2021 && \
     wget http://github.com/wpilibsuite/allwpilib/releases/download/v2021.1.2/WPILib_Linux-2021.1.2.tar.gz && \ 
     tar -xf WPILib_Linux-2021.1.2.tar.gz && \
-    # cd tools && \
-    # python3 ToolsUpdater.py 
+    cd tools && \
+    java ./ToolsUpdater.jar 
     
 
 

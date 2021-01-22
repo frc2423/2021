@@ -1,24 +1,18 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Timer;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANEncoder;
-import com.revrobotics.CANPIDController;
-import com.revrobotics.ControlType;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
-class Intake {
+public class Intake {
     enum State{
       INTAKEBALLS, OUTTAKE, STALLED, NOTHING
     }
   
     private State state = State.NOTHING;
-    private Timer timer = new timer();
+    private Timer timer = new Timer();
     private double zoom  = 0.6;
     private CANSparkMax motor;
     private Boolean running;
@@ -32,44 +26,44 @@ class Intake {
     private DoubleSolenoid.Value intakeValue = DoubleSolenoid.Value.kOff;
 
     public Intake() {
-        motor = CANSparkMax(7, MotorType.kBrushless);
+        motor = new CANSparkMax(7, MotorType.kBrushless);
         encoder = motor.getEncoder();
         running = false;
-        intakeValve = DoubleSolenoid(2, 3);
-        greenWheel = CANSparkMax(2, MotorType.kBrushless);
+        intakeValve = new DoubleSolenoid(2, 3);
+        greenWheel = new CANSparkMax(2, MotorType.kBrushless);
     }
 
-    public init() {
+    public void init() {
       stop();
     }
 
-    public stop (){
+    public void stop (){
       running = false;
       runIntake();
       greenWheelSpeed = 0.0;
     }
 
-    public intake() {
+    public void intake() {
       running = true;
       runIntake();
       greenWheelSpeed = -.3;
     }
 
-    public turnWheel(double speed) {
+    public void turnWheel(double speed) {
       greenWheelSpeed = speed;
     }
 
     public boolean isDown() {
       return intakeValve.get() == DoubleSolenoid.Value.kReverse;
     }
-  public intakeUp(){
+  public void intakeUp(){
     intakeValue = DoubleSolenoid.Value.kForward;
   }
-  public intakeDown(){
+  public void intakeDown(){
     intakeValue = DoubleSolenoid.Value.kReverse;
   }
    
-    private runIntake(){
+    private void runIntake(){
       
         switch(state){
             case NOTHING: 
@@ -123,7 +117,7 @@ class Intake {
         }
     }
 
-    public execute() {
+    public void execute() {
       motor.set(motorSpeed);
       greenWheel.set(greenWheelSpeed);
       intakeValve.set(intakeValue);

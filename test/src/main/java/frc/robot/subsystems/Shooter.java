@@ -1,17 +1,12 @@
-package frc.robot;
+package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.Timer;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.ControlType;
 
-class Shooter {
+public class Shooter {
     private CANPIDController CAN;
     private CANSparkMax shooterMotor;
     private double speed = 0.0;
@@ -30,25 +25,25 @@ class Shooter {
         CAN.setI(0.0);
     }
 
-    public init() {
+    public void init() {
         stop();
     }
 
     public boolean atVelocity() {
-        double diff = (shooterEncoder.getVelocity() - previousVelocity) < atVelocityConstant;
+        boolean diff = (shooterEncoder.getVelocity() - previousVelocity) < atVelocityConstant;
         previousVelocity = shooterEncoder.getVelocity();
         return diff;
     }
 
-    public shoot() {
+    public void shoot() {
         speed = -1.0;
     }
 
-    public stop() {
+    public void stop() {
         speed = 0.0;
     }
 
-    public execute() {
+    public void execute() {
         CAN.setReference(speed, ControlType.kVelocity);
  //       shooterMotor.set(speed)
     }

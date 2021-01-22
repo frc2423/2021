@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
@@ -10,11 +10,20 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import com.revrobotics.ControlType;
 import edu.wpi.first.wpiutil.math.MathUtil;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.EntryNotification;
+import edu.wpi.first.networktables.EntryListenerFlags;
 
-class Drive {
+import com.kauailabs.navx.frc.AHRS;
 
-    private val countsPerRev = 16.35;
-    private val ftPerRev = 1.57;
+
+import edu.wpi.first.wpilibj.SPI.Port;
+
+public class Drive {
+
+    private double countsPerRev = 16.35;
+    
+    private double ftPerRev = 1.57;
 
     private CANPIDController m_l_PIDController; 
     private CANPIDController m_r_PIDController; 
@@ -25,21 +34,30 @@ class Drive {
     private boolean previous_button = false;
 
     private DoubleSolenoid gear_switcher;
-    private CANSparkMax lf_motor;  //left front motor
+    private IDriveMotor lf_motor;
+    // private CANSparkMax lf_motor;  //left front motor
     private CANSparkMax lb_motor;  //left back motor
     private CANSparkMax rf_motor;  //right front motor
     private CANSparkMax rb_motor;  //right back motor
   
     private double joystickDeadband = 0.17;
 
-    private AHRS gyro = Port.kMXP;
+    private AHRS gyro = new AHRS(Port.kMXP);
 
     private double leftSpeed = 0.0;
     private double rightSpeed = 0.0;
 
     private double maxSpeed = 7.0;
 
-    public void robotInit() {
+    public Drive() {
+
+        if (RobotBase.isReal()) {
+            lf_motor = new DriveMotor();
+        } else {
+            lf_motor = new SimDriveMotor();
+        }
+
+
         lf_motor = new CANSparkMax(1, MotorType.kBrushless);
         lb_motor = new CANSparkMax(4, MotorType.kBrushless);
         rf_motor = new CANSparkMax(6, MotorType.kBrushless);
@@ -107,7 +125,7 @@ class Drive {
     }
 
     private boolean isHighGear() {
-        speed = NetworkTableInstance.getDefault().getEntry("/gear").getString("slow");
+        String speed = NetworkTableInstance.getDefault().getEntry("/gear").getString("slow");
         return speed == "fast";
     }
 
@@ -145,6 +163,7 @@ class Drive {
         var rSpeed = driveArray[1];
         m_l_PIDController.setReference(lSpeed * maxRPM, ControlType.kVoltage);
         m_r_PIDController.setReference(rSpeed * maxRPM, ControlType.kVoltage);
+        System.out.println("Speeds: " + lSpeed + ", " + rSpeed);
     }
 
     public void setTankSpeeds(double leftSpeed, double rightSpeed) {

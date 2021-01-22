@@ -6,7 +6,7 @@ import frc.robot.IDriveMotor;
 
 public class DriveMotor implements IDriveMotor {
     
-    private CANSparkMax motor;
+    // private CANSparkMax motor;
 
     public DriveMotor() {
         
@@ -14,7 +14,7 @@ public class DriveMotor implements IDriveMotor {
 
     public void setReference(double speed) {
         if (RobotBase.isReal()) {
-            realMotor.setReference(speed, ControlType.kVoltage);
+            // realMotor.setReference(speed, ControlType.kVoltage);
         } else {
 
         }

@@ -34,8 +34,8 @@ public class Drive {
     private boolean previous_button = false;
 
     private DoubleSolenoid gear_switcher;
-    private IDriveMotor lf_motor;
-    // private CANSparkMax lf_motor;  //left front motor
+    // private IDriveMotor lf_motor;
+    private CANSparkMax lf_motor;  //left front motor
     private CANSparkMax lb_motor;  //left back motor
     private CANSparkMax rf_motor;  //right front motor
     private CANSparkMax rb_motor;  //right back motor
@@ -49,13 +49,19 @@ public class Drive {
 
     private double maxSpeed = 7.0;
 
+    private double kP = 0.0001; //.0407
+    private double kI = 1e-6; // 0
+    private double kD = 0.0;
+
     public Drive() {
 
-        if (RobotBase.isReal()) {
-            lf_motor = new DriveMotor();
-        } else {
-            lf_motor = new SimDriveMotor();
-        }
+        // if (RobotBase.isReal()) {
+        //     lf_motor = new DriveMotor();
+        // } else {
+        //     lf_motor = new SimDriveMotor();
+        // }
+
+        // lf_motor.setReference();
 
 
         lf_motor = new CANSparkMax(1, MotorType.kBrushless);
@@ -76,8 +82,19 @@ public class Drive {
         m_r_PIDController = rb_motor.getPIDController();
         m_l_PIDController.setReference(0.0, ControlType.kVoltage);
         m_r_PIDController.setReference(0.0, ControlType.kVoltage);
+
+        setPids();
     
         gear_switcher = new DoubleSolenoid(0, 1);
+    }
+
+    private void setPids() {
+        m_l_PIDController.setP(kP);
+        m_l_PIDController.setI(kI);
+        m_l_PIDController.setD(kD);
+        m_r_PIDController.setP(kP);
+        m_r_PIDController.setI(kI);
+        m_r_PIDController.setD(kD);
     }
 
     public void init() {
@@ -161,9 +178,15 @@ public class Drive {
         var driveArray = this.getSpeeds(forwardBack, rotation, true);
         var lSpeed = driveArray[0];
         var rSpeed = driveArray[1];
-        m_l_PIDController.setReference(lSpeed * maxRPM, ControlType.kVoltage);
-        m_r_PIDController.setReference(rSpeed * maxRPM, ControlType.kVoltage);
-        System.out.println("Speeds: " + lSpeed + ", " + rSpeed);
+        // m_l_PIDController.setReference(1000000, ControlType.kVelocity);
+        // m_r_PIDController.setReference(1000000, ControlType.kVelocity);
+
+        m_l_PIDController.setReference(lSpeed * maxRPM, ControlType.kVelocity);
+        m_r_PIDController.setReference(rSpeed * maxRPM, ControlType.kVelocity);
+
+        // System.out.println("ref: " + m_l_PIDController.get());
+        // System.out.println("encoder: " + m_l_encoder.getPosition());
+        // System.out.println("Speeds: " + lSpeed + ", " + rSpeed);
     }
 
     public void setTankSpeeds(double leftSpeed, double rightSpeed) {

@@ -1,6 +1,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.Encoder;
@@ -12,6 +13,7 @@ public class SimDriveMotor implements IDriveMotor {
     private PIDController pidController;  
     private Encoder encoder; 
     protected ArrayList<SimDriveMotor> followers = new ArrayList<SimDriveMotor>();
+    private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(1, 3);
 
     public SimDriveMotor(int port, int channelA, int channelB) {
        motor = new PWMVictorSPX(port);
@@ -20,40 +22,38 @@ public class SimDriveMotor implements IDriveMotor {
        setPercent(0);
     }
 
-
     public void setSpeed(double speed){
 
-        pidController.setReference(speed, ControlType.kVelocity);
-
-
+        double output = pidController.calculate(encoder.getRate(), speed);
+        motor.setVoltage(output + feedForward.calculate(speed));
+                        
         for (SimDriveMotor follower : followers) {
             follower.setSpeed(speed);
         }
     }
 
     public double getSpeed(){
-        return encoder.getVelocity();
+        return encoder.getRate();
     }
 
-    public void setPercent(double percent){
-        pidController.setReference(percent, ControlType.kVoltage);
-        voltage = percent;
+    public void setPercent(double percent) {
+        motor.setVoltage(percent);
     }
 
     public double getPercent(){
-        return this.voltage;
+        return motor.get();
     }
 
     public void setDistance(double dist){
-        pidController.setReference(dist, ControlType.kPosition);
+        // pidController.setReference(dist, ControlType.kPosition);
     }
 
     public void resetEncoder(double distance) {
-        encoder.setPosition(distance);
+        // encoder.setPosition(distance);
     }
 
     public double getDistance(){
-        return encoder.getPosition();
+        return encoder.getDistance();
     }
 
     public void setConversionFactor(double factor){
@@ -95,9 +95,9 @@ public class SimDriveMotor implements IDriveMotor {
     }
 
     public void follow(IDriveMotor leader){
-        if(leader.getClass() == SimDriveMotor.class) {
+        if (leader.getClass() == SimDriveMotor.class) {
             SimDriveMotor leadDriveMotor = (SimDriveMotor)leader;
-            // this.motor.follow(leadDriveMotor.motor);
+            leadDriveMotor.followers.add(this);
         }
     }
 }

@@ -1,13 +1,7 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANPIDController;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import com.revrobotics.ControlType;
 import edu.wpi.first.wpiutil.math.MathUtil;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -20,26 +14,25 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.SPI.Port;
 
+import frc.robot.IDriveMotor;
+import frc.robot.DriveMotor;
+
 public class Drive {
 
     private double countsPerRev = 16.35;
 
     private double ftPerRev = 1.57;
 
-    private CANPIDController m_l_PIDController;
-    private CANPIDController m_r_PIDController;
-    private CANEncoder m_l_encoder;
-    private CANEncoder m_r_encoder;
     private int maxRPM = 5676;
 
     private boolean previous_button = false;
 
     private DoubleSolenoid gear_switcher;
-    // private IDriveMotor lf_motor;
-    private CANSparkMax lf_motor; // left front motor
-    private CANSparkMax lb_motor; // left back motor
-    private CANSparkMax rf_motor; // right front motor
-    private CANSparkMax rb_motor; // right back motor
+
+    private IDriveMotor lf_motor; // left front motor
+    private IDriveMotor lb_motor; // left back motor
+    private IDriveMotor rf_motor; // right front motor
+    private IDriveMotor rb_motor; // right back motor
 
     private double joystickDeadband = 0.17;
 
@@ -50,9 +43,6 @@ public class Drive {
 
     private double maxSpeed = 7.0;
 
-    private double kP = NtHelper.getEntry("/drive/kP").getDouble(0.0001);
-    private double kI = NtHelper.getEntry("/drive/kI").getDouble(1e-6);
-    private double kD = NtHelper.getEntry("/drive/kD").getDouble(0.0);
 
     public Drive() {
 
@@ -64,27 +54,17 @@ public class Drive {
 
         // lf_motor.setReference();
 
-        lf_motor = new CANSparkMax(1, MotorType.kBrushless);
-        lb_motor = new CANSparkMax(4, MotorType.kBrushless);
-        rf_motor = new CANSparkMax(6, MotorType.kBrushless);
-        rb_motor = new CANSparkMax(5, MotorType.kBrushless);
+        lf_motor = new DriveMotor(1);
+        lb_motor = new DriveMotor(4);
+        rf_motor = new DriveMotor(6);
+        rb_motor = new DriveMotor(5);
 
         lf_motor.follow(lb_motor);
         rf_motor.follow(rb_motor);
 
-        lb_motor.restoreFactoryDefaults();
-        rb_motor.restoreFactoryDefaults();
-
-        m_l_encoder = lf_motor.getEncoder();
-        m_r_encoder = rf_motor.getEncoder();
-
-        m_l_PIDController = lb_motor.getPIDController();
-        m_r_PIDController = rb_motor.getPIDController();
-        m_l_PIDController.setReference(0.0, ControlType.kVoltage);
-        m_r_PIDController.setReference(0.0, ControlType.kVoltage);
+        // m_l_encoder.setPositionConversionFactor(factor)
 
         setPids();
-
         gear_switcher = new DoubleSolenoid(0, 1);
 
         NtHelper.listen("/drive/kP", (table) -> setPids());
@@ -95,13 +75,25 @@ public class Drive {
 
     }
 
+    private double getP() {
+        return NtHelper.getDouble("/drive/kP", 0.0001);
+    }
+
+    private double getI() {
+        return NtHelper.getDouble("/drive/kI", 1e-6);
+    }
+
+    private double getD() {
+        return NtHelper.getDouble("/drive/kD", 0.0);
+    }
+
     private void setPids() {
-        m_l_PIDController.setP(NtHelper.getDouble("/drive/kP", 0.0001));
-        m_l_PIDController.setI(NtHelper.getDouble("/drive/kI", 1e-6));
-        m_l_PIDController.setD(NtHelper.getDouble("/drive/kD", 0.0));
-        m_r_PIDController.setP(NtHelper.getDouble("/drive/kP", 0.0001));
-        m_r_PIDController.setI(NtHelper.getDouble("/drive/kI", 1e-6));
-        m_r_PIDController.setD(NtHelper.getDouble("/drive/kD", 0.0));
+        lb_motor.setP(getP());
+        lb_motor.setI(getI());
+        lb_motor.setD(getD());
+        rb_motor.setP(getP());
+        rb_motor.setI(getI());
+        rb_motor.setD(getD());
     }
 
     public void init() {
@@ -111,8 +103,8 @@ public class Drive {
     }
 
     public void reset() {
-        m_l_encoder.setPosition(0.0);
-        m_r_encoder.setPosition(0.0);
+        lb_motor.resetEncoder(0.0);
+        rb_motor.resetEncoder(0.0);
         gyro.reset();
     }
 
@@ -162,19 +154,19 @@ public class Drive {
     }
 
     public double getLeftDistance() {
-        return m_l_encoder.getPosition() / countsPerRev * ftPerRev;
+        return lb_motor.getDistance() / countsPerRev * ftPerRev;
     }
 
     public double getRightDistance() {
-        return -m_r_encoder.getPosition() / countsPerRev * ftPerRev;
+        return -rb_motor.getDistance() / countsPerRev * ftPerRev;
     }
 
     public double getLeftVelocity() {
-        return m_l_encoder.getVelocity() / countsPerRev * ftPerRev / 60.0;
+        return lb_motor.getSpeed() / countsPerRev * ftPerRev / 60.0;
     }
 
     public double getRightVelocity() {
-        return -m_r_encoder.getVelocity() / countsPerRev * ftPerRev / 60.0;
+        return -rb_motor.getSpeed() / countsPerRev * ftPerRev / 60.0;
     }
 
     public void setSpeeds(double speed, double rot) {
@@ -187,8 +179,8 @@ public class Drive {
         // m_l_PIDController.setReference(1000000, ControlType.kVelocity);
         // m_r_PIDController.setReference(1000000, ControlType.kVelocity);
 
-        m_l_PIDController.setReference(lSpeed * maxRPM, ControlType.kVelocity);
-        m_r_PIDController.setReference(rSpeed * maxRPM, ControlType.kVelocity);
+        leftSpeed = lSpeed * maxRPM;
+        rightSpeed = rSpeed * maxRPM;
 
         // System.out.println("ref: " + m_l_PIDController.get());
         // System.out.println("encoder: " + m_l_encoder.getPosition());
@@ -233,8 +225,8 @@ public class Drive {
     }
 
     public void execute() {
-        m_l_PIDController.setReference(leftSpeed, ControlType.kVelocity);
-        m_r_PIDController.setReference(rightSpeed, ControlType.kVelocity);
+        rb_motor.setSpeed(leftSpeed);
+        lb_motor.setSpeed(rightSpeed);
 
         if (isHighGear()) {
             gear_switcher.set(DoubleSolenoid.Value.kReverse);

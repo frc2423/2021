@@ -13,33 +13,34 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.EntryNotification;
 import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTable;
+import frc.robot.NtHelper;
 
 import com.kauailabs.navx.frc.AHRS;
-
 
 import edu.wpi.first.wpilibj.SPI.Port;
 
 public class Drive {
 
     private double countsPerRev = 16.35;
-    
+
     private double ftPerRev = 1.57;
 
-    private CANPIDController m_l_PIDController; 
-    private CANPIDController m_r_PIDController; 
-    private CANEncoder m_l_encoder; 
+    private CANPIDController m_l_PIDController;
+    private CANPIDController m_r_PIDController;
+    private CANEncoder m_l_encoder;
     private CANEncoder m_r_encoder;
     private int maxRPM = 5676;
-  
+
     private boolean previous_button = false;
 
     private DoubleSolenoid gear_switcher;
     // private IDriveMotor lf_motor;
-    private CANSparkMax lf_motor;  //left front motor
-    private CANSparkMax lb_motor;  //left back motor
-    private CANSparkMax rf_motor;  //right front motor
-    private CANSparkMax rb_motor;  //right back motor
-  
+    private CANSparkMax lf_motor; // left front motor
+    private CANSparkMax lb_motor; // left back motor
+    private CANSparkMax rf_motor; // right front motor
+    private CANSparkMax rb_motor; // right back motor
+
     private double joystickDeadband = 0.17;
 
     private AHRS gyro = new AHRS(Port.kMXP);
@@ -49,20 +50,19 @@ public class Drive {
 
     private double maxSpeed = 7.0;
 
-    private double kP = 0.0001; //.0407
-    private double kI = 1e-6; // 0
-    private double kD = 0.0;
+    private double kP = NtHelper.getEntry("/drive/kP").getDouble(0.0001);
+    private double kI = NtHelper.getEntry("/drive/kI").getDouble(1e-6);
+    private double kD = NtHelper.getEntry("/drive/kD").getDouble(0.0);
 
     public Drive() {
 
         // if (RobotBase.isReal()) {
-        //     lf_motor = new DriveMotor();
+        // lf_motor = new DriveMotor();
         // } else {
-        //     lf_motor = new SimDriveMotor();
+        // lf_motor = new SimDriveMotor();
         // }
 
         // lf_motor.setReference();
-
 
         lf_motor = new CANSparkMax(1, MotorType.kBrushless);
         lb_motor = new CANSparkMax(4, MotorType.kBrushless);
@@ -84,17 +84,24 @@ public class Drive {
         m_r_PIDController.setReference(0.0, ControlType.kVoltage);
 
         setPids();
-    
+
         gear_switcher = new DoubleSolenoid(0, 1);
+
+        NtHelper.listen("/drive/kP", (table) -> setPids());
+
+        NtHelper.listen("/drive/kI", (table) -> setPids());
+
+        NtHelper.listen("/drive/kD", (table) -> setPids());
+
     }
 
     private void setPids() {
-        m_l_PIDController.setP(kP);
-        m_l_PIDController.setI(kI);
-        m_l_PIDController.setD(kD);
-        m_r_PIDController.setP(kP);
-        m_r_PIDController.setI(kI);
-        m_r_PIDController.setD(kD);
+        m_l_PIDController.setP(NtHelper.getDouble("/drive/kP", 0.0001));
+        m_l_PIDController.setI(NtHelper.getDouble("/drive/kI", 1e-6));
+        m_l_PIDController.setD(NtHelper.getDouble("/drive/kD", 0.0));
+        m_r_PIDController.setP(NtHelper.getDouble("/drive/kP", 0.0001));
+        m_r_PIDController.setI(NtHelper.getDouble("/drive/kI", 1e-6));
+        m_r_PIDController.setD(NtHelper.getDouble("/drive/kD", 0.0));
     }
 
     public void init() {
@@ -109,27 +116,26 @@ public class Drive {
         gyro.reset();
     }
 
-    private static double applyDeadband(double value, double deadband/*default should be 0.1*/){
-        if(Math.abs(value) < deadband){
-        return 0.0;
+    private static double applyDeadband(double value, double deadband/* default should be 0.1 */) {
+        if (Math.abs(value) < deadband) {
+            return 0.0;
         }
         // if we made it here, we're outside the deadband
-        final double slope = 1.0/(1-deadband);
+        final double slope = 1.0 / (1 - deadband);
         final double xDist = (Math.abs(value) - deadband);
         final double yVal = xDist * slope;
-        
-        if(value < 0){
-        return -yVal;
+
+        if (value < 0) {
+            return -yVal;
         }
         return yVal;
     }
 
     public void switchGears() {
         if (gear_switcher.get() == DoubleSolenoid.Value.kForward) {
-        toLowGear();
-        }
-        else {
-        toHighGear();
+            toLowGear();
+        } else {
+            toHighGear();
         }
     }
 
@@ -221,7 +227,7 @@ public class Drive {
         }
         var lm_speed = (MathUtil.clamp(leftMotorOutput, -1.0, 1.0) * 1);
         var rm_speed = (MathUtil.clamp(rightMotorOutput, -1.0, 1.0) * -1);
-        
+
         double[] returnArray = { lm_speed, rm_speed };
         return returnArray;
     }

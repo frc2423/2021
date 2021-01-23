@@ -4,12 +4,14 @@ package frc.robot;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.Encoder;
+import java.util.ArrayList;
 
 public class SimDriveMotor implements IDriveMotor {
 
     private PWMVictorSPX  motor;
     private PIDController pidController;  
     private Encoder encoder; 
+    protected ArrayList<SimDriveMotor> followers = new ArrayList<SimDriveMotor>();
 
     public SimDriveMotor(int port, int channelA, int channelB) {
        motor = new PWMVictorSPX(port);
@@ -20,7 +22,13 @@ public class SimDriveMotor implements IDriveMotor {
 
 
     public void setSpeed(double speed){
+
         pidController.setReference(speed, ControlType.kVelocity);
+
+
+        for (SimDriveMotor follower : followers) {
+            follower.setSpeed(speed);
+        }
     }
 
     public double getSpeed(){
@@ -49,12 +57,11 @@ public class SimDriveMotor implements IDriveMotor {
     }
 
     public void setConversionFactor(double factor){
-        encoder.setPositionConversionFactor(factor);
-        encoder.setVelocityConversionFactor(factor);
+        encoder.setDistancePerPulse(factor);
     }
 
     public double getConversionFactor(){
-        return encoder.getPositionConversionFactor();
+        return encoder.getDistancePerPulse();
     }
 
     public void setPid(double kP, double kI, double kD){
@@ -88,9 +95,9 @@ public class SimDriveMotor implements IDriveMotor {
     }
 
     public void follow(IDriveMotor leader){
-        if(leader.getClass() == DriveMotor.class) {
-            DriveMotor leadDriveMotor = (DriveMotor)leader;
-            this.motor.follow(leadDriveMotor.motor);
+        if(leader.getClass() == SimDriveMotor.class) {
+            SimDriveMotor leadDriveMotor = (SimDriveMotor)leader;
+            // this.motor.follow(leadDriveMotor.motor);
         }
     }
 }

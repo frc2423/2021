@@ -5,15 +5,16 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import frc.robot.NtHelper;
 
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.SPI.Port;
 
-import frc.robot.IDriveMotor;
-import frc.robot.DriveMotor;
-import frc.robot.SimDriveMotor;
+import frc.robot.devices.IDriveMotor;
+import frc.robot.devices.DriveMotor;
+import frc.robot.devices.SimDriveMotor;
+import frc.robot.helpers.NtHelper;
+
 
 public class Drive {
 

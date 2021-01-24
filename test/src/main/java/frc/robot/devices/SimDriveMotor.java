@@ -1,5 +1,5 @@
 
-package frc.robot;
+package frc.robot.devices;
 
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.PWMVictorSPX;

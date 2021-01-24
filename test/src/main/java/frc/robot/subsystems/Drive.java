@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -16,6 +17,7 @@ import edu.wpi.first.wpilibj.SPI.Port;
 
 import frc.robot.IDriveMotor;
 import frc.robot.DriveMotor;
+import frc.robot.SimDriveMotor;
 
 public class Drive {
 
@@ -54,10 +56,17 @@ public class Drive {
 
         // lf_motor.setReference();
 
-        lf_motor = new DriveMotor(1);
-        lb_motor = new DriveMotor(4);
-        rf_motor = new DriveMotor(6);
-        rb_motor = new DriveMotor(5);
+        if (RobotBase.isReal()) {
+            lf_motor = new DriveMotor(1);
+            lb_motor = new DriveMotor(4);
+            rf_motor = new DriveMotor(6);
+            rb_motor = new DriveMotor(5);
+        } else {
+            lf_motor = new SimDriveMotor(1, 0, 1);
+            lb_motor = new SimDriveMotor(4, 2, 3);
+            rf_motor = new SimDriveMotor(6, 4, 5);
+            rb_motor = new SimDriveMotor(5, 6, 7);
+        }
 
         lf_motor.follow(lb_motor);
         rf_motor.follow(rb_motor);

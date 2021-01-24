@@ -8,9 +8,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
-
-
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.RobotBase;
 
 import frc.robot.subsystems.Drive;
 
@@ -64,7 +63,9 @@ public class Robot extends TimedRobot {
    * SmartDashboard integrated updating.
    */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    driveBase.execute();
+  }
 
   /**
    * This autonomous (along with the chooser code above) shows how to select between different
@@ -106,7 +107,12 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    setSpeeds(xboxController.getY(Hand.kRight), xboxController.getX(Hand.kRight));
+
+    if (RobotBase.isReal()) {
+      setSpeeds(xboxController.getY(Hand.kRight), xboxController.getX(Hand.kRight));
+    } else {
+      setSpeeds(xboxController.getRawAxis(1), xboxController.getRawAxis(0));
+    }
     //nothing bad ever happens to the kennedys
 
     if (xboxController.getBumperPressed(Hand.kLeft)) {

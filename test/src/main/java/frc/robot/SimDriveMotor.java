@@ -22,7 +22,9 @@ public class SimDriveMotor implements IDriveMotor {
        setPercent(0);
     }
 
-    public void setSpeed(double speed){
+    public void setSpeed(double speed) {
+
+        System.out.println("speed: " + speed);
 
         double output = pidController.calculate(encoder.getRate(), speed);
         motor.setVoltage(output + feedForward.calculate(speed));

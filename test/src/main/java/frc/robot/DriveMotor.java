@@ -23,7 +23,7 @@ public class DriveMotor implements IDriveMotor {
 
 
     public void setSpeed(double speed){
-        pidController.setReference(speed, ControlType.kVelocity);
+        pidController.setReference(speed / getConversionFactor() * 60, ControlType.kVelocity);
     }
 
     public double getSpeed(){
@@ -53,7 +53,7 @@ public class DriveMotor implements IDriveMotor {
 
     public void setConversionFactor(double factor){
         encoder.setPositionConversionFactor(factor);
-        encoder.setVelocityConversionFactor(factor);
+        encoder.setVelocityConversionFactor(factor / 60);
     }
 
     public double getConversionFactor(){

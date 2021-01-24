@@ -4,11 +4,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpiutil.math.MathUtil;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.EntryNotification;
-import edu.wpi.first.networktables.EntryListenerFlags;
-import edu.wpi.first.networktables.NetworkTable;
 import frc.robot.NtHelper;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -22,10 +18,8 @@ import frc.robot.SimDriveMotor;
 public class Drive {
 
     private double countsPerRev = 16.35;
-
     private double ftPerRev = 1.57;
-
-    private int maxRPM = 5676;
+    private double maxSpeed = 9.0;  // feet per second
 
     private boolean previous_button = false;
 
@@ -43,18 +37,9 @@ public class Drive {
     private double leftSpeed = 0.0;
     private double rightSpeed = 0.0;
 
-    private double maxSpeed = 7.0;
-
-
     public Drive() {
 
-        // if (RobotBase.isReal()) {
-        // lf_motor = new DriveMotor();
-        // } else {
-        // lf_motor = new SimDriveMotor();
-        // }
-
-        // lf_motor.setReference();
+        double conversionFactor = RobotBase.isReal() ? ftPerRev / countsPerRev : 1;
 
         if (RobotBase.isReal()) {
             lf_motor = new DriveMotor(1);
@@ -68,20 +53,20 @@ public class Drive {
             rb_motor = new SimDriveMotor(5, 6, 7);
         }
 
+        lf_motor.setConversionFactor(conversionFactor);
+        lb_motor.setConversionFactor(conversionFactor);
+        rf_motor.setConversionFactor(conversionFactor);
+        rb_motor.setConversionFactor(conversionFactor);
+
         lf_motor.follow(lb_motor);
         rf_motor.follow(rb_motor);
-
-        // m_l_encoder.setPositionConversionFactor(factor)
 
         setPids();
         gear_switcher = new DoubleSolenoid(0, 1);
 
         NtHelper.listen("/drive/kP", (table) -> setPids());
-
         NtHelper.listen("/drive/kI", (table) -> setPids());
-
         NtHelper.listen("/drive/kD", (table) -> setPids());
-
     }
 
     private double getP() {
@@ -185,15 +170,9 @@ public class Drive {
         var driveArray = this.getSpeeds(forwardBack, rotation, true);
         var lSpeed = driveArray[0];
         var rSpeed = driveArray[1];
-        // m_l_PIDController.setReference(1000000, ControlType.kVelocity);
-        // m_r_PIDController.setReference(1000000, ControlType.kVelocity);
 
-        leftSpeed = lSpeed * maxRPM;
-        rightSpeed = rSpeed * maxRPM;
-
-        // System.out.println("ref: " + m_l_PIDController.get());
-        // System.out.println("encoder: " + m_l_encoder.getPosition());
-        // System.out.println("Speeds: " + lSpeed + ", " + rSpeed);
+        leftSpeed = lSpeed * maxSpeed;
+        rightSpeed = rSpeed * maxSpeed;
     }
 
     public void setTankSpeeds(double leftSpeed, double rightSpeed) {

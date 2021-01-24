@@ -14,6 +14,7 @@ public class SimDriveMotor implements IDriveMotor {
     private Encoder encoder; 
     protected ArrayList<SimDriveMotor> followers = new ArrayList<SimDriveMotor>();
     private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(1, 3);
+    private double encoderOffset = 0;
 
     public SimDriveMotor(int port, int channelA, int channelB) {
        motor = new PWMVictorSPX(port);
@@ -45,15 +46,16 @@ public class SimDriveMotor implements IDriveMotor {
     }
 
     public void setDistance(double dist){
-        // pidController.setReference(dist, ControlType.kPosition);
+        pidController.setSetpoint(dist);
     }
 
     public void resetEncoder(double distance) {
-        // encoder.setPosition(distance);
+        encoder.reset();
+        encoderOffset = distance;
     }
 
     public double getDistance(){
-        return encoder.getDistance();
+        return encoder.getDistance() + encoderOffset;
     }
 
     public void setConversionFactor(double factor){

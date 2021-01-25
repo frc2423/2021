@@ -5,13 +5,12 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.RobotBase;
 
 import frc.robot.subsystems.Drive;
+import frc.robot.helpers.DriveHelper;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -20,14 +19,12 @@ import frc.robot.subsystems.Drive;
  * project.
  */
 public class Robot extends TimedRobot {
-  private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
-  private String m_autoSelected;
-  private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
   private XboxController xboxController;
-
   private Drive driveBase;
+
+  private double joystickDeadband = 0.17;
+
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -36,25 +33,14 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    m_chooser.addOption("My Auto", kCustomAuto);
-    SmartDashboard.putData("Auto choices", m_chooser);
-
     xboxController = new XboxController(0);
     driveBase = new Drive();
-    
-    
 
   }
 
   public void switchGears() {
     driveBase.switchGears();
   }
-
-  public void setSpeeds(double speed, double rot) {
-    driveBase.setSpeeds(speed, rot);
-  }
-
 
   /**
    * This function is called every robot packet, no matter the mode. Use this for items like
@@ -80,23 +66,13 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    m_autoSelected = m_chooser.getSelected();
-    // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
-    System.out.println("Auto selected: " + m_autoSelected);
+
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    switch (m_autoSelected) {
-      case kCustomAuto:
-        // Put custom auto code here
-        break;
-      case kDefaultAuto:
-      default:
-        // Put default auto code here
-        break;
-    }
+
   }
 
   /** This function is called once when teleop is enabled. */
@@ -109,12 +85,13 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    if (RobotBase.isReal()) {
-      setSpeeds(xboxController.getY(Hand.kRight), xboxController.getX(Hand.kRight));
-    } else {
-      setSpeeds(xboxController.getRawAxis(1), xboxController.getRawAxis(0));
-    }
-    //nothing bad ever happens to the kennedys
+    double x = RobotBase.isReal() ? xboxController.getX(Hand.kRight) : xboxController.getRawAxis(0);
+    double y = RobotBase.isReal() ? xboxController.getY(Hand.kRight) : xboxController.getRawAxis(1);
+
+    driveBase.setSpeeds(
+      DriveHelper.applyDeadband(-y, joystickDeadband), 
+      DriveHelper.applyDeadband(x, joystickDeadband)
+    );
 
     if (xboxController.getBumperPressed(Hand.kLeft)) {
       switchGears();

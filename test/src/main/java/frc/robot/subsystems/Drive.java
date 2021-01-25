@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpiutil.math.MathUtil;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -14,6 +13,7 @@ import frc.robot.devices.IDriveMotor;
 import frc.robot.devices.DriveMotor;
 import frc.robot.devices.SimDriveMotor;
 import frc.robot.helpers.NtHelper;
+import frc.robot.helpers.DriveHelper;
 
 
 public class Drive {
@@ -30,8 +30,6 @@ public class Drive {
     private IDriveMotor lb_motor; // left back motor
     private IDriveMotor rf_motor; // right front motor
     private IDriveMotor rb_motor; // right back motor
-
-    private double joystickDeadband = 0.17;
 
     private AHRS gyro = new AHRS(Port.kMXP);
 
@@ -103,21 +101,6 @@ public class Drive {
         gyro.reset();
     }
 
-    private static double applyDeadband(double value, double deadband/* default should be 0.1 */) {
-        if (Math.abs(value) < deadband) {
-            return 0.0;
-        }
-        // if we made it here, we're outside the deadband
-        final double slope = 1.0 / (1 - deadband);
-        final double xDist = (Math.abs(value) - deadband);
-        final double yVal = xDist * slope;
-
-        if (value < 0) {
-            return -yVal;
-        }
-        return yVal;
-    }
-
     public void switchGears() {
         if (gear_switcher.get() == DoubleSolenoid.Value.kForward) {
             toLowGear();
@@ -149,26 +132,23 @@ public class Drive {
     }
 
     public double getLeftDistance() {
-        return lb_motor.getDistance() / countsPerRev * ftPerRev;
+        return lb_motor.getDistance();
     }
 
     public double getRightDistance() {
-        return -rb_motor.getDistance() / countsPerRev * ftPerRev;
+        return -rb_motor.getDistance();
     }
 
     public double getLeftVelocity() {
-        return lb_motor.getSpeed() / countsPerRev * ftPerRev / 60.0;
+        return lb_motor.getSpeed();
     }
 
     public double getRightVelocity() {
-        return -rb_motor.getSpeed() / countsPerRev * ftPerRev / 60.0;
+        return -rb_motor.getSpeed();
     }
 
     public void setSpeeds(double speed, double rot) {
-        final double forwardbackNoDeadband = -speed;
-        final double forwardBack = applyDeadband(forwardbackNoDeadband, joystickDeadband);
-        final double rotation = applyDeadband(rot, joystickDeadband);
-        var driveArray = this.getSpeeds(forwardBack, rotation, true);
+        var driveArray = DriveHelper.getArcadeSpeeds(speed, rot, true);
         var lSpeed = driveArray[0];
         var rSpeed = driveArray[1];
 
@@ -177,40 +157,8 @@ public class Drive {
     }
 
     public void setTankSpeeds(double leftSpeed, double rightSpeed) {
-        this.leftSpeed = leftSpeed * countsPerRev / ftPerRev * 60.0;
-        this.rightSpeed = -rightSpeed * countsPerRev / ftPerRev * 60.0;
-    }
-
-    private double[] getSpeeds(double xSpeedInput, double zRotationInput, boolean squareInputs) {
-        double xSpeed = MathUtil.clamp(xSpeedInput, -1.0, 1.0);
-        double zRotation = MathUtil.clamp(zRotationInput, -1.0, 1.0);
-        if (squareInputs) {
-            xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed);
-            zRotation = Math.copySign(zRotation * zRotation, zRotation);
-        }
-        var maxInput = Math.copySign(Math.max(Math.abs(xSpeed), Math.abs(zRotation)), xSpeed);
-        double leftMotorOutput;
-        double rightMotorOutput;
-        if (xSpeed >= 0.0) {
-            if (zRotation >= 0.0) {
-                leftMotorOutput = maxInput;
-                rightMotorOutput = xSpeed - zRotation;
-            } else {
-                leftMotorOutput = xSpeed + zRotation;
-                rightMotorOutput = maxInput;
-            }
-        } else if (zRotation >= 0.0) {
-            leftMotorOutput = xSpeed + zRotation;
-            rightMotorOutput = maxInput;
-        } else {
-            leftMotorOutput = maxInput;
-            rightMotorOutput = xSpeed - zRotation;
-        }
-        var lm_speed = (MathUtil.clamp(leftMotorOutput, -1.0, 1.0) * 1);
-        var rm_speed = (MathUtil.clamp(rightMotorOutput, -1.0, 1.0) * -1);
-
-        double[] returnArray = { lm_speed, rm_speed };
-        return returnArray;
+        this.leftSpeed = leftSpeed;
+        this.rightSpeed = rightSpeed;
     }
 
     public void execute() {

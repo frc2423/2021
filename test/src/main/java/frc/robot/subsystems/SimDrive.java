@@ -2,18 +2,39 @@ package frc.robot.subsystems;
 
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.networktables.NetworkTableInstance;
+
+import com.kauailabs.navx.frc.AHRS;
+
+import edu.wpi.first.wpilibj.SPI.Port;
+
+import frc.robot.subsystems.IDrive;
 
 import frc.robot.devices.IDriveMotor;
 import frc.robot.devices.DriveMotor;
+import frc.robot.devices.SimDriveMotor;
 import frc.robot.devices.Gyro;
 import frc.robot.devices.IGyro;
-
+import frc.robot.devices.SimGyro;
 
 import frc.robot.helpers.NtHelper;
 import frc.robot.helpers.DriveHelper;
+import edu.wpi.first.wpilibj.system.LinearSystem;
+import edu.wpi.first.wpilibj.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
+import edu.wpi.first.wpiutil.math.numbers.N2;
+import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.RobotController;
 
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
+
+import edu.wpi.first.wpilibj.AnalogGyro;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 
 public class Drive implements IDrive{
 
@@ -30,22 +51,48 @@ public class Drive implements IDrive{
     private IDriveMotor rf_motor; // right front motor
     private IDriveMotor rb_motor; // right back motor
 
+    // private AHRS gyro = new AHRS(Port.kMXP);
+
     private IGyro gyro;
 
     private double leftSpeed = 0.0;
     private double rightSpeed = 0.0;
+    private static final double kTrackWidth = 2;
+    private static final double kWheelRadius = 0.5;
+    private final LinearSystem<N2, N2, N2> drivetrainSystem =
+      LinearSystemId.identifyDrivetrainSystem(1.98, 0.2, 1.5, 0.3);
+    private final DifferentialDrivetrainSim drivetrainSimulator =
+      new DifferentialDrivetrainSim(
+          drivetrainSystem, DCMotor.getCIM(2), 8, kTrackWidth, kWheelRadius, null);
+
+
+    // private final AnalogGyro m_gyro = new AnalogGyro(0);//gyroSim wants an AnalogGyro not AHRS
+    // private final AnalogGyroSim m_gyroSim = new AnalogGyroSim(m_gyro);
+    private final Field2d m_fieldSim = new Field2d();
+    private final DifferentialDriveOdometry m_odometry;
 
     
     public Drive () {
 
-        double conversionFactor = ftPerRev / countsPerRev;
+        double conversionFactor = RobotBase.isReal() ? ftPerRev / countsPerRev : 1;
 
-        lf_motor = new DriveMotor(1);
-        lb_motor = new DriveMotor(4);
-        rf_motor = new DriveMotor(6);
-        rb_motor = new DriveMotor(5);
-        gyro = new Gyro();
+        if (RobotBase.isReal()) {
+            lf_motor = new DriveMotor(1);
+            lb_motor = new DriveMotor(4);
+            rf_motor = new DriveMotor(6);
+            rb_motor = new DriveMotor(5);
+            gyro = new Gyro();
+        } else {
+            lf_motor = new SimDriveMotor(1, 0, 1);
+            lb_motor = new SimDriveMotor(4, 2, 3);
+            rf_motor = new SimDriveMotor(6, 4, 5);
+            rb_motor = new SimDriveMotor(5, 6, 7);
+            gyro = new SimGyro();
 
+        }
+
+        m_odometry =
+        new DifferentialDriveOdometry(gyro.getRotation2d());
 
         lf_motor.setConversionFactor(conversionFactor);
         lb_motor.setConversionFactor(conversionFactor);
@@ -62,6 +109,12 @@ public class Drive implements IDrive{
         NtHelper.listen("/drive/kI", (table) -> setPids());
         NtHelper.listen("/drive/kD", (table) -> setPids());
 
+        SmartDashboard.putData("Field", m_fieldSim);
+        /*
+            Link to all .json and .pngs to be used in field simulation.
+            https://github.com/wpilibsuite/PathWeaver/tree/master/src/main/resources/edu/wpi/first/pathweaver
+            In simulations
+        */
 
     }
 
@@ -96,6 +149,7 @@ public class Drive implements IDrive{
         lb_motor.resetEncoder(0.0);
         rb_motor.resetEncoder(0.0);
         gyro.reset();
+        drivetrainSimulator.setPose(new Pose2d());
     }
 
     public void switchGears() {
@@ -166,6 +220,21 @@ public class Drive implements IDrive{
         } else {
             gear_switcher.set(DoubleSolenoid.Value.kForward);
         }
+        drivetrainSimulator.setInputs(
+          lb_motor.getPercent() * RobotController.getInputVoltage(),
+          rb_motor.getPercent() * RobotController.getInputVoltage());
+        drivetrainSimulator.update(0.02);
+        lb_motor.setEncoderPositionAndRate(
+            drivetrainSimulator.getLeftPositionMeters(),
+            drivetrainSimulator.getLeftVelocityMetersPerSecond()
+        );
+        rb_motor.setEncoderPositionAndRate(
+            drivetrainSimulator.getRightPositionMeters(),
+            drivetrainSimulator.getRightVelocityMetersPerSecond()
+        );
+        gyro.setAngle(drivetrainSimulator.getHeading().getDegrees());
+        updateOdometry(); //function not finished
+        m_fieldSim.setRobotPose(m_odometry.getPoseMeters());
     }
 
     

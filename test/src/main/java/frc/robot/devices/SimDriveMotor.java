@@ -6,6 +6,9 @@ import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.Encoder;
 import java.util.ArrayList;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
+import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 
 public class SimDriveMotor implements IDriveMotor {
 
@@ -15,10 +18,11 @@ public class SimDriveMotor implements IDriveMotor {
     protected ArrayList<SimDriveMotor> followers = new ArrayList<SimDriveMotor>();
     private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(1, 3);
     private double encoderOffset = 0;
-
+    private final EncoderSim encoderSim;
     public SimDriveMotor(int port, int channelA, int channelB) {
        motor = new PWMVictorSPX(port);
        encoder = new Encoder(channelA, channelB);
+       encoderSim = new EncoderSim(encoder);
        pidController = new PIDController(0, 0, 0);
        setPercent(0);
     }

@@ -14,7 +14,10 @@ import frc.robot.devices.DriveMotor;
 import frc.robot.devices.SimDriveMotor;
 import frc.robot.helpers.NtHelper;
 import frc.robot.helpers.DriveHelper;
-
+import edu.wpi.first.wpilibj.system.LinearSystem;
+import edu.wpi.first.wpilibj.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
+import edu.wpi.first.wpiutil.math.numbers.N2;
 
 public class Drive {
 
@@ -35,7 +38,11 @@ public class Drive {
 
     private double leftSpeed = 0.0;
     private double rightSpeed = 0.0;
-
+    private final LinearSystem<N2, N2, N2> drivetrainSystem =
+      LinearSystemId.identifyDrivetrainSystem(1.98, 0.2, 1.5, 0.3);
+    private final DifferentialDrivetrainSim drivetrainSimulator =
+      new DifferentialDrivetrainSim(
+          drivetrainSystem, DCMotor.getCIM(2), 8, kTrackWidth, kWheelRadius, null);
     public Drive() {
 
         double conversionFactor = RobotBase.isReal() ? ftPerRev / countsPerRev : 1;

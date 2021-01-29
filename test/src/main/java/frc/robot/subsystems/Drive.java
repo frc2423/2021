@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpiutil.math.numbers.N2;
+import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 
 public class Drive {
 
@@ -38,6 +39,8 @@ public class Drive {
 
     private double leftSpeed = 0.0;
     private double rightSpeed = 0.0;
+    private static final double kTrackWidth = 2;
+    private static final double kWheelRadius = 0.5;
     private final LinearSystem<N2, N2, N2> drivetrainSystem =
       LinearSystemId.identifyDrivetrainSystem(1.98, 0.2, 1.5, 0.3);
     private final DifferentialDrivetrainSim drivetrainSimulator =

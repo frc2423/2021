@@ -45,7 +45,7 @@ public class Drive {
     private IDriveMotor rf_motor; // right front motor
     private IDriveMotor rb_motor; // right back motor
 
-    private AHRS gyro = new AHRS(Port.kMXP);
+    // private AHRS gyro = new AHRS(Port.kMXP);
 
     private double leftSpeed = 0.0;
     private double rightSpeed = 0.0;
@@ -58,8 +58,8 @@ public class Drive {
           drivetrainSystem, DCMotor.getCIM(2), 8, kTrackWidth, kWheelRadius, null);
 
 
-    private final AnalogGyro m_gyro = new AnalogGyro(0);//gyroSim wants an AnalogGyro not AHRS
-    private final AnalogGyroSim m_gyroSim = new AnalogGyroSim(m_gyro);
+    // private final AnalogGyro m_gyro = new AnalogGyro(0);//gyroSim wants an AnalogGyro not AHRS
+    // private final AnalogGyroSim m_gyroSim = new AnalogGyroSim(m_gyro);
     private final Field2d m_fieldSim = new Field2d();
     private final DifferentialDriveOdometry m_odometry =
         new DifferentialDriveOdometry(m_gyro.getRotation2d());

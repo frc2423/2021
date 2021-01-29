@@ -10,6 +10,9 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.RobotBase;
 
 import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.SimDrive;
+import frc.robot.subsystems.IDrive;
+
 import frc.robot.helpers.DriveHelper;
 
 /**
@@ -21,7 +24,7 @@ import frc.robot.helpers.DriveHelper;
 public class Robot extends TimedRobot {
 
   private XboxController xboxController;
-  private Drive driveBase;
+  private IDrive driveBase;
 
   private double joystickDeadband = 0.17;
 
@@ -34,7 +37,11 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     xboxController = new XboxController(0);
-    driveBase = new Drive();
+    if(isReal()){
+        driveBase = new Drive();
+    } else {
+        driveBase = new SimDrive();
+    }
 
   }
 

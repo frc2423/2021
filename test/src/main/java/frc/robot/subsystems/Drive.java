@@ -182,5 +182,9 @@ public class Drive {
         } else {
             gear_switcher.set(DoubleSolenoid.Value.kForward);
         }
+        drivetrainSimulator.setInputs(
+          lb_motor.getPercent() * RobotController.getInputVoltage(),
+          rb_motor.getPercent() * RobotController.getInputVoltage());
+        drivetrainSimulator.update(0.02);
     }
 }

@@ -36,7 +36,7 @@ import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 
-public class Drive implements IDrive{
+public class SimDrive implements IDrive{
 
     private double countsPerRev = 16.35;
     private double ftPerRev = 1.57;
@@ -51,8 +51,6 @@ public class Drive implements IDrive{
     private IDriveMotor rf_motor; // right front motor
     private IDriveMotor rb_motor; // right back motor
 
-    // private AHRS gyro = new AHRS(Port.kMXP);
-
     private IGyro gyro;
 
     private double leftSpeed = 0.0;
@@ -66,30 +64,20 @@ public class Drive implements IDrive{
           drivetrainSystem, DCMotor.getCIM(2), 8, kTrackWidth, kWheelRadius, null);
 
 
-    // private final AnalogGyro m_gyro = new AnalogGyro(0);//gyroSim wants an AnalogGyro not AHRS
-    // private final AnalogGyroSim m_gyroSim = new AnalogGyroSim(m_gyro);
     private final Field2d m_fieldSim = new Field2d();
     private final DifferentialDriveOdometry m_odometry;
 
     
-    public Drive () {
+    public SimDrive () {
 
         double conversionFactor = RobotBase.isReal() ? ftPerRev / countsPerRev : 1;
 
-        if (RobotBase.isReal()) {
-            lf_motor = new DriveMotor(1);
-            lb_motor = new DriveMotor(4);
-            rf_motor = new DriveMotor(6);
-            rb_motor = new DriveMotor(5);
-            gyro = new Gyro();
-        } else {
-            lf_motor = new SimDriveMotor(1, 0, 1);
-            lb_motor = new SimDriveMotor(4, 2, 3);
-            rf_motor = new SimDriveMotor(6, 4, 5);
-            rb_motor = new SimDriveMotor(5, 6, 7);
-            gyro = new SimGyro();
 
-        }
+        lf_motor = new SimDriveMotor(1, 0, 1);
+        lb_motor = new SimDriveMotor(4, 2, 3);
+        rf_motor = new SimDriveMotor(6, 4, 5);
+        rb_motor = new SimDriveMotor(5, 6, 7);
+        gyro = new SimGyro();
 
         m_odometry =
         new DifferentialDriveOdometry(gyro.getRotation2d());

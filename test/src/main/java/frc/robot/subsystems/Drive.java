@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
 
 public class Drive {
 
@@ -109,6 +110,7 @@ public class Drive {
         lb_motor.resetEncoder(0.0);
         rb_motor.resetEncoder(0.0);
         gyro.reset();
+        drivetrainSimulator.setPose(new Pose2d());
     }
 
     public void switchGears() {

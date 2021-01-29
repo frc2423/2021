@@ -9,9 +9,15 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.SPI.Port;
 
+import frc.robot.subsystems.IDrive;
+
 import frc.robot.devices.IDriveMotor;
 import frc.robot.devices.DriveMotor;
 import frc.robot.devices.SimDriveMotor;
+import frc.robot.devices.Gyro;
+import frc.robot.devices.IGyro;
+import frc.robot.devices.SimGyro;
+
 import frc.robot.helpers.NtHelper;
 import frc.robot.helpers.DriveHelper;
 import edu.wpi.first.wpilibj.system.LinearSystem;
@@ -30,7 +36,7 @@ import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 
-public class Drive {
+public class Drive implements IDrive{
 
     private double countsPerRev = 16.35;
     private double ftPerRev = 1.57;
@@ -47,6 +53,8 @@ public class Drive {
 
     // private AHRS gyro = new AHRS(Port.kMXP);
 
+    private IGyro gyro;
+
     private double leftSpeed = 0.0;
     private double rightSpeed = 0.0;
     private static final double kTrackWidth = 2;
@@ -61,11 +69,10 @@ public class Drive {
     // private final AnalogGyro m_gyro = new AnalogGyro(0);//gyroSim wants an AnalogGyro not AHRS
     // private final AnalogGyroSim m_gyroSim = new AnalogGyroSim(m_gyro);
     private final Field2d m_fieldSim = new Field2d();
-    private final DifferentialDriveOdometry m_odometry =
-        new DifferentialDriveOdometry(m_gyro.getRotation2d());
+    private final DifferentialDriveOdometry m_odometry;
 
     
-    public Drive() {
+    public Drive () {
 
         double conversionFactor = RobotBase.isReal() ? ftPerRev / countsPerRev : 1;
 
@@ -74,12 +81,18 @@ public class Drive {
             lb_motor = new DriveMotor(4);
             rf_motor = new DriveMotor(6);
             rb_motor = new DriveMotor(5);
+            gyro = new Gyro();
         } else {
             lf_motor = new SimDriveMotor(1, 0, 1);
             lb_motor = new SimDriveMotor(4, 2, 3);
             rf_motor = new SimDriveMotor(6, 4, 5);
             rb_motor = new SimDriveMotor(5, 6, 7);
+            gyro = new SimGyro();
+
         }
+
+        m_odometry =
+        new DifferentialDriveOdometry(gyro.getRotation2d());
 
         lf_motor.setConversionFactor(conversionFactor);
         lb_motor.setConversionFactor(conversionFactor);
@@ -165,8 +178,7 @@ public class Drive {
     }
 
     public void setAngle(double angle) {
-        gyro.reset();
-        gyro.setAngleAdjustment(angle);
+        gyro.setAngle(angle);
     }
 
     public double getLeftDistance() {
@@ -220,34 +232,19 @@ public class Drive {
             drivetrainSimulator.getRightPositionMeters(),
             drivetrainSimulator.getRightVelocityMetersPerSecond()
         );
-        gyroSim.setAngle(drivetrainSimulator.getHeading().getDegrees());
-  }
-
-  //might be duplicated code below this point.
-  public void simulationPeriodic() { //might work, needs to set encodersim rate and distance
-        // To update our simulation, we set motor voltage inputs, update the
-        // simulation, and write the simulated positions and velocities to our
-        // simulated encoder and gyro. We negate the right side so that positive
-        // voltages make the right side move forward.
-        drivetrainSimulator.setInputs(
-            lb_motor.getPercent() * RobotController.getInputVoltage(),
-            -rb_motor.getPercent() * RobotController.getInputVoltage());
-        drivetrainSimulator.update(0.02);
-        m_gyroSim.setAngle(-drivetrainSimulator.getHeading().getDegrees());
-    }
-
-    public void periodic() {
+        gyro.setAngle(drivetrainSimulator.getHeading().getDegrees());
         updateOdometry(); //function not finished
         m_fieldSim.setRobotPose(m_odometry.getPoseMeters());
     }
+
     
     /** 
      * Update robot odometry.
      *  Needs encoders to work.
      */
-    public void updateOdometry() {
+    public void updateOdometry() { //ooooooooh
         //m_odometry.update(m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
     }
 
 
-    }
+}

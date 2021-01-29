@@ -108,4 +108,9 @@ public class SimDriveMotor implements IDriveMotor {
             leadDriveMotor.followers.add(this);
         }
     }
+    public void setEncoderPositionAndRate(double position, double rate){
+    encoderSim.setDistance(position);
+    encoderSim.setRate(rate);
+    }
+
 }

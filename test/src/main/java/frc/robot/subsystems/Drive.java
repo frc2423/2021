@@ -20,6 +20,15 @@ import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.RobotController;
+
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
+
+import edu.wpi.first.wpilibj.AnalogGyro;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 
 public class Drive {
 
@@ -47,6 +56,15 @@ public class Drive {
     private final DifferentialDrivetrainSim drivetrainSimulator =
       new DifferentialDrivetrainSim(
           drivetrainSystem, DCMotor.getCIM(2), 8, kTrackWidth, kWheelRadius, null);
+
+
+    private final AnalogGyro m_gyro = new AnalogGyro(0);//gyroSim wants an AnalogGyro not AHRS
+    private final AnalogGyroSim m_gyroSim = new AnalogGyroSim(m_gyro);
+    private final Field2d m_fieldSim = new Field2d();
+    private final DifferentialDriveOdometry m_odometry =
+        new DifferentialDriveOdometry(m_gyro.getRotation2d());
+
+    
     public Drive() {
 
         double conversionFactor = RobotBase.isReal() ? ftPerRev / countsPerRev : 1;
@@ -77,6 +95,14 @@ public class Drive {
         NtHelper.listen("/drive/kP", (table) -> setPids());
         NtHelper.listen("/drive/kI", (table) -> setPids());
         NtHelper.listen("/drive/kD", (table) -> setPids());
+
+        SmartDashboard.putData("Field", m_fieldSim);
+        /*
+            Link to all .json and .pngs to be used in field simulation.
+            https://github.com/wpilibsuite/PathWeaver/tree/master/src/main/resources/edu/wpi/first/pathweaver
+            In simulations
+        */
+
     }
 
     private double getP() {
@@ -186,5 +212,42 @@ public class Drive {
           lb_motor.getPercent() * RobotController.getInputVoltage(),
           rb_motor.getPercent() * RobotController.getInputVoltage());
         drivetrainSimulator.update(0.02);
+        lb_motor.setEncoderPositionAndRate(
+            drivetrainSimulator.getLeftPositionMeters(),
+            drivetrainSimulator.getLeftVelocityMetersPerSecond()
+        );
+        rb_motor.setEncoderPositionAndRate(
+            drivetrainSimulator.getRightPositionMeters(),
+            drivetrainSimulator.getRightVelocityMetersPerSecond()
+        );
+        gyroSim.setAngle(drivetrainSimulator.getHeading().getDegrees());
+  }
+
+  //might be duplicated code below this point.
+  public void simulationPeriodic() { //might work, needs to set encodersim rate and distance
+        // To update our simulation, we set motor voltage inputs, update the
+        // simulation, and write the simulated positions and velocities to our
+        // simulated encoder and gyro. We negate the right side so that positive
+        // voltages make the right side move forward.
+        drivetrainSimulator.setInputs(
+            lb_motor.getPercent() * RobotController.getInputVoltage(),
+            -rb_motor.getPercent() * RobotController.getInputVoltage());
+        drivetrainSimulator.update(0.02);
+        m_gyroSim.setAngle(-drivetrainSimulator.getHeading().getDegrees());
     }
-}
+
+    public void periodic() {
+        updateOdometry(); //function not finished
+        m_fieldSim.setRobotPose(m_odometry.getPoseMeters());
+    }
+    
+    /** 
+     * Update robot odometry.
+     *  Needs encoders to work.
+     */
+    public void updateOdometry() {
+        //m_odometry.update(m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
+    }
+
+
+    }

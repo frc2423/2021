@@ -96,4 +96,6 @@ public class DriveMotor implements IDriveMotor {
             this.motor.follow(leadDriveMotor.motor);
         }
     }
+    public void setEncoderPositionAndRate(double position, double rate){
+    }
 }

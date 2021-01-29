@@ -36,6 +36,9 @@ public interface IDriveMotor {
     public double getD();
 
     public void follow(IDriveMotor leader); // thats sir motor to you
+
+    public void setEncoderPositionAndRate(double position, double rate); //poop
+
     
 
 }

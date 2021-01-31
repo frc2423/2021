@@ -2,19 +2,10 @@ package frc.robot.subsystems;
 
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
-import com.kauailabs.navx.frc.AHRS;
-
-import edu.wpi.first.wpilibj.SPI.Port;
-
-import frc.robot.subsystems.IDrive;
-
 import frc.robot.devices.IDriveMotor;
-import frc.robot.devices.DriveMotor;
 import frc.robot.devices.SimDriveMotor;
-import frc.robot.devices.Gyro;
 import frc.robot.devices.IGyro;
 import frc.robot.devices.SimGyro;
 
@@ -30,10 +21,6 @@ import edu.wpi.first.wpilibj.RobotController;
 
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
-
-import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 
 public class SimDrive implements IDrive{
@@ -41,8 +28,6 @@ public class SimDrive implements IDrive{
     private double countsPerRev = 16.35;
     private double ftPerRev = 1.57;
     private double maxSpeed = 9.0;  // feet per second
-
-    private boolean previous_button = false;
 
     private DoubleSolenoid gear_switcher;
 
@@ -64,13 +49,13 @@ public class SimDrive implements IDrive{
           drivetrainSystem, DCMotor.getCIM(2), 8, kTrackWidth, kWheelRadius, null);
 
 
-    private final Field2d m_fieldSim = new Field2d();
-    private final DifferentialDriveOdometry m_odometry;
+    private final Field2d field = new Field2d();
+    private final DifferentialDriveOdometry odometry;
 
     
     public SimDrive () {
 
-        double conversionFactor = RobotBase.isReal() ? ftPerRev / countsPerRev : 1;
+        double conversionFactor = 1;
 
 
         lf_motor = new SimDriveMotor(1, 0, 1);
@@ -79,8 +64,7 @@ public class SimDrive implements IDrive{
         rb_motor = new SimDriveMotor(5, 6, 7);
         gyro = new SimGyro();
 
-        m_odometry =
-        new DifferentialDriveOdometry(gyro.getRotation2d());
+        odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
 
         lf_motor.setConversionFactor(conversionFactor);
         lb_motor.setConversionFactor(conversionFactor);
@@ -97,7 +81,7 @@ public class SimDrive implements IDrive{
         NtHelper.listen("/drive/kI", (table) -> setPids());
         NtHelper.listen("/drive/kD", (table) -> setPids());
 
-        SmartDashboard.putData("Field", m_fieldSim);
+        SmartDashboard.putData("Field", field);
         /*
             Link to all .json and .pngs to be used in field simulation.
             https://github.com/wpilibsuite/PathWeaver/tree/master/src/main/resources/edu/wpi/first/pathweaver
@@ -221,18 +205,7 @@ public class SimDrive implements IDrive{
             drivetrainSimulator.getRightVelocityMetersPerSecond()
         );
         gyro.setAngle(drivetrainSimulator.getHeading().getDegrees());
-        updateOdometry(); //function not finished
-        m_fieldSim.setRobotPose(m_odometry.getPoseMeters());
+        odometry.update(gyro.getRotation2d(), lb_motor.getDistance(), rb_motor.getDistance());
+        field.setRobotPose(odometry.getPoseMeters());
     }
-
-    
-    /** 
-     * Update robot odometry.
-     *  Needs encoders to work.
-     */
-    public void updateOdometry() { //ooooooooh
-        //m_odometry.update(m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
-    }
-
-
 }

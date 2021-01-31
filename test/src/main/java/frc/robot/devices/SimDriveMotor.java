@@ -7,8 +7,6 @@ import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.Encoder;
 import java.util.ArrayList;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
-import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
-import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 
 public class SimDriveMotor implements IDriveMotor {
 
@@ -28,8 +26,6 @@ public class SimDriveMotor implements IDriveMotor {
     }
 
     public void setSpeed(double speed) {
-
-        System.out.println("speed: " + speed);
 
         double output = pidController.calculate(encoder.getRate(), speed);
         motor.setVoltage(output + feedForward.calculate(speed));
@@ -108,9 +104,10 @@ public class SimDriveMotor implements IDriveMotor {
             leadDriveMotor.followers.add(this);
         }
     }
+
     public void setEncoderPositionAndRate(double position, double rate){
-    encoderSim.setDistance(position);
-    encoderSim.setRate(rate);
+        encoderSim.setDistance(position);
+        encoderSim.setRate(rate);
     }
 
 }

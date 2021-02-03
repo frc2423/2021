@@ -1,16 +1,22 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+
 public interface IDrive {
     
     public void init();
 
     public void reset();
+    
+    public void reset(Pose2d pose);
 
     public void switchGears();
 
     public double getAngle();
 
     public void setAngle(double angle);
+
+    public Pose2d getPose();
 
     public double getLeftDistance();
 

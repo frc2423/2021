@@ -118,10 +118,15 @@ public class SimDrive implements IDrive{
     }
 
     public void reset() {
+        reset(new Pose2d());
+    }
+
+    public void reset(Pose2d pose) {
         lb_motor.resetEncoder(0.0);
         rb_motor.resetEncoder(0.0);
         gyro.reset();
-        drivetrainSimulator.setPose(new Pose2d());
+        drivetrainSimulator.setPose(pose);
+        odometry.resetPosition(pose, gyro.getRotation2d());
     }
 
     public void switchGears() {
@@ -143,6 +148,10 @@ public class SimDrive implements IDrive{
     private boolean isHighGear() {
         String speed = NetworkTableInstance.getDefault().getEntry("/gear").getString("slow");
         return speed == "fast";
+    }
+
+    public Pose2d getPose() {
+        return odometry.getPoseMeters();
     }
 
     public double getAngle() {

@@ -8,11 +8,19 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.controller.RamseteController;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
+import java.util.List;
 
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.SimDrive;
 import frc.robot.subsystems.IDrive;
-
 import frc.robot.helpers.DriveHelper;
 
 /**
@@ -28,6 +36,10 @@ public class Robot extends TimedRobot {
 
   private double joystickDeadband = 0.17;
 
+  private final RamseteController ramsete = new RamseteController();
+  private final Timer timer = new Timer();
+  private Trajectory trajectory;
+
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -42,6 +54,13 @@ public class Robot extends TimedRobot {
     } else {
         driveBase = new SimDrive();
     }
+
+    trajectory =
+        TrajectoryGenerator.generateTrajectory(
+            new Pose2d(2, 2, new Rotation2d()),
+            List.of(),
+            new Pose2d(6, 4, new Rotation2d()),
+            new TrajectoryConfig(2, 2));
 
   }
 
@@ -61,25 +80,21 @@ public class Robot extends TimedRobot {
     driveBase.execute();
   }
 
-  /**
-   * This autonomous (along with the chooser code above) shows how to select between different
-   * autonomous modes using the dashboard. The sendable chooser code works with the Java
-   * SmartDashboard. If you prefer the LabVIEW Dashboard, remove all of the chooser code and
-   * uncomment the getString line to get the auto name from the text box below the Gyro
-   *
-   * <p>You can add additional auto modes by adding additional comparisons to the switch structure
-   * below with additional strings. If using the SendableChooser make sure to add them to the
-   * chooser code above as well.
-   */
+
   @Override
   public void autonomousInit() {
-
+    timer.reset();
+    timer.start();
+    driveBase.reset(trajectory.getInitialPose());
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-
+    double elapsed = timer.get();
+    Trajectory.State reference = trajectory.sample(elapsed);
+    ChassisSpeeds speeds = ramsete.calculate(driveBase.getPose(), reference);
+    driveBase.setTankSpeeds(speeds.vxMetersPerSecond, speeds.omegaRadiansPerSecond);
   }
 
   /** This function is called once when teleop is enabled. */

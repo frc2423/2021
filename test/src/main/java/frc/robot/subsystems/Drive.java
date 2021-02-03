@@ -2,7 +2,7 @@ package frc.robot.subsystems;
 
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-
+import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 import frc.robot.devices.IDriveMotor;
@@ -92,10 +92,14 @@ public class Drive implements IDrive{
         reset();
     }
 
-    public void reset() {
+    public void reset(Pose2d pose) {
         lb_motor.resetEncoder(0.0);
         rb_motor.resetEncoder(0.0);
         gyro.reset();
+    }
+
+    public void reset() {
+        reset(new Pose2d());
     }
 
     public void switchGears() {
@@ -125,6 +129,10 @@ public class Drive implements IDrive{
 
     public void setAngle(double angle) {
         gyro.setAngle(angle);
+    }
+
+    public Pose2d getPose() {
+        return null;
     }
 
     public double getLeftDistance() {

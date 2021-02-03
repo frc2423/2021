@@ -55,7 +55,7 @@ public class SimDrive implements IDrive{
     
     public SimDrive () {
 
-        double conversionFactor = 1;
+        double conversionFactor = 2 * Math.PI * kWheelRadius / -4096;
 
 
         lf_motor = new SimDriveMotor(1, 0, 1);

@@ -17,6 +17,7 @@ public class SimDriveMotor implements IDriveMotor {
     private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(1, 3);
     private double encoderOffset = 0;
     private final EncoderSim encoderSim;
+
     public SimDriveMotor(int port, int channelA, int channelB) {
        motor = new PWMVictorSPX(port);
        encoder = new Encoder(channelA, channelB);
@@ -26,8 +27,7 @@ public class SimDriveMotor implements IDriveMotor {
     }
 
     public void setSpeed(double speed) {
-
-        double output = pidController.calculate(encoder.getRate(), speed);
+        double output = pidController.calculate(getSpeed(), speed);
         motor.setVoltage(output + feedForward.calculate(speed));
                         
         for (SimDriveMotor follower : followers) {
@@ -36,7 +36,8 @@ public class SimDriveMotor implements IDriveMotor {
     }
 
     public double getSpeed(){
-        return encoder.getRate();
+        double rate = encoder.getRate();
+        return motor.getInverted() ? -rate : rate;
     }
 
     public void setPercent(double percent) {
@@ -47,8 +48,9 @@ public class SimDriveMotor implements IDriveMotor {
         return motor.get();
     }
 
-    public void setDistance(double dist){
-        pidController.setSetpoint(dist);
+    public void setDistance(double dist) {
+        double output = pidController.calculate(getDistance(), dist);
+        pidController.setSetpoint(output);
     }
 
     public void resetEncoder(double distance) {
@@ -56,8 +58,9 @@ public class SimDriveMotor implements IDriveMotor {
         encoderOffset = distance;
     }
 
-    public double getDistance(){
-        return encoder.getDistance() + encoderOffset;
+    public double getDistance() {
+        double distance =  encoder.getDistance() + encoderOffset;
+        return motor.getInverted() ? -distance : distance;
     }
 
     public void setConversionFactor(double factor){
@@ -66,6 +69,10 @@ public class SimDriveMotor implements IDriveMotor {
 
     public double getConversionFactor(){
         return encoder.getDistancePerPulse();
+    }
+
+    public void setInverted(boolean isInverted) {
+        motor.setInverted(isInverted);
     }
 
     public void setPid(double kP, double kI, double kD){

@@ -94,7 +94,8 @@ public class Robot extends TimedRobot {
     double elapsed = timer.get();
     Trajectory.State reference = trajectory.sample(elapsed);
     ChassisSpeeds speeds = ramsete.calculate(driveBase.getPose(), reference);
-    driveBase.setTankSpeeds(speeds.vxMetersPerSecond, speeds.omegaRadiansPerSecond);
+
+    // set robot speed and rotation 
   }
 
   /** This function is called once when teleop is enabled. */

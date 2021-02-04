@@ -30,8 +30,8 @@ public class DriveHelper {
             leftMotorOutput = maxInput;
             rightMotorOutput = xSpeed - zRotation;
         }
-        var lm_speed = (MathUtil.clamp(leftMotorOutput, -1.0, 1.0) * 1);
-        var rm_speed = (MathUtil.clamp(rightMotorOutput, -1.0, 1.0) * -1);
+        var lm_speed = MathUtil.clamp(leftMotorOutput, -1.0, 1.0);
+        var rm_speed = MathUtil.clamp(rightMotorOutput, -1.0, 1.0);
 
         double[] returnArray = { lm_speed, rm_speed };
         return returnArray;

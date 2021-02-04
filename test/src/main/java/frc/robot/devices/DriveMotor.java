@@ -60,6 +60,10 @@ public class DriveMotor implements IDriveMotor {
         return encoder.getPositionConversionFactor();
     }
 
+    public void setInverted(boolean isInverted) {
+        motor.setInverted(isInverted);
+    }
+    
     public void setPid(double kP, double kI, double kD){
         setP(kP);
         setI(kI);

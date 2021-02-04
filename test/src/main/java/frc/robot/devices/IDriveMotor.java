@@ -21,6 +21,8 @@ public interface IDriveMotor {
 
     public double getConversionFactor();
 
+    public void setInverted(boolean isInverted);
+
     public void setPid(double kP, double kI, double kD);
 
     public void setP(double kP);

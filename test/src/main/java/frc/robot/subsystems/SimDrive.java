@@ -55,7 +55,7 @@ public class SimDrive implements IDrive{
     
     public SimDrive () {
 
-        double conversionFactor = 2 * Math.PI * kWheelRadius / -4096;
+        double conversionFactor = 2 * Math.PI * kWheelRadius / 4096;
 
 
         lf_motor = new SimDriveMotor(1, 0, 1);
@@ -167,7 +167,7 @@ public class SimDrive implements IDrive{
     }
 
     public double getRightDistance() {
-        return -rb_motor.getDistance();
+        return rb_motor.getDistance();
     }
 
     public double getLeftVelocity() {
@@ -175,7 +175,7 @@ public class SimDrive implements IDrive{
     }
 
     public double getRightVelocity() {
-        return -rb_motor.getSpeed();
+        return rb_motor.getSpeed();
     }
 
     public void setSpeeds(double speed, double rot) {
@@ -193,8 +193,9 @@ public class SimDrive implements IDrive{
     }
 
     public void execute() {
-        rb_motor.setSpeed(leftSpeed);
-        lb_motor.setSpeed(rightSpeed);
+
+        lb_motor.setSpeed(leftSpeed);
+        rb_motor.setSpeed(rightSpeed);
 
         if (isHighGear()) {
             gear_switcher.set(DoubleSolenoid.Value.kReverse);
@@ -203,7 +204,8 @@ public class SimDrive implements IDrive{
         }
         drivetrainSimulator.setInputs(
           lb_motor.getPercent() * RobotController.getInputVoltage(),
-          rb_motor.getPercent() * RobotController.getInputVoltage());
+          rb_motor.getPercent() * RobotController.getInputVoltage()
+        );
         drivetrainSimulator.update(0.02);
         lb_motor.setEncoderPositionAndRate(
             drivetrainSimulator.getLeftPositionMeters(),
@@ -213,6 +215,7 @@ public class SimDrive implements IDrive{
             drivetrainSimulator.getRightPositionMeters(),
             drivetrainSimulator.getRightVelocityMetersPerSecond()
         );
+
         gyro.setAngle(drivetrainSimulator.getHeading().getDegrees());
         odometry.update(gyro.getRotation2d(), lb_motor.getDistance(), rb_motor.getDistance());
         field.setRobotPose(odometry.getPoseMeters());

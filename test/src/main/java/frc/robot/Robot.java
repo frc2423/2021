@@ -68,7 +68,7 @@ public class Robot extends TimedRobot {
     //         new TrajectoryConfig(2, 2));
 
 
-    String trajectoryJSON = "paths/Bounce.wpilib.json";
+    String trajectoryJSON = "paths/BounceTest.wpilib.json";
     trajectory = new Trajectory();
     try {
       Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
@@ -113,17 +113,17 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
 
-    // if (trajectory != null) {
-    //   double elapsed = timer.get();
-    //   Trajectory.State reference = trajectory.sample(elapsed);
-    //   ChassisSpeeds speeds = ramsete.calculate(driveBase.getPose(), reference);
+    if (trajectory != null) {
+      double elapsed = timer.get();
+      Trajectory.State reference = trajectory.sample(elapsed);
+      ChassisSpeeds speeds = ramsete.calculate(driveBase.getPose(), reference);
 
-    //   // set robot speed and rotation 
-    //   driveBase.setArcadeSpeeds(
-    //       Units.metersToFeet(speeds.vxMetersPerSecond),
-    //       Units.radiansToDegrees(speeds.omegaRadiansPerSecond)
-    //   );
-    // }
+      // set robot speed and rotation 
+      driveBase.setArcadeSpeeds(
+          Units.metersToFeet(speeds.vxMetersPerSecond),
+          Units.radiansToDegrees(speeds.omegaRadiansPerSecond)
+      );
+    }
   }
 
   /** This function is called once when teleop is enabled. */

@@ -120,7 +120,7 @@ public class SimDrive implements IDrive{
     }
 
     public void init() {
-        setSpeeds(0.0, 0.0);
+        setArcadeSpeeds(0.0, 0.0);
         toLowGear();
         reset();
     }
@@ -203,7 +203,7 @@ public class SimDrive implements IDrive{
 
     public void setArcadeSpeeds(double feetPerSecond, double degreesPerSecond) {
         DifferentialDriveWheelSpeeds wheelSpeeds = kinematics.toWheelSpeeds(
-            new ChassisSpeeds(Unit.feetToMeters(feetPerSecond), 0, Unit.degreesToRadians(degreesPerSecond))
+            new ChassisSpeeds(Units.feetToMeters(feetPerSecond), 0, Units.degreesToRadians(degreesPerSecond))
         );
         double leftFeetPerSecond = Units.metersToFeet(wheelSpeeds.leftMetersPerSecond);
         double rightFeetPerSecond = Units.metersToFeet(wheelSpeeds.rightMetersPerSecond);

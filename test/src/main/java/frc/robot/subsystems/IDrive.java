@@ -26,11 +26,13 @@ public interface IDrive {
 
     public double getRightVelocity();
 
-    public void setSpeeds(double speed, double rot);
+    public void setArcadeSpeeds(double feetPerSecond, double degreesPerSecond);
 
-    public void setTankSpeeds(double leftSpeed, double rightSpeed);
+    public void setTankSpeeds(double leftFeetPerSecond, double rightFeetPerSecond);
 
     public void execute();
 
-    public void drive(double feetPerSecond, double degreesPerSecond);
+    public void setArcadePercent(double speed, double rot);
+
+    public void setTankPercent(double leftSpeed, double rightSpeed);
 }

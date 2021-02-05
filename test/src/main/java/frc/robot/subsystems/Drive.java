@@ -14,6 +14,11 @@ import frc.robot.devices.IGyro;
 import frc.robot.helpers.NtHelper;
 import frc.robot.helpers.DriveHelper;
 
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.util.Units;
+
 
 public class Drive implements IDrive{
 
@@ -34,6 +39,12 @@ public class Drive implements IDrive{
 
     private double leftSpeed = 0.0;
     private double rightSpeed = 0.0;
+
+    private static final double kTrackWidth = 2;
+    private static final double kWheelRadius = 0.5;
+
+    private final DifferentialDriveKinematics kinematics =
+        new DifferentialDriveKinematics(kTrackWidth);
 
     
     public Drive () {
@@ -87,7 +98,7 @@ public class Drive implements IDrive{
     }
 
     public void init() {
-        setSpeeds(0.0, 0.0);
+        setArcadeSpeeds(0.0, 0.0);
         toLowGear();
         reset();
     }
@@ -151,18 +162,28 @@ public class Drive implements IDrive{
         return -rb_motor.getSpeed();
     }
 
-    public void setSpeeds(double speed, double rot) {
+    public void setArcadePercent(double speed, double rot) {
         var driveArray = DriveHelper.getArcadeSpeeds(speed, rot, true);
-        var lSpeed = driveArray[0];
-        var rSpeed = driveArray[1];
-
-        leftSpeed = lSpeed * maxSpeed;
-        rightSpeed = rSpeed * maxSpeed;
+        setTankPercent(driveArray[0], driveArray[1]);
     }
 
-    public void setTankSpeeds(double leftSpeed, double rightSpeed) {
-        this.leftSpeed = leftSpeed;
-        this.rightSpeed = rightSpeed;
+    public void setTankPercent(double leftSpeed, double rightSpeed) {
+        this.leftSpeed = leftSpeed * maxSpeed;
+        this.rightSpeed = rightSpeed * maxSpeed;
+    }
+
+    public void setTankSpeeds(double leftFeetPerSecond, double rightFeetPerSecond) {
+        leftSpeed = leftFeetPerSecond;
+        rightSpeed = rightFeetPerSecond;
+    }
+
+    public void setArcadeSpeeds(double feetPerSecond, double degreesPerSecond) {
+        DifferentialDriveWheelSpeeds wheelSpeeds = kinematics.toWheelSpeeds(
+            new ChassisSpeeds(Units.feetToMeters(feetPerSecond), 0, Units.degreesToRadians(degreesPerSecond))
+        );
+        double leftFeetPerSecond = Units.metersToFeet(wheelSpeeds.leftMetersPerSecond);
+        double rightFeetPerSecond = Units.metersToFeet(wheelSpeeds.rightMetersPerSecond);
+        setTankSpeeds(leftFeetPerSecond, rightFeetPerSecond);
     }
 
     public void execute() {

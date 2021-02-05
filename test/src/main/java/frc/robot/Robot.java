@@ -22,6 +22,7 @@ import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.SimDrive;
 import frc.robot.subsystems.IDrive;
 import frc.robot.helpers.DriveHelper;
+import edu.wpi.first.wpilibj.util.Units;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -96,6 +97,10 @@ public class Robot extends TimedRobot {
     ChassisSpeeds speeds = ramsete.calculate(driveBase.getPose(), reference);
 
     // set robot speed and rotation 
+    driveBase.setArcadeSpeeds(
+        Units.metersToFeet(speeds.vxMetersPerSecond),
+        Units.radiansToDegrees(speeds.omegaRadiansPerSecond)
+    );
   }
 
   /** This function is called once when teleop is enabled. */
@@ -111,7 +116,7 @@ public class Robot extends TimedRobot {
     double x = RobotBase.isReal() ? xboxController.getX(Hand.kRight) : xboxController.getRawAxis(0);
     double y = RobotBase.isReal() ? xboxController.getY(Hand.kRight) : xboxController.getRawAxis(1);
 
-    driveBase.setSpeeds(
+    driveBase.setArcadePercent(
       DriveHelper.applyDeadband(-y, joystickDeadband), 
       DriveHelper.applyDeadband(x, joystickDeadband)
     );

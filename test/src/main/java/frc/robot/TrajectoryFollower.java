@@ -55,23 +55,21 @@ public class TrajectoryFollower {
         curTrajectory = trajectory;
 
         if (trajectory != null) {
-        drive.reset(trajectory.getInitialPose());
-        System.out.println("Initial pose: " + trajectory.getInitialPose().getTranslation().getX());
-        System.out.println(trajectory.getInitialPose());
+            drive.reset(trajectory.getInitialPose());
         }
     }
 
     public void follow() {
         if (curTrajectory != null) {
-        double elapsed = timer.get();
-        Trajectory.State reference = curTrajectory.sample(elapsed);
-        ChassisSpeeds speeds = ramsete.calculate(drive.getPose(), reference);
+            double elapsed = timer.get();
+            Trajectory.State reference = curTrajectory.sample(elapsed);
+            ChassisSpeeds speeds = ramsete.calculate(drive.getPose(), reference);
 
-        // set robot speed and rotation 
-        drive.setArcadeSpeeds(
-            Units.metersToFeet(speeds.vxMetersPerSecond),
-            Units.radiansToDegrees(speeds.omegaRadiansPerSecond)
-        );
+            // set robot speed and rotation 
+            drive.setArcadeSpeeds(
+                Units.metersToFeet(speeds.vxMetersPerSecond),
+                Units.radiansToDegrees(speeds.omegaRadiansPerSecond)
+            );
         }
     }
 

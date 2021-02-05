@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.controller.RamseteController;
 
 public class TrajectoryFollower {
 
-    private IDrive drive; // poopDrive <-- amory wrote this, he took control of my screen and wrote it
+    private IDrive drive;
     private HashMap<String, Trajectory> trajectories = new HashMap<String, Trajectory>();
     private final Timer timer = new Timer();
     private Trajectory curTrajectory;
@@ -34,18 +34,14 @@ public class TrajectoryFollower {
     }
 
     public void addTrajectory(String trajectoryName) {
-        Trajectory trajectory; // this may be dumb
-        // paths\BounceTest.wpilib.json
+        Trajectory trajectory;
         trajectoryName = "paths\\" + trajectoryName + ".wpilib.json";
-        System.out.println(trajectoryName);
         try {
             Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryName);
             trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-            System.out.println("Trajectory found");
             trajectories.put(trajectoryName, trajectory);
         } catch (Exception ex) {
             System.out.println("ERROR");
-            // drive.initDeathMode();
         }
     }
 

@@ -4,29 +4,16 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.trajectory.Trajectory;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
-import edu.wpi.first.wpilibj.controller.RamseteController;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
-import java.util.List;
+import edu.wpi.first.wpilibj.TimedRobot; // K
+import edu.wpi.first.wpilibj.GenericHID.Hand; // W
+import edu.wpi.first.wpilibj.XboxController; // A
+import edu.wpi.first.wpilibj.RobotBase; // R
 
-import frc.robot.subsystems.Drive;
-import frc.robot.subsystems.SimDrive;
+import frc.robot.subsystems.Drive; // Q
+import frc.robot.subsystems.SimDrive; // S
 import frc.robot.subsystems.IDrive;
 import frc.robot.helpers.DriveHelper;
-import edu.wpi.first.wpilibj.util.Units;
-import edu.wpi.first.wpilibj.Filesystem;
-import java.io.IOException;
-import java.nio.file.Path;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -40,10 +27,6 @@ public class Robot extends TimedRobot {
   private IDrive driveBase;
 
   private double joystickDeadband = 0.17;
-
-  private final RamseteController ramsete = new RamseteController();
-  private final Timer timer = new Timer();
-  private Trajectory trajectory;
 
   private TrajectoryFollower follower;
     
@@ -62,16 +45,6 @@ public class Robot extends TimedRobot {
     } else {
         driveBase = new SimDrive();
     }
-
-    // trajectory =
-    //     TrajectoryGenerator.generateTrajectory(
-    //         new Pose2d(2, 2, new Rotation2d()),
-    //         List.of(),
-    //         new Pose2d(6, 4, new Rotation2d()),
-    //         new TrajectoryConfig(2, 2));
-
-
-    
 
     follower = new TrajectoryFollower(driveBase);
 

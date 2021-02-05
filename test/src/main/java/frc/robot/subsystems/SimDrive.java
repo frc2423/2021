@@ -183,18 +183,23 @@ public class SimDrive implements IDrive{
         return rb_motor.getSpeed();
     }
 
-    public void setSpeeds(double speed, double rot) {
+    public void setArcadePercent(double speed, double rot) {
         var driveArray = DriveHelper.getArcadeSpeeds(speed, rot, true);
-        var lSpeed = driveArray[0];
-        var rSpeed = driveArray[1];
-
-        leftSpeed = lSpeed * maxSpeed;
-        rightSpeed = rSpeed * maxSpeed;
+        setTankPercent(driveArray[0], driveArray[1]);
     }
 
-    public void setTankSpeeds(double leftSpeed, double rightSpeed) {
-        this.leftSpeed = leftSpeed;
-        this.rightSpeed = rightSpeed;
+    public void setTankPercent(double leftSpeed, double rightSpeed) {
+        this.leftSpeed = leftSpeed * maxSpeed;
+        this.rightSpeed = rightSpeed * maxSpeed;
+    }
+
+    public void setTankSpeeds(double leftFeetPerSecond, double rightFeetPerSecond) {
+        leftSpeed = leftFeetPerSecond;
+        rightSpeed = rightFeetPerSecond;
+    }
+
+    public void setArcadeSpeeds(double feetPerSecond, double degreesPerSecond) {
+        setTankSpeeds(kinematics.toWheelSpeeds(new ChassisSpeeds(feetPerSecond, 0, degreesPerSecond)));
     }
 
     public void execute() {
@@ -224,9 +229,5 @@ public class SimDrive implements IDrive{
         gyro.setAngle(drivetrainSimulator.getHeading().getDegrees());
         odometry.update(gyro.getRotation2d(), lb_motor.getDistance(), rb_motor.getDistance());
         field.setRobotPose(odometry.getPoseMeters());
-    }
-
-    public void drive(double xSpeed, double rot) {
-        setSpeeds(kinematics.toWheelSpeeds(new ChassisSpeeds(xSpeed, 0, rot)));
     }
 }

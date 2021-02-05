@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
@@ -23,6 +24,9 @@ import frc.robot.subsystems.SimDrive;
 import frc.robot.subsystems.IDrive;
 import frc.robot.helpers.DriveHelper;
 import edu.wpi.first.wpilibj.util.Units;
+import edu.wpi.first.wpilibj.Filesystem;
+import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -56,13 +60,24 @@ public class Robot extends TimedRobot {
         driveBase = new SimDrive();
     }
 
-    trajectory =
-        TrajectoryGenerator.generateTrajectory(
-            new Pose2d(2, 2, new Rotation2d()),
-            List.of(),
-            new Pose2d(6, 4, new Rotation2d()),
-            new TrajectoryConfig(2, 2));
+    // trajectory =
+    //     TrajectoryGenerator.generateTrajectory(
+    //         new Pose2d(2, 2, new Rotation2d()),
+    //         List.of(),
+    //         new Pose2d(6, 4, new Rotation2d()),
+    //         new TrajectoryConfig(2, 2));
 
+
+    String trajectoryJSON = "paths/Bounce.wpilib.json";
+    trajectory = new Trajectory();
+    try {
+      Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+      trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+      System.out.println("Trajectory found");
+    } catch (IOException ex) {
+      System.out.println("ERROR");
+      // DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
+    }
   }
 
   public void switchGears() {
@@ -86,21 +101,29 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     timer.reset();
     timer.start();
-    driveBase.reset(trajectory.getInitialPose());
+
+    if (trajectory != null) {
+      driveBase.reset(trajectory.getInitialPose());
+      System.out.println("Initial pose: " + trajectory.getInitialPose().getTranslation().getX());
+      System.out.println(trajectory.getInitialPose());
+    }
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    double elapsed = timer.get();
-    Trajectory.State reference = trajectory.sample(elapsed);
-    ChassisSpeeds speeds = ramsete.calculate(driveBase.getPose(), reference);
 
-    // set robot speed and rotation 
-    driveBase.setArcadeSpeeds(
-        Units.metersToFeet(speeds.vxMetersPerSecond),
-        Units.radiansToDegrees(speeds.omegaRadiansPerSecond)
-    );
+    // if (trajectory != null) {
+    //   double elapsed = timer.get();
+    //   Trajectory.State reference = trajectory.sample(elapsed);
+    //   ChassisSpeeds speeds = ramsete.calculate(driveBase.getPose(), reference);
+
+    //   // set robot speed and rotation 
+    //   driveBase.setArcadeSpeeds(
+    //       Units.metersToFeet(speeds.vxMetersPerSecond),
+    //       Units.radiansToDegrees(speeds.omegaRadiansPerSecond)
+    //   );
+    // }
   }
 
   /** This function is called once when teleop is enabled. */

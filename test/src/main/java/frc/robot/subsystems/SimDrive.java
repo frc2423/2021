@@ -22,6 +22,8 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 
 public class SimDrive implements IDrive{
 
@@ -48,6 +50,9 @@ public class SimDrive implements IDrive{
       new DifferentialDrivetrainSim(
           drivetrainSystem, DCMotor.getCIM(2), 8, kTrackWidth, kWheelRadius, null);
 
+    
+    private final DifferentialDriveKinematics kinematics =
+        new DifferentialDriveKinematics(kTrackWidth);
 
     private final Field2d field = new Field2d();
     private final DifferentialDriveOdometry odometry;
@@ -219,5 +224,9 @@ public class SimDrive implements IDrive{
         gyro.setAngle(drivetrainSimulator.getHeading().getDegrees());
         odometry.update(gyro.getRotation2d(), lb_motor.getDistance(), rb_motor.getDistance());
         field.setRobotPose(odometry.getPoseMeters());
+    }
+
+    public void drive(double xSpeed, double rot) {
+        setSpeeds(kinematics.toWheelSpeeds(new ChassisSpeeds(xSpeed, 0, rot)));
     }
 }

@@ -31,4 +31,6 @@ public interface IDrive {
     public void setTankSpeeds(double leftSpeed, double rightSpeed);
 
     public void execute();
+
+    public void drive(double feetPerSecond, double degreesPerSecond);
 }

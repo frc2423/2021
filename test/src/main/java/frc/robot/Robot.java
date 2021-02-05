@@ -45,6 +45,9 @@ public class Robot extends TimedRobot {
   private final Timer timer = new Timer();
   private Trajectory trajectory;
 
+  private TrajectoryFollower follower;
+    
+  String trajectoryJSON = "BounceTest";
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -68,16 +71,11 @@ public class Robot extends TimedRobot {
     //         new TrajectoryConfig(2, 2));
 
 
-    String trajectoryJSON = "paths/BounceTest.wpilib.json";
-    trajectory = new Trajectory();
-    try {
-      Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
-      trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-      System.out.println("Trajectory found");
-    } catch (IOException ex) {
-      System.out.println("ERROR");
-      // DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
-    }
+    
+
+    follower = new TrajectoryFollower(driveBase);
+
+    follower.addTrajectory(trajectoryJSON);
   }
 
   public void switchGears() {
@@ -99,31 +97,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    timer.reset();
-    timer.start();
-
-    if (trajectory != null) {
-      driveBase.reset(trajectory.getInitialPose());
-      System.out.println("Initial pose: " + trajectory.getInitialPose().getTranslation().getX());
-      System.out.println(trajectory.getInitialPose());
-    }
+    follower.initFollowing(trajectoryJSON);
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-
-    if (trajectory != null) {
-      double elapsed = timer.get();
-      Trajectory.State reference = trajectory.sample(elapsed);
-      ChassisSpeeds speeds = ramsete.calculate(driveBase.getPose(), reference);
-
-      // set robot speed and rotation 
-      driveBase.setArcadeSpeeds(
-          Units.metersToFeet(speeds.vxMetersPerSecond),
-          Units.radiansToDegrees(speeds.omegaRadiansPerSecond)
-      );
-    }
+    follower.follow();
   }
 
   /** This function is called once when teleop is enabled. */

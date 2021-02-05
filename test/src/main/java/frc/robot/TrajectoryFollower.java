@@ -1,49 +1,78 @@
-package frc.robot;
+package frc.robot; // G
 
-import frc.robot.subsystems.IDrive;
-import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import frc.robot.subsystems.IDrive; // A
+
+import java.util.HashMap; // M
+
+import edu.wpi.first.wpilibj.trajectory.Trajectory; // I
+import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil; // N
+
+import java.nio.file.Path; // G
+import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.util.Units;
+
+import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.controller.RamseteController;
 
 
 public class TrajectoryFollower {
+
+    private IDrive drive; // poopDrive <-- amory wrote this, he took control of my screen and wrote it
+    private HashMap<String, Trajectory> trajectories = new HashMap<String, Trajectory>();
+    private final Timer timer = new Timer();
+    private Trajectory curTrajectory;
+    private final RamseteController ramsete = new RamseteController();
+
     
     public TrajectoryFollower(IDrive drive) {
-
+        this.drive = drive;
     }
 
     public void addTrajectory(String pathName, Trajectory trajectory) {
-
+        trajectories.put(pathName, trajectory);
     }
 
     public void addTrajectory(String trajectoryName) {
-        trajectory = new Trajectory();
+        Trajectory trajectory; // this may be dumb
+        // paths\BounceTest.wpilib.json
+        trajectoryName = "paths\\" + trajectoryName + ".wpilib.json";
+        System.out.println(trajectoryName);
         try {
             Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryName);
             trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
             System.out.println("Trajectory found");
-        } catch (IOException ex) {
+            trajectories.put(trajectoryName, trajectory);
+        } catch (Exception ex) {
             System.out.println("ERROR");
+            // drive.initDeathMode();
         }
     }
 
     public void initFollowing(String trajectoryName) {
         timer.reset();
         timer.start();
+        trajectoryName = "paths\\" + trajectoryName + ".wpilib.json";
+
+
+        Trajectory trajectory = trajectories.get(trajectoryName);
+        curTrajectory = trajectory;
 
         if (trajectory != null) {
-        driveBase.reset(trajectory.getInitialPose());
+        drive.reset(trajectory.getInitialPose());
         System.out.println("Initial pose: " + trajectory.getInitialPose().getTranslation().getX());
         System.out.println(trajectory.getInitialPose());
         }
     }
 
     public void follow() {
-        if (trajectory != null) {
+        if (curTrajectory != null) {
         double elapsed = timer.get();
-        Trajectory.State reference = trajectory.sample(elapsed);
-        ChassisSpeeds speeds = ramsete.calculate(driveBase.getPose(), reference);
+        Trajectory.State reference = curTrajectory.sample(elapsed);
+        ChassisSpeeds speeds = ramsete.calculate(drive.getPose(), reference);
 
         // set robot speed and rotation 
-        driveBase.setArcadeSpeeds(
+        drive.setArcadeSpeeds(
             Units.metersToFeet(speeds.vxMetersPerSecond),
             Units.radiansToDegrees(speeds.omegaRadiansPerSecond)
         );
@@ -51,14 +80,14 @@ public class TrajectoryFollower {
     }
 
     public void stopFollowing() {
-
+        timer.stop();
     } 
 
     public boolean hasCompletedTrajectory() {
-        return false;
+        return timer.get() > curTrajectory.getTotalTimeSeconds();
     }
 
     public double getTimeFollowing() {
-        return 0.0;
+        return timer.get();
     }
 }

@@ -24,6 +24,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.util.Units;
+
 
 public class SimDrive implements IDrive{
 
@@ -199,7 +202,12 @@ public class SimDrive implements IDrive{
     }
 
     public void setArcadeSpeeds(double feetPerSecond, double degreesPerSecond) {
-        setTankSpeeds(kinematics.toWheelSpeeds(new ChassisSpeeds(feetPerSecond, 0, degreesPerSecond)));
+        DifferentialDriveWheelSpeeds wheelSpeeds = kinematics.toWheelSpeeds(
+            new ChassisSpeeds(Unit.feetToMeters(feetPerSecond), 0, Unit.degreesToRadians(degreesPerSecond))
+        );
+        double leftFeetPerSecond = Units.metersToFeet(wheelSpeeds.leftMetersPerSecond);
+        double rightFeetPerSecond = Units.metersToFeet(wheelSpeeds.rightMetersPerSecond);
+        setTankSpeeds(leftFeetPerSecond, rightFeetPerSecond);
     }
 
     public void execute() {

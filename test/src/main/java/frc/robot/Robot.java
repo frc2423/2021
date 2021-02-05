@@ -47,7 +47,7 @@ public class Robot extends TimedRobot {
 
   private TrajectoryFollower follower;
     
-  String trajectoryJSON = "BounceTest";
+  String trajectoryJSON = "GalacticSearchRedB";
 
   /**
    * This function is run when the robot is first started up and should be used for any

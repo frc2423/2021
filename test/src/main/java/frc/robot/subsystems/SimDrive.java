@@ -2,8 +2,11 @@ package frc.robot.subsystems;
 
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.networktables.NetworkTableInstance;
 
+import org.opencv.core.RotatedRect;
+
+import edu.wpi.first.networktables.NetworkTableInstance;
+import frc.robot.DrivePosition;
 import frc.robot.devices.IDriveMotor;
 import frc.robot.devices.SimDriveMotor;
 import frc.robot.devices.IGyro;
@@ -17,6 +20,7 @@ import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.RobotController;
 
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -47,18 +51,8 @@ public class SimDrive implements IDrive{
     private double rightSpeed = 0.0;
     private static final double kTrackWidth = 2;
     private static final double kWheelRadius = 0.5;
-    private final LinearSystem<N2, N2, N2> drivetrainSystem =
-      LinearSystemId.identifyDrivetrainSystem(1.98, 0.2, 1.5, 0.3);
-    private final DifferentialDrivetrainSim drivetrainSimulator =
-      new DifferentialDrivetrainSim(
-          drivetrainSystem, DCMotor.getCIM(2), 8, kTrackWidth, kWheelRadius, null);
 
-    
-    private final DifferentialDriveKinematics kinematics =
-        new DifferentialDriveKinematics(kTrackWidth);
-
-    private final Field2d field = new Field2d();
-    private final DifferentialDriveOdometry odometry;
+    private final DrivePosition drivePosition;
 
     
     public SimDrive () {
@@ -72,8 +66,6 @@ public class SimDrive implements IDrive{
         rb_motor = new SimDriveMotor(5, 6, 7);
         gyro = new SimGyro();
 
-        odometry = new DifferentialDriveOdometry(gyro.getRotation2d());
-
         lf_motor.setConversionFactor(conversionFactor);
         lb_motor.setConversionFactor(conversionFactor);
         rf_motor.setConversionFactor(conversionFactor);
@@ -82,6 +74,8 @@ public class SimDrive implements IDrive{
         lf_motor.follow(lb_motor);
         rf_motor.follow(rb_motor);
 
+        drivePosition = new DrivePosition(kTrackWidth, kWheelRadius, gyro.getRotation2d());
+
         setPids();
         gear_switcher = new DoubleSolenoid(0, 1);
 
@@ -89,7 +83,6 @@ public class SimDrive implements IDrive{
         NtHelper.listen("/drive/kI", (table) -> setPids());
         NtHelper.listen("/drive/kD", (table) -> setPids());
 
-        SmartDashboard.putData("Field", field);
         /*
             Link to all .json and .pngs to be used in field simulation.
             https://github.com/wpilibsuite/PathWeaver/tree/master/src/main/resources/edu/wpi/first/pathweaver
@@ -133,8 +126,7 @@ public class SimDrive implements IDrive{
         lb_motor.resetEncoder(0.0);
         rb_motor.resetEncoder(0.0);
         gyro.reset();
-        drivetrainSimulator.setPose(pose);
-        odometry.resetPosition(pose, gyro.getRotation2d());
+        drivePosition.reset(pose, gyro.getRotation2d());
     }
 
     public void switchGears() {
@@ -159,11 +151,15 @@ public class SimDrive implements IDrive{
     }
 
     public Pose2d getPose() {
-        return odometry.getPoseMeters();
+        return drivePosition.getPose();
     }
 
     public double getAngle() {
         return gyro.getAngle();
+    }
+
+    public Rotation2d getRotation2d(){
+        return gyro.getRotation2d();
     }
 
     public void setAngle(double angle) {
@@ -202,9 +198,7 @@ public class SimDrive implements IDrive{
     }
 
     public void setArcadeSpeeds(double feetPerSecond, double degreesPerSecond) {
-        DifferentialDriveWheelSpeeds wheelSpeeds = kinematics.toWheelSpeeds(
-            new ChassisSpeeds(Units.feetToMeters(feetPerSecond), 0, Units.degreesToRadians(degreesPerSecond))
-        );
+        DifferentialDriveWheelSpeeds wheelSpeeds = drivePosition.getWheelSpeeds(feetPerSecond, degreesPerSecond); // comment (very helpful)
         double leftFeetPerSecond = Units.metersToFeet(wheelSpeeds.leftMetersPerSecond);
         double rightFeetPerSecond = Units.metersToFeet(wheelSpeeds.rightMetersPerSecond);
         setTankSpeeds(leftFeetPerSecond, rightFeetPerSecond);
@@ -220,22 +214,19 @@ public class SimDrive implements IDrive{
         } else {
             gear_switcher.set(DoubleSolenoid.Value.kForward);
         }
-        drivetrainSimulator.setInputs(
-          lb_motor.getPercent() * RobotController.getInputVoltage(),
-          rb_motor.getPercent() * RobotController.getInputVoltage()
-        );
-        drivetrainSimulator.update(0.02);
+        drivePosition.setInputs(lb_motor.getPercent(), rb_motor.getPercent());
+
         lb_motor.setEncoderPositionAndRate(
-            drivetrainSimulator.getLeftPositionMeters(),
-            drivetrainSimulator.getLeftVelocityMetersPerSecond()
+            drivePosition.getLeftPos(),
+            drivePosition.getLeftVel()
         );
         rb_motor.setEncoderPositionAndRate(
-            drivetrainSimulator.getRightPositionMeters(),
-            drivetrainSimulator.getRightVelocityMetersPerSecond()
+            drivePosition.getRightPos(),
+            drivePosition.getRightVel()
         );
 
-        gyro.setAngle(drivetrainSimulator.getHeading().getDegrees());
-        odometry.update(gyro.getRotation2d(), lb_motor.getDistance(), rb_motor.getDistance());
-        field.setRobotPose(odometry.getPoseMeters());
+        gyro.setAngle(drivePosition.getDegrees());
+
+        drivePosition.updateOdometry(gyro.getRotation2d(), lb_motor.getDistance(), rb_motor.getDistance());
     }
 }

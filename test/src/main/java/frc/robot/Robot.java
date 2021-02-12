@@ -29,8 +29,8 @@ public class Robot extends TimedRobot {
   private double joystickDeadband = 0.17;
 
   private TrajectoryFollower follower;
-    
-  String trajectoryJSON = "GalacticSearchRedA";
+
+  String trajectoryJSON = "Barrel";
 
   /**
    * This function is run when the robot is first started up and should be used for any

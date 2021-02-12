@@ -30,7 +30,7 @@ public class Robot extends TimedRobot {
 
   private TrajectoryFollower follower;
     
-  String trajectoryJSON = "Slalom";
+  String trajectoryJSON = "Barrel";
 
   /**
    * This function is run when the robot is first started up and should be used for any

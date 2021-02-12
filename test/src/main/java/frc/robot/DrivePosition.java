@@ -36,8 +36,8 @@ public class DrivePosition {
     private final DifferentialDriveOdometry odometry;
 
     public DrivePosition(double trackWidth, double wheelRadius, Rotation2d rotation2d){
-        kTrackWidth = trackWidth;
-        kWheelRadius = wheelRadius;
+        kTrackWidth = Units.feetToMeters(trackWidth);
+        kWheelRadius = Units.feetToMeters(wheelRadius);
 
         odometry = new DifferentialDriveOdometry(rotation2d);
 

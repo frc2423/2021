@@ -1,24 +1,18 @@
 package frc.robot.subsystems;
 
-
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.util.Units;
 
 import frc.robot.devices.IDriveMotor;
 import frc.robot.devices.DriveMotor;
 import frc.robot.devices.Gyro;
 import frc.robot.devices.IGyro;
-
-
 import frc.robot.helpers.NtHelper;
 import frc.robot.helpers.DriveHelper;
-
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
-import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.wpilibj.util.Units;
-
+import frc.robot.DrivePosition;
 
 public class Drive implements IDrive{
 
@@ -40,12 +34,9 @@ public class Drive implements IDrive{
     private double leftSpeed = 0.0;
     private double rightSpeed = 0.0;
 
-    private static final double kTrackWidth = 2;
+    private static final double kTrackWidth = 1.9375;
     private static final double kWheelRadius = 0.5;
-
-    private final DifferentialDriveKinematics kinematics =
-        new DifferentialDriveKinematics(kTrackWidth);
-
+    private final DrivePosition drivePosition;
     
     public Drive () {
 
@@ -73,7 +64,7 @@ public class Drive implements IDrive{
         NtHelper.listen("/drive/kI", (table) -> setPids());
         NtHelper.listen("/drive/kD", (table) -> setPids());
 
-
+        drivePosition = new DrivePosition(kTrackWidth, kWheelRadius, gyro.getRotation2d());
     }
 
     private double getP() {
@@ -98,7 +89,7 @@ public class Drive implements IDrive{
     }
 
     public void init() {
-        setArcadeSpeeds(0.0, 0.0);
+        setTankPercent(0.0, 0.0);
         toLowGear();
         reset();
     }
@@ -178,9 +169,7 @@ public class Drive implements IDrive{
     }
 
     public void setArcadeSpeeds(double feetPerSecond, double degreesPerSecond) {
-        DifferentialDriveWheelSpeeds wheelSpeeds = kinematics.toWheelSpeeds(
-            new ChassisSpeeds(Units.feetToMeters(feetPerSecond), 0, Units.degreesToRadians(degreesPerSecond))
-        );
+        DifferentialDriveWheelSpeeds wheelSpeeds = drivePosition.getWheelSpeeds(feetPerSecond, degreesPerSecond);
         double leftFeetPerSecond = Units.metersToFeet(wheelSpeeds.leftMetersPerSecond);
         double rightFeetPerSecond = Units.metersToFeet(wheelSpeeds.rightMetersPerSecond);
         setTankSpeeds(leftFeetPerSecond, rightFeetPerSecond);

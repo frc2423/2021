@@ -2,9 +2,6 @@ package frc.robot.subsystems;
 
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-
-import org.opencv.core.RotatedRect;
-
 import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.DrivePosition;
 import frc.robot.devices.IDriveMotor;
@@ -14,28 +11,14 @@ import frc.robot.devices.SimGyro;
 
 import frc.robot.helpers.NtHelper;
 import frc.robot.helpers.DriveHelper;
-import edu.wpi.first.wpilibj.system.LinearSystem;
-import edu.wpi.first.wpilibj.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
-import edu.wpi.first.wpiutil.math.numbers.N2;
-import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.RobotController;
-
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
-import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.util.Units;
 
 
 public class SimDrive implements IDrive{
 
-    private double countsPerRev = 16.35;
-    private double ftPerRev = 1.57;
     private double maxSpeed = 9.0;  // feet per second
 
     private DoubleSolenoid gear_switcher;
@@ -49,7 +32,7 @@ public class SimDrive implements IDrive{
 
     private double leftSpeed = 0.0;
     private double rightSpeed = 0.0;
-    private static final double kTrackWidth = 2;
+    private static final double kTrackWidth = 1.9375;
     private static final double kWheelRadius = 0.5;
 
     private final DrivePosition drivePosition;

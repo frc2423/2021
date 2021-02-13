@@ -161,9 +161,9 @@ public class Robot extends TimedRobot {
         
     
 
-    CANSparkMax rightMotor = setupCANSparkMax(6, Sides.RIGHT, false);
-    CANSparkMax rightFollowerID5 = setupCANSparkMax(5, Sides.FOLLOWER, false);
-    rightFollowerID5.follow(rightMotor, false);
+    CANSparkMax rightMotor = setupCANSparkMax(6, Sides.RIGHT, true);
+    CANSparkMax rightFollowerID5 = setupCANSparkMax(5, Sides.FOLLOWER, true);
+    rightFollowerID5.follow(rightMotor, true);
     drive = new DifferentialDrive(leftMotor, rightMotor);
     drive.setDeadband(0);
 

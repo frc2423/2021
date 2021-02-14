@@ -6,7 +6,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANEncoder;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
-public class Intake {
+public class Intake implements ISubsystem{
     enum State{
       INTAKEBALLS, OUTTAKE, STALLED, NOTHING
     }

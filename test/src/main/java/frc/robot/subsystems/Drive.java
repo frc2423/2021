@@ -171,7 +171,7 @@ public class Drive implements IDrive, ISubsystem{
     }
 
     public double getRightDistance() {
-        return -rb_motor.getDistance();
+        return rb_motor.getDistance();
     }
 
     public double getLeftVelocity() {
@@ -179,7 +179,7 @@ public class Drive implements IDrive, ISubsystem{
     }
 
     public double getRightVelocity() {
-        return -rb_motor.getSpeed();
+        return rb_motor.getSpeed();
     }
 
     public void setArcadePercent(double speed, double rot) {
@@ -207,8 +207,8 @@ public class Drive implements IDrive, ISubsystem{
     public void execute() {
         lb_motor.setSpeed(leftSpeed);
         rb_motor.setSpeed(rightSpeed);
-        System.out.println("Drive velocity" + lb_motor.getSpeed());
-        NtHelper.setDouble("/drive/velocity", lb_motor.getSpeed());
+        System.out.println("Drive velocity" + getRightVelocity());
+        NtHelper.setDouble("/drive/velocity", getRightVelocity());
         NtHelper.setDouble("/gyroAngle", getAngle());
 
         if (isHighGear()) {

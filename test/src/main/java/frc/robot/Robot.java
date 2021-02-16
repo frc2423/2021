@@ -121,13 +121,9 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
     //NtHelper.setDouble("/drive/velocity", driveBase.getLeftVelocity());
 
-    double x = NtHelper.getDouble("/drive/setPoint", 0);
     double y = NtHelper.getDouble("/drive/setPoint", 0);
 
-    driveBase.setArcadePercent(
-      DriveHelper.applyDeadband(-y, joystickDeadband), 
-      DriveHelper.applyDeadband(x, joystickDeadband)
-    );
+    driveBase.setTankSpeeds(y, y);
     
     
 

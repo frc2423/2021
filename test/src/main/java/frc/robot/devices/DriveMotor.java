@@ -30,7 +30,9 @@ public class DriveMotor implements IDriveMotor {
     }
 
     public double getSpeed(){
-        return encoder.getVelocity();
+        double rate = encoder.getVelocity();
+        return motor.getInverted() ? -rate : rate;
+
     }
 
     public void setPercent(double percent){

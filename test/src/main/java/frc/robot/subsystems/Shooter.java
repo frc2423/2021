@@ -6,7 +6,7 @@ import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.ControlType;
 
-public class Shooter {
+public class Shooter implements ISubsystem{
     private CANPIDController CAN;
     private CANSparkMax shooterMotor;
     private double speed = 0.0;

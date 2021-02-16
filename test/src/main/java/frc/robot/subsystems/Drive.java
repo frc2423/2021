@@ -14,7 +14,7 @@ import frc.robot.helpers.NtHelper;
 import frc.robot.helpers.DriveHelper;
 import frc.robot.DrivePosition;
 
-public class Drive implements IDrive{
+public class Drive implements IDrive, ISubsystem{
 
     private double countsPerRev = 16.35;
     private double ftPerRev = 1.57;

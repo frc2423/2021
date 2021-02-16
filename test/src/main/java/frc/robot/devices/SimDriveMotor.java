@@ -81,6 +81,13 @@ public class SimDriveMotor implements IDriveMotor {
         setD(kD);       
     }
 
+    public void setPidf(double kP, double kI, double kD, double kF){
+        setP(kP);
+        setI(kI);
+        setD(kD);
+        setF(kF); 
+    }
+
     public void setP(double kP){
         pidController.setP(kP);
     }
@@ -93,6 +100,10 @@ public class SimDriveMotor implements IDriveMotor {
         pidController.setD(kD);
     }
 
+    public void setF(double kF) {
+
+    }
+
     public double getP(){
         return pidController.getP();
     }
@@ -103,6 +114,10 @@ public class SimDriveMotor implements IDriveMotor {
 
     public double getD(){
         return pidController.getD();
+    }
+
+    public double getF() {
+        return 0.0;
     }
 
     public void follow(IDriveMotor leader){

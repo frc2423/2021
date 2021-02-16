@@ -18,12 +18,15 @@ public class DriveMotor implements IDriveMotor {
        motor.restoreFactoryDefaults();
        encoder = motor.getEncoder();
        pidController = motor.getPIDController();
+    //    pidController.setOutputRange(-1, 1);
+    //    pidController.setIZone(3000);
+    //    pidController.setIAcc/m(iAccum)
        setPercent(0);
     }
 
 
     public void setSpeed(double speed){
-        pidController.setReference(speed / getConversionFactor() * 60, ControlType.kVelocity);
+        pidController.setReference(speed / encoder.getVelocityConversionFactor(), ControlType.kVelocity);
     }
 
     public double getSpeed(){
@@ -70,6 +73,13 @@ public class DriveMotor implements IDriveMotor {
         setD(kD);       
     }
 
+    public void setPidf(double kP, double kI, double kD, double kF) {
+        setP(kP);
+        setI(kI);
+        setD(kD);
+        setF(kF);
+    }
+
     public void setP(double kP){
         pidController.setP(kP);
     }
@@ -82,6 +92,10 @@ public class DriveMotor implements IDriveMotor {
         pidController.setD(kD);
     }
 
+    public void setF(double kF) {
+        pidController.setFF(kF);
+    }
+
     public double getP(){
         return pidController.getP();
     }
@@ -92,6 +106,10 @@ public class DriveMotor implements IDriveMotor {
 
     public double getD(){
         return pidController.getD();
+    }
+
+    public double getF() {
+        return pidController.getFF();
     }
 
     public void follow(IDriveMotor leader){

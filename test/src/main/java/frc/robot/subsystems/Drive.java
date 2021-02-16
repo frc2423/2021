@@ -67,8 +67,19 @@ public class Drive implements IDrive, ISubsystem{
         NtHelper.listen("/drive/kI", (table) -> setPids());
         NtHelper.listen("/drive/kD", (table) -> setPids());
         NtHelper.listen("/drive/kF", (table) -> setPids());
+        NtHelper.listen("/drive/setPoint", (table) -> setSetPoints());
 
         drivePosition = new DrivePosition(kTrackWidth, kWheelRadius, gyro.getRotation2d());
+    }
+
+    private double getSetPoint() {
+        return NtHelper.getDouble("/drive/setPoint", 0);
+        
+    }
+    
+    private void setSetPoints() {
+        leftSpeed = getSetPoint();
+        rightSpeed = getSetPoint();
     }
 
     private double getP() {
@@ -196,7 +207,8 @@ public class Drive implements IDrive, ISubsystem{
     public void execute() {
         lb_motor.setSpeed(leftSpeed);
         rb_motor.setSpeed(rightSpeed);
-
+        System.out.println("Drive velocity" + lb_motor.getSpeed());
+        NtHelper.setDouble("/drive/velocity", lb_motor.getSpeed());
         NtHelper.setDouble("/gyroAngle", getAngle());
 
         if (isHighGear()) {

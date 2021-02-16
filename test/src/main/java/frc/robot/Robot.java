@@ -13,6 +13,7 @@ import frc.robot.subsystems.Drive; // Q
 import frc.robot.subsystems.SimDrive; // S
 import frc.robot.subsystems.IDrive;
 import frc.robot.helpers.DriveHelper;
+import frc.robot.helpers.NtHelper;
 
 
 /**
@@ -96,6 +97,7 @@ public class Robot extends TimedRobot {
       DriveHelper.applyDeadband(-y, joystickDeadband), 
       DriveHelper.applyDeadband(x, joystickDeadband)
     );
+    
 
     if (xboxController.getBumperPressed(Hand.kLeft)) {
       switchGears();
@@ -116,5 +118,23 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+    //NtHelper.setDouble("/drive/velocity", driveBase.getLeftVelocity());
+
+    double x = NtHelper.getDouble("/drive/setPoint", 0);
+    double y = NtHelper.getDouble("/drive/setPoint", 0);
+
+    driveBase.setArcadePercent(
+      DriveHelper.applyDeadband(-y, joystickDeadband), 
+      DriveHelper.applyDeadband(x, joystickDeadband)
+    );
+    
+    
+
+    if (xboxController.getBumperPressed(Hand.kLeft)) {
+      switchGears();
+    }
+
+
+  }
 }

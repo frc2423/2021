@@ -78,8 +78,8 @@ public class Drive implements IDrive, ISubsystem{
     }
     
     private void setSetPoints() {
-        leftSpeed = getSetPoint();
-        rightSpeed = getSetPoint();
+        //leftSpeed = getSetPoint();
+        //rightSpeed = getSetPoint();
     }
 
     private double getP() {
@@ -207,7 +207,7 @@ public class Drive implements IDrive, ISubsystem{
     public void execute() {
         lb_motor.setSpeed(leftSpeed);
         rb_motor.setSpeed(rightSpeed);
-        System.out.println("Drive velocity" + getRightVelocity());
+        System.out.println("Drive velocity" + getRightVelocity()+ "  inverted" + lb_motor.getInverted() + " " + rb_motor.getInverted());
         NtHelper.setDouble("/drive/velocity", getRightVelocity());
         NtHelper.setDouble("/gyroAngle", getAngle());
 

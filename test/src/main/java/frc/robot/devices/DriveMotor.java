@@ -68,6 +68,9 @@ public class DriveMotor implements IDriveMotor {
     public void setInverted(boolean isInverted) {
         motor.setInverted(isInverted);
     }
+    public boolean getInverted() {
+        return motor.getInverted();
+    }
     
     public void setPid(double kP, double kI, double kD){
         setP(kP);

@@ -23,6 +23,8 @@ public interface IDriveMotor {
 
     public void setInverted(boolean isInverted);
 
+    public boolean getInverted();
+
     public void setPid(double kP, double kI, double kD);
     
     public void setPidf(double kP, double kI, double kD, double kF);

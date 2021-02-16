@@ -75,6 +75,10 @@ public class SimDriveMotor implements IDriveMotor {
         motor.setInverted(isInverted);
     }
 
+    public boolean getInverted() {
+        return motor.getInverted();
+    }
+
     public void setPid(double kP, double kI, double kD){
         setP(kP);
         setI(kI);

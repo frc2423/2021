@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.util.Units;
 
 
-public class SimDrive implements IDrive{
+public class SimDrive implements IDrive, ISubsystem{
 
     private double maxSpeed = 9.0;  // feet per second
 

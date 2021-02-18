@@ -43,6 +43,8 @@ public class GalacticSearch extends Controller {
 
   @Override
   public void robotInit(HashMap<String, ISubsystem> subsystems) {
+    System.out.println("HEHEHEHEYEHEHEHEHEHEHEHEHEH ROBOT INIT WAS CALLED");
+
     xboxController = new XboxController(0);
 
     driveBase = (IDrive)subsystems.get("drive");

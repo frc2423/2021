@@ -18,19 +18,6 @@ public abstract class KwarqsRobot extends TimedRobot {
         controllers = new HashMap<String, Controller>();
     }
 
-    @Override
-    public void robotInit() {
-        init();
-    }
-
-    public void teleopPeriodic(){
-        currController.teleopPeriodic();
-    }
-
-    public void autonomousPeriodic(){
-        currController.autonomousPeriodic();
-    }
-
     public abstract void init();
 
     public void addSubsystem(String name, ISubsystem subsystem){
@@ -71,6 +58,15 @@ public abstract class KwarqsRobot extends TimedRobot {
 
     public void setCurrController(String name){
         currController = controllers.get(name);
+        if(this.isTest()) {
+            testInit();
+        } else if(this.isAutonomous()){
+            autonomousInit();
+        } else if(this.isOperatorControl()) {
+            teleopInit();
+        } else {
+            disabledInit(); // for safety of course ;)
+        }
     }
 
     public Controller getCurrController(){
@@ -79,5 +75,50 @@ public abstract class KwarqsRobot extends TimedRobot {
 
     public void initController(){
         currController.robotInit(subsystems);
+    }
+    
+    // controller crap
+    // WARNING: !!!EPIC CODE BELOW!!!
+
+    @Override
+    public void robotInit() {
+        System.out.println("HELLO I'M BEING INITIALIZED");
+        init();
+        for(String key : controllers.keySet()) {
+            System.out.println(key);
+            controllers.get(key).robotInit(subsystems);
+        }
+    }
+
+    public void teleopPeriodic(){
+        currController.teleopPeriodic();
+    }
+
+    public void autonomousPeriodic(){
+        currController.autonomousPeriodic();
+    }
+
+    public void teleopInit(){
+        currController.teleopInit();
+    }
+
+    public void autonomousInit(){
+        currController.autonomousInit();
+    }
+
+    public void disabledInit(){
+        currController.disabledInit();
+    }
+
+    public void disabledPeriodic(){
+        currController.disabledInit();
+    }
+
+    public void testInit(){
+        currController.testInit();
+    }
+
+    public void testPeriodic(){
+        currController.testPeriodic();
     }
 }

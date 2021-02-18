@@ -13,6 +13,8 @@ public abstract class KwarqsRobot extends TimedRobot {
 
     private Controller currController;
 
+    private boolean isInitialized = false;
+
     public KwarqsRobot(){
         subsystems = new HashMap<String, ISubsystem>();
         controllers = new HashMap<String, Controller>();
@@ -58,14 +60,16 @@ public abstract class KwarqsRobot extends TimedRobot {
 
     public void setCurrController(String name){
         currController = controllers.get(name);
-        if(this.isTest()) {
-            testInit();
-        } else if(this.isAutonomous()){
-            autonomousInit();
-        } else if(this.isOperatorControl()) {
-            teleopInit();
-        } else {
-            disabledInit(); // for safety of course ;)
+        if(isInitialized){
+            if(this.isTest()) {
+                testInit();
+            } else if(this.isAutonomous()){
+                autonomousInit();
+            } else if(this.isOperatorControl()) {
+                teleopInit();
+            } else {
+                disabledInit(); // for safety of course ;)
+            }
         }
     }
 
@@ -82,12 +86,17 @@ public abstract class KwarqsRobot extends TimedRobot {
 
     @Override
     public void robotInit() {
-        System.out.println("HELLO I'M BEING INITIALIZED");
         init();
+        initAllSubsystems();
         for(String key : controllers.keySet()) {
             System.out.println(key);
             controllers.get(key).robotInit(subsystems);
         }
+        isInitialized = true;
+    }
+
+    public void robotPeriodic(){
+        executeAllSubsystems();
     }
 
     public void teleopPeriodic(){

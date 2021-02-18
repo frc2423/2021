@@ -28,7 +28,11 @@ public class Robot extends KwarqsRobot {
 
   @Override
   public void init(){
-    addSubsystem("drive", new Drive());
+    if (isSimulation()){
+      addSubsystem("drive", new SimDrive());
+    } else {
+      addSubsystem("drive", new Drive());
+    }
     addController("galacticSearch", new GalacticSearch());
 
     setCurrController("galacticSearch");

@@ -85,24 +85,24 @@ public class Drive implements IDrive, ISubsystem{
     private double getP() {
         // return NtHelper.getDouble("/drive/kP", 6e-5);
         // return NtHelper.getDouble("/drive/kP", 0.0001);
-        return NtHelper.getDouble("/drive/kP", 6e-6);
+        return NtHelper.getDouble("/drive/kP", 0.0001);
         // return NtHelper.getDouble("/drive/kP", 0.0002);
     }
 
     private double getI() {
-        return NtHelper.getDouble("/drive/kI", 1e-7);
+        return NtHelper.getDouble("/drive/kI", 0);
         // return NtHelper.getDouble("/drive/kI", 1e-9);
         // return NtHelper.getDouble("/drive/kI", 0);
     }
 
     private double getD() {
-        return NtHelper.getDouble("/drive/kD", 0);
+        return NtHelper.getDouble("/drive/kD", 0.000015);
 
         // return NtHelper.getDouble("/drive/kD", 0.0);
     }
 
     private double getF() {
-        return NtHelper.getDouble("/drive/kF", 0.000015);
+        return NtHelper.getDouble("/drive/kF", 0.0);
         // return NtHelper.getDouble("/drive/kF", 0.0);
     }
 
@@ -163,7 +163,7 @@ public class Drive implements IDrive, ISubsystem{
     }
 
     public Pose2d getPose() {
-        return null;
+        return drivePosition.getPose();
     }
 
     public double getLeftDistance() {
@@ -207,8 +207,8 @@ public class Drive implements IDrive, ISubsystem{
     public void execute() {
         lb_motor.setSpeed(leftSpeed);
         rb_motor.setSpeed(rightSpeed);
-        System.out.println("Drive velocity" + getRightVelocity()+ "  inverted" + lb_motor.getInverted() + " " + rb_motor.getInverted());
-        NtHelper.setDouble("/drive/velocity", getRightVelocity());
+       // System.out.println("Drive velocity" + getRightVelocity() + "  inverted" + lb_motor.getInverted() + " " + rb_motor.getInverted());
+        NtHelper.setDouble("/drive/velocity", getLeftVelocity() /maxSpeed);
         NtHelper.setDouble("/gyroAngle", getAngle());
 
         if (isHighGear()) {

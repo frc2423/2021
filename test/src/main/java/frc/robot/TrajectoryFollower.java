@@ -60,6 +60,7 @@ public class TrajectoryFollower {
     }
 
     public void follow() {
+        System.out.println("cur" + curTrajectory );
         if (curTrajectory != null) {
             double elapsed = timer.get();
             Trajectory.State reference = curTrajectory.sample(elapsed);
@@ -70,6 +71,7 @@ public class TrajectoryFollower {
                 Units.metersToFeet(speeds.vxMetersPerSecond),
                 Units.radiansToDegrees(speeds.omegaRadiansPerSecond)
             );
+            System.out.println("speed: " + speeds.vxMetersPerSecond);
         }
     }
 

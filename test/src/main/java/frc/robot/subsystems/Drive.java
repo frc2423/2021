@@ -54,6 +54,9 @@ public class Drive implements IDrive, ISubsystem{
         rf_motor.setConversionFactor(conversionFactor);
         rb_motor.setConversionFactor(conversionFactor);
 
+        rf_motor.setInverted(true);
+        rb_motor.setInverted(true);
+
         lf_motor.follow(lb_motor);
         rf_motor.follow(rb_motor);
 
@@ -63,29 +66,55 @@ public class Drive implements IDrive, ISubsystem{
         NtHelper.listen("/drive/kP", (table) -> setPids());
         NtHelper.listen("/drive/kI", (table) -> setPids());
         NtHelper.listen("/drive/kD", (table) -> setPids());
+        NtHelper.listen("/drive/kF", (table) -> setPids());
+        NtHelper.listen("/drive/setPoint", (table) -> setSetPoints());
 
         drivePosition = new DrivePosition(kTrackWidth, kWheelRadius, gyro.getRotation2d());
     }
 
+    private double getSetPoint() {
+        return NtHelper.getDouble("/drive/setPoint", 0);
+        
+    }
+    
+    private void setSetPoints() {
+        //leftSpeed = getSetPoint();
+        //rightSpeed = getSetPoint();
+    }
+
     private double getP() {
+        // return NtHelper.getDouble("/drive/kP", 6e-5);
+        // return NtHelper.getDouble("/drive/kP", 0.0001);
         return NtHelper.getDouble("/drive/kP", 0.0001);
+        // return NtHelper.getDouble("/drive/kP", 0.0002);
     }
 
     private double getI() {
-        return NtHelper.getDouble("/drive/kI", 1e-6);
+        return NtHelper.getDouble("/drive/kI", 0);
+        // return NtHelper.getDouble("/drive/kI", 1e-9);
+        // return NtHelper.getDouble("/drive/kI", 0);
     }
 
     private double getD() {
-        return NtHelper.getDouble("/drive/kD", 0.0);
+        return NtHelper.getDouble("/drive/kD", 0.000015);
+
+        // return NtHelper.getDouble("/drive/kD", 0.0);
+    }
+
+    private double getF() {
+        return NtHelper.getDouble("/drive/kF", 0.0);
+        // return NtHelper.getDouble("/drive/kF", 0.0);
     }
 
     private void setPids() {
         lb_motor.setP(getP());
         lb_motor.setI(getI());
         lb_motor.setD(getD());
+        lb_motor.setF(getF());
         rb_motor.setP(getP());
         rb_motor.setI(getI());
         rb_motor.setD(getD());
+        rb_motor.setF(getF());
     }
 
     public void init() {
@@ -134,7 +163,7 @@ public class Drive implements IDrive, ISubsystem{
     }
 
     public Pose2d getPose() {
-        return null;
+        return drivePosition.getPose();
     }
 
     public double getLeftDistance() {
@@ -142,7 +171,7 @@ public class Drive implements IDrive, ISubsystem{
     }
 
     public double getRightDistance() {
-        return -rb_motor.getDistance();
+        return rb_motor.getDistance();
     }
 
     public double getLeftVelocity() {
@@ -150,7 +179,7 @@ public class Drive implements IDrive, ISubsystem{
     }
 
     public double getRightVelocity() {
-        return -rb_motor.getSpeed();
+        return rb_motor.getSpeed();
     }
 
     public void setArcadePercent(double speed, double rot) {
@@ -176,24 +205,19 @@ public class Drive implements IDrive, ISubsystem{
     }
 
     public void execute() {
-        rb_motor.setSpeed(leftSpeed);
-        lb_motor.setSpeed(rightSpeed);
+        lb_motor.setSpeed(leftSpeed);
+        rb_motor.setSpeed(rightSpeed);
+       // System.out.println("Drive velocity" + getRightVelocity() + "  inverted" + lb_motor.getInverted() + " " + rb_motor.getInverted());
+        NtHelper.setDouble("/drive/velocity", getLeftVelocity() /maxSpeed);
+        NtHelper.setDouble("/gyroAngle", getAngle());
 
         if (isHighGear()) {
             gear_switcher.set(DoubleSolenoid.Value.kReverse);
         } else {
             gear_switcher.set(DoubleSolenoid.Value.kForward);
         }
+
+        drivePosition.setInputs(lb_motor.getPercent(), rb_motor.getPercent());
+        drivePosition.updateOdometry(gyro.getRotation2d(), lb_motor.getDistance(), rb_motor.getDistance());
     }
-
-    
-    /** 
-     * Update robot odometry.
-     *  Needs encoders to work.
-     */
-    public void updateOdometry() { //ooooooooh
-        //m_odometry.update(m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
-    }
-
-
 }

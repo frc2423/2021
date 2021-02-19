@@ -23,7 +23,11 @@ public interface IDriveMotor {
 
     public void setInverted(boolean isInverted);
 
+    public boolean getInverted();
+
     public void setPid(double kP, double kI, double kD);
+    
+    public void setPidf(double kP, double kI, double kD, double kF);
 
     public void setP(double kP);
 
@@ -31,11 +35,15 @@ public interface IDriveMotor {
 
     public void setD(double kD);
 
+    public void setF(double kF);
+
     public double getP();
 
     public double getI();
 
     public double getD();
+
+    public double getF();
 
     public void follow(IDriveMotor leader); // thats sir motor to you
 

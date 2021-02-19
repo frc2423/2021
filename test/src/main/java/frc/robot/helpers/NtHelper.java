@@ -20,4 +20,8 @@ public class NtHelper {
     public static double getDouble(String key, double defaultValue) {
         return getEntry(key).getDouble(defaultValue);
     }
+
+    public static void setDouble(String key, double value) {
+        getEntry(key).setDouble(value);
+    }
 }

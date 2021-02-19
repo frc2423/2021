@@ -14,6 +14,7 @@ import frc.robot.subsystems.SimDrive; // S
 import frc.robot.subsystems.IDrive;
 import frc.robot.subsystems.ISubsystem;
 import frc.robot.helpers.DriveHelper;
+import frc.robot.helpers.NtHelper;
 import frc.robot.TrajectoryFollower;
 import java.util.HashMap;
 
@@ -84,6 +85,24 @@ public class GalacticSearch extends Controller {
     if (xboxController.getBumperPressed(Hand.kLeft)) {
       driveBase.switchGears();
     }
+
+  }
+
+  /** This function is called periodically during test mode. */
+  @Override
+  public void testPeriodic() {
+    //NtHelper.setDouble("/drive/velocity", driveBase.getLeftVelocity());
+
+    double y = NtHelper.getDouble("/drive/setPoint", 0);
+
+    driveBase.setTankSpeeds(y, y);
+    
+    
+
+    if (xboxController.getBumperPressed(Hand.kLeft)) {
+      driveBase.switchGears();
+    }
+
 
   }
 }

@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.util.Units;
 
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.controller.RamseteController;
+import edu.wpi.first.wpilibj.RobotBase;
 
 
 public class TrajectoryFollower {
@@ -35,20 +36,25 @@ public class TrajectoryFollower {
 
     public void addTrajectory(String trajectoryName) {
         Trajectory trajectory;
-        trajectoryName = "paths\\" + trajectoryName + ".wpilib.json";
+        trajectoryName = RobotBase.isReal() 
+            ? "paths/" + trajectoryName + ".wpilib.json"
+            : "paths\\" + trajectoryName + ".wpilib.json";
+
         try {
             Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryName);
             trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
             trajectories.put(trajectoryName, trajectory);
         } catch (Exception ex) {
-            System.out.println("ERROR");
+            System.out.println(ex);
         }
     }
 
     public void initFollowing(String trajectoryName) {
         timer.reset();
         timer.start();
-        trajectoryName = "paths\\" + trajectoryName + ".wpilib.json";
+        trajectoryName = RobotBase.isReal() 
+            ? "paths/" + trajectoryName + ".wpilib.json"
+            : "paths\\" + trajectoryName + ".wpilib.json";
 
 
         Trajectory trajectory = trajectories.get(trajectoryName);

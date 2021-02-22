@@ -35,7 +35,7 @@ public class GalacticSearch extends Controller {
 
   private TrajectoryFollower follower;
 
-  String trajectoryJSON = "Barrel";
+  String trajectoryJSON = "Forward";
 
   /**
    * This function is run when the robot is first started up and should be used for any

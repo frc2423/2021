@@ -209,7 +209,7 @@ public class Drive implements IDrive, ISubsystem{
         rb_motor.setSpeed(rightSpeed);
        // System.out.println("Drive velocity" + getRightVelocity() + "  inverted" + lb_motor.getInverted() + " " + rb_motor.getInverted());
         NtHelper.setDouble("/drive/velocity", getLeftVelocity() /maxSpeed);
-        NtHelper.setDouble("/gyroAngle", getAngle());
+        NtHelper.setDouble("/gyroAngle", gyro.getRotation2d().getDegrees());
 
         if (isHighGear()) {
             gear_switcher.set(DoubleSolenoid.Value.kReverse);

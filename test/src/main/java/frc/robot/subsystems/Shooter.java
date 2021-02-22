@@ -18,7 +18,7 @@ public class Shooter implements ISubsystem{
 
     private IMotor shooterWheel1;
     private IMotor shooterWheel2;
-    private double wheelSpeed = .5;
+    private double wheelSpeed = .2;
 
     //placeholder
     private double kp = 1.0;
@@ -27,7 +27,7 @@ public class Shooter implements ISubsystem{
 
     public Shooter() {
         shooterMotor = new NeoMotor(8);
-        shooterMotor.setPids(kp, ki, kd);
+       // shooterMotor.setPids(kp, ki, kd);
 
         // NtHelper.listen("/shooter/kP", (table) -> setPids());
         // NtHelper.listen("/shooter/kI", (table) -> setPids());
@@ -35,8 +35,8 @@ public class Shooter implements ISubsystem{
         // NtHelper.listen("/shooter/kF", (table) -> setPids());
         // NtHelper.listen("/shooter/setPoint", (table) -> setSetPoints());
 
-        shooterWheel1 = new CANSparkMax(10, MotorType.kBrushless);
-        shooterWheel2 = new CANSparkMax(11, MotorType.kBrushless);
+        shooterWheel1 = new NeoMotor(10);
+        shooterWheel2 = new NeoMotor(11);
     }
 
     public void init() {
@@ -60,9 +60,9 @@ public class Shooter implements ISubsystem{
     // }
 
     public boolean atVelocity() {
-        boolean diff = (shooterMotor.getVelocity() - previousVelocity) < atVelocityConstant;
-        previousVelocity = shooterMotor.getVelocity();
-        return diff;
+      //  boolean diff = (shooterMotor.getVelocity() - previousVelocity) < atVelocityConstant;
+      //  previousVelocity = shooterMotor.getVelocity();
+        return false;
     }
 
     public void setWheelSpeeds(double speed) {
@@ -79,7 +79,7 @@ public class Shooter implements ISubsystem{
 
     public void execute() {
         //shooterMotor.setSpeed(speed);
-        shooterWheel1.setSpeed(wheelSpeed);
-        shooterWheel2.setSpeed(wheelSpeed);
+        shooterWheel1.setPercent(wheelSpeed);
+        shooterWheel2.setPercent(-wheelSpeed);
     }
 }

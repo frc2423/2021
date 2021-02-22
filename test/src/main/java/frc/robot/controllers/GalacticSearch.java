@@ -96,11 +96,10 @@ public class GalacticSearch extends Controller {
   public void testPeriodic() {
     //NtHelper.setDouble("/drive/velocity", driveBase.getLeftVelocity());
 
-    double y = NtHelper.getDouble("/drive/setPoint", 0);
+   // double y = NtHelper.getDouble("/drive/setPoint", 0);
 
-    driveBase.setTankSpeeds(y, y);
-    
-    
+    //driveBase.setTankSpeeds(y, y);
+
 
     if (xboxController.getBumperPressed(Hand.kLeft)) {
       driveBase.switchGears();

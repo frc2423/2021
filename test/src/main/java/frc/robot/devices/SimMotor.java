@@ -8,17 +8,17 @@ import edu.wpi.first.wpilibj.Encoder;
 import java.util.ArrayList;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 
-public class SimDriveMotor implements IDriveMotor {
+public class SimMotor implements IMotor {
 
     private PWMVictorSPX  motor;
     private PIDController pidController;  
     private Encoder encoder; 
-    protected ArrayList<SimDriveMotor> followers = new ArrayList<SimDriveMotor>();
+    protected ArrayList<SimMotor> followers = new ArrayList<SimMotor>();
     private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(1, 3);
     private double encoderOffset = 0;
     private final EncoderSim encoderSim;
 
-    public SimDriveMotor(int port, int channelA, int channelB) {
+    public SimMotor(int port, int channelA, int channelB) {
        motor = new PWMVictorSPX(port);
        encoder = new Encoder(channelA, channelB);
        encoderSim = new EncoderSim(encoder);
@@ -30,7 +30,7 @@ public class SimDriveMotor implements IDriveMotor {
         double output = pidController.calculate(getSpeed(), speed);
         motor.setVoltage(output + feedForward.calculate(speed));
                         
-        for (SimDriveMotor follower : followers) {
+        for (SimMotor follower : followers) {
             follower.setSpeed(speed);
         }
     }
@@ -124,9 +124,9 @@ public class SimDriveMotor implements IDriveMotor {
         return 0.0;
     }
 
-    public void follow(IDriveMotor leader){
-        if (leader.getClass() == SimDriveMotor.class) {
-            SimDriveMotor leadDriveMotor = (SimDriveMotor)leader;
+    public void follow(IMotor leader){
+        if (leader.getClass() == SimMotor.class) {
+            SimMotor leadDriveMotor = (SimMotor)leader;
             leadDriveMotor.followers.add(this);
         }
     }

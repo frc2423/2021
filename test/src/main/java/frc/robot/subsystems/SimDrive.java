@@ -23,10 +23,10 @@ public class SimDrive implements IDrive, ISubsystem{
 
     private DoubleSolenoid gear_switcher;
 
-    private IDriveMotor lf_motor; // left front motor
-    private IDriveMotor lb_motor; // left back motor
-    private IDriveMotor rf_motor; // right front motor
-    private IDriveMotor rb_motor; // right back motor
+    private IMotor lf_motor; // left front motor
+    private IMotor lb_motor; // left back motor
+    private IMotor rf_motor; // right front motor
+    private IMotor rb_motor; // right back motor
 
     private IGyro gyro;
 
@@ -43,10 +43,10 @@ public class SimDrive implements IDrive, ISubsystem{
         double conversionFactor = 2 * Math.PI * kWheelRadius / 4096;
 
 
-        lf_motor = new SimDriveMotor(1, 0, 1);
-        lb_motor = new SimDriveMotor(4, 2, 3);
-        rf_motor = new SimDriveMotor(6, 4, 5);
-        rb_motor = new SimDriveMotor(5, 6, 7);
+        lf_motor = new SimMotor(1, 0, 1);
+        lb_motor = new SimMotor(4, 2, 3);
+        rf_motor = new SimMotor(6, 4, 5);
+        rb_motor = new SimMotor(5, 6, 7);
         gyro = new SimGyro();
 
         lf_motor.setConversionFactor(conversionFactor);

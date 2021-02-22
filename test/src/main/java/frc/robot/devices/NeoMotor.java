@@ -6,14 +6,14 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 
-public class DriveMotor implements IDriveMotor {
+public class NeoMotor implements IMotor {
 
     protected CANSparkMax motor;
     private CANEncoder encoder;
     private CANPIDController pidController;
     private double voltage = 0.0;
 
-    public DriveMotor(int port) {
+    public NeoMotor(int port) {
        motor = new CANSparkMax(port, MotorType.kBrushless);
        motor.restoreFactoryDefaults();
        encoder = motor.getEncoder();
@@ -117,9 +117,9 @@ public class DriveMotor implements IDriveMotor {
         return pidController.getFF();
     }
 
-    public void follow(IDriveMotor leader){
-        if(leader.getClass() == DriveMotor.class) {
-            DriveMotor leadDriveMotor = (DriveMotor)leader;
+    public void follow(IMotor leader){
+        if(leader.getClass() == NeoMotor.class) {
+            NeoMotor leadDriveMotor = (NeoMotor)leader;
             this.motor.follow(leadDriveMotor.motor);
         }
     }

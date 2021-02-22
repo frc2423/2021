@@ -1,6 +1,6 @@
 package frc.robot.devices;
 
-public interface IDriveMotor {
+public interface IMotor {
 
 
     public void setSpeed(double speed);
@@ -45,7 +45,7 @@ public interface IDriveMotor {
 
     public double getF();
 
-    public void follow(IDriveMotor leader); // thats sir motor to you
+    public void follow(IMotor leader); // thats sir motor to you
 
     public void setEncoderPositionAndRate(double position, double rate); //poop
 

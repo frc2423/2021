@@ -6,8 +6,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.util.Units;
 
-import frc.robot.devices.IDriveMotor;
-import frc.robot.devices.DriveMotor;
+import frc.robot.devices.IMotor;
+import frc.robot.devices.NeoMotor;
 import frc.robot.devices.Gyro;
 import frc.robot.devices.IGyro;
 import frc.robot.helpers.NtHelper;
@@ -24,10 +24,10 @@ public class Drive implements IDrive, ISubsystem{
 
     private DoubleSolenoid gear_switcher;
 
-    private IDriveMotor lf_motor; // left front motor
-    private IDriveMotor lb_motor; // left back motor
-    private IDriveMotor rf_motor; // right front motor
-    private IDriveMotor rb_motor; // right back motor
+    private IMotor lf_motor; // left front motor
+    private IMotor lb_motor; // left back motor
+    private IMotor rf_motor; // right front motor
+    private IMotor rb_motor; // right back motor
 
     private IGyro gyro;
 
@@ -42,10 +42,10 @@ public class Drive implements IDrive, ISubsystem{
 
         double conversionFactor = ftPerRev / countsPerRev;
 
-        lf_motor = new DriveMotor(1);
-        lb_motor = new DriveMotor(4);
-        rf_motor = new DriveMotor(6);
-        rb_motor = new DriveMotor(5);
+        lf_motor = new NeoMotor(1);
+        lb_motor = new NeoMotor(4);
+        rf_motor = new NeoMotor(6);
+        rb_motor = new NeoMotor(5);
         gyro = new Gyro();
 
 

@@ -4,8 +4,8 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.DrivePosition;
-import frc.robot.devices.IDriveMotor;
-import frc.robot.devices.SimDriveMotor;
+import frc.robot.devices.IMotor;
+import frc.robot.devices.SimMotor;
 import frc.robot.devices.IGyro;
 import frc.robot.devices.SimGyro;
 

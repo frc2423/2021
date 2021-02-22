@@ -13,6 +13,7 @@ import frc.robot.subsystems.Drive; // Q
 import frc.robot.subsystems.SimDrive; // S
 import frc.robot.subsystems.IDrive;
 import frc.robot.subsystems.ISubsystem;
+import frc.robot.subsystems.Shooter;
 import frc.robot.helpers.DriveHelper;
 import frc.robot.helpers.NtHelper;
 import frc.robot.TrajectoryFollower;
@@ -30,6 +31,7 @@ public class GalacticSearch extends Controller {
 
   private XboxController xboxController;
   private IDrive driveBase;
+  private Shooter shooter;
 
   private double joystickDeadband = 0.17;
 
@@ -48,6 +50,7 @@ public class GalacticSearch extends Controller {
     xboxController = new XboxController(0);
 
     driveBase = (IDrive)subsystems.get("drive");
+    shooter = new Shooter();
 
     follower = new TrajectoryFollower(driveBase);
     follower.addTrajectory(trajectoryJSON);
@@ -102,6 +105,10 @@ public class GalacticSearch extends Controller {
     if (xboxController.getBumperPressed(Hand.kLeft)) {
       driveBase.switchGears();
     }
+
+    if (xboxController.getAButton()) {
+        shooter.execute();
+    } 
 
 
   }

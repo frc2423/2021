@@ -89,7 +89,6 @@ public abstract class KwarqsRobot extends TimedRobot {
         init();
         initAllSubsystems();
         for(String key : controllers.keySet()) {
-            System.out.println(key);
             controllers.get(key).robotInit(subsystems);
         }
         isInitialized = true;

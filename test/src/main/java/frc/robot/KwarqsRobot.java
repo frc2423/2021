@@ -86,10 +86,6 @@ public abstract class KwarqsRobot extends TimedRobot {
     public Controller getCurrController(){
         return currController;
     }
-
-    public void initController(){
-        currController.robotInit(subsystems);
-    }
     
     // controller crap
     // WARNING: !!!EPIC CODE BELOW!!!
@@ -99,7 +95,7 @@ public abstract class KwarqsRobot extends TimedRobot {
         init();
         initAllSubsystems();
         for(String key : controllers.keySet()) {
-            controllers.get(key).robotInit(subsystems);
+            controllers.get(key).robotInit(subsystems, devices);
         }
         isInitialized = true;
     }

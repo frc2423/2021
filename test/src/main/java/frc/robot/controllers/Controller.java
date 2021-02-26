@@ -5,7 +5,7 @@ import frc.robot.subsystems.ISubsystem;
 
 public abstract class Controller {
 
-    public abstract void robotInit(HashMap<String, ISubsystem> subsystems);
+    public abstract void robotInit(HashMap<String, ISubsystem> subsystems, HashMap<String, Object> devices);
 
     public void robotPeriodic(){
 

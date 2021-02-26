@@ -16,7 +16,7 @@ public class SimBallTracker implements IBallTracker{
         // Simulated Vision System.
     // Configure these to match your PhotonVision Camera,
     // pipeline, and LED setup.
-    PhotonCamera camera = new PhotonCamera("photonvision");
+    PhotonCamera camera = new PhotonCamera("kwarqsPhotonVision1");
     double camDiagFOV = 170.0; // degrees - assume wide-angle camera
     double camPitch =  Units.degreesToRadians(15); //Units.radiansToDegrees(Robot.CAMERA_PITCH_RADIANS); // degrees // tbd
     double camHeightOffGround = .5; //Robot.CAMERA_HEIGHT_METERS; // meters // tbd

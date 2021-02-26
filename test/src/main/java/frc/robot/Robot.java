@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.XboxController; // A
 
 import frc.robot.subsystems.Drive; // Q
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SimDrive; // S
 import frc.robot.controllers.GalacticSearch;
 
@@ -32,6 +33,7 @@ public class Robot extends KwarqsRobot {
       addDevice("ballTracker", new BallTracker());
     }
     addController("galacticSearch", new GalacticSearch());
+    addSubsystem("intake", new Intake());
 
     setCurrController("galacticSearch");
   }

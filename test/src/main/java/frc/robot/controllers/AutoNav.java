@@ -16,7 +16,6 @@ import jdk.jfr.Threshold;
 import frc.robot.subsystems.IDrive;
 import frc.robot.subsystems.ISubsystem;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.IIntake;
 import frc.robot.helpers.DriveHelper;
 import frc.robot.helpers.NtHelper;
 import frc.robot.TrajectoryFollower;
@@ -32,7 +31,7 @@ import java.util.HashMap;
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class GalacticSearch extends Controller {
+public class AutoNav extends Controller {
 
   private XboxController xboxController;
   private IDrive driveBase;
@@ -42,8 +41,6 @@ public class GalacticSearch extends Controller {
   private double joystickDeadband = 0.17;
 
   private TrajectoryFollower follower;
-
-  private IIntake intake;
 
   String trajectoryJSON = "Forward";
 
@@ -63,8 +60,7 @@ public class GalacticSearch extends Controller {
     ballTracker = (IBallTracker)devices.get("ballTracker");
 
     follower = new TrajectoryFollower(driveBase);
-
-    intake = (IIntake)devices.get("intake");
+    follower.addTrajectory(trajectoryJSON);
 
     ballTracker.addSimulatedBall(10, 0);
   }
@@ -97,17 +93,13 @@ public class GalacticSearch extends Controller {
 
   @Override
   public void autonomousInit() {
-    String field = detectField();
-    follower.addTrajectory(field);
-    follower.initFollowing(field);
-    intake.intakeDown();
+    follower.initFollowing(trajectoryJSON);
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
     follower.follow();
-    intake.intake();
   }
 
   /** This function is called once when teleop is enabled. */

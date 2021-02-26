@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.XboxController; // A
 
 import frc.robot.subsystems.Drive; // Q
 import frc.robot.subsystems.Intake;
@@ -13,6 +12,7 @@ import frc.robot.subsystems.SimIntake;
 import frc.robot.subsystems.SimStorage;
 import frc.robot.subsystems.Storage;
 import frc.robot.controllers.GalacticSearch;
+import frc.robot.controllers.ShooterTesting;
 
 import frc.robot.devices.SimBallTracker;
 import frc.robot.helpers.NtHelper;
@@ -44,11 +44,14 @@ public class Robot extends KwarqsRobot {
       addSubsystem("intake", new Intake());
       addDevice("ballTracker", new BallTracker());
     }
-    addController("galacticSearch", new GalacticSearch());
+    
+    addController("Galactic Search", new GalacticSearch());
+    addController("Shooter Tester", new ShooterTesting());
 
     setCurrController("Galactic Search");
-    NtHelper.listen("/controllerPicker/value", (table) -> {
-      setCurrController(NtHelper.getString("/controllerPicker/value", "Galactic Search"));
+    
+    NtHelper.listen("/controllerPicker/selected", (table) -> {
+      setCurrController(NtHelper.getString("/controllerPicker/selected", "Galactic Search"));
     });
   }
 }

@@ -34,18 +34,16 @@ public class Robot extends KwarqsRobot {
     if (isSimulation()){
       addSubsystem("drive", new SimDrive());
       addSubsystem("shooter", new Shooter());
-      addSubsystem("storage", new SimStorage());
+      // addSubsystem("storage", new SimStorage());
       addSubsystem("intake", new SimIntake());
       addDevice("ballTracker", new SimBallTracker());
     } else {
       addSubsystem("drive", new Drive());
       addSubsystem("shooter", new Shooter());
-      addSubsystem("storage", new Storage());
+      // addSubsystem("storage", new Storage());
       addSubsystem("intake", new Intake());
       addDevice("ballTracker", new BallTracker());
     }
-
-    addDevice("intake", new Intake());
 
     addController("Galactic Search", new GalacticSearch());
     addController("Shooter Tester", new ShooterTesting());

@@ -55,7 +55,7 @@ public class AutoNav extends Controller {
     xboxController = new XboxController(0);
 
     driveBase = (IDrive)subsystems.get("drive");
-    shooter = new Shooter();
+    shooter = (Shooter)subsystems.get("shooter");
 
     ballTracker = (IBallTracker)devices.get("ballTracker");
 

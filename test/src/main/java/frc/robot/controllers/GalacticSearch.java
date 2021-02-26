@@ -59,7 +59,7 @@ public class GalacticSearch extends Controller {
 
     follower = new TrajectoryFollower(driveBase);
 
-    intake = (IIntake)devices.get("intake");
+    intake = (IIntake)subsystems.get("intake");
 
     ballTracker.addSimulatedBall(10, 0);
   }

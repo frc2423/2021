@@ -55,4 +55,11 @@ public class DriveHelper {
         }
         return yVal;
     }
+
+    public static double squareInputs(double initVal) {
+        if (initVal < 0) {
+            return (Math.pow(initVal, 2)) * -1;
+        }
+        return Math.pow(initVal, 2);
+    }
 }

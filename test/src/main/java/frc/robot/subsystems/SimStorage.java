@@ -3,14 +3,14 @@ package frc.robot.subsystems;
 import java.util.ArrayList;
 import edu.wpi.first.wpilibj.AnalogInput;
 import frc.robot.devices.IMotor;
-import frc.robot.devices.NeoMotor;
+import frc.robot.devices.SimMotor;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 
-public class Storage implements ISubsystem{
+public class SimStorage implements ISubsystem{
     private IMotor beltMotor;
     private AnalogInput ballSensor;
   
@@ -20,8 +20,8 @@ public class Storage implements ISubsystem{
     private double beltMotorSpeed = 0.0;
   
   
-    public Storage (){
-      beltMotor = new NeoMotor(3);
+    public SimStorage (){
+      beltMotor = new SimMotor(3, 12, 13);
       ballSensor = new AnalogInput(0);
       for (int x = 0; x < BALL_READING_COUNT; x++) {
           ballReadings.add(false);

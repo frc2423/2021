@@ -4,16 +4,20 @@
 
 package frc.robot.controllers;
 
+import edu.wpi.first.wpilibj.TimedRobot; // K
 import edu.wpi.first.wpilibj.GenericHID.Hand; // W
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj.XboxController; // A
 import edu.wpi.first.wpilibj.RobotBase; // R
 
+import frc.robot.subsystems.Drive; // Q
+import frc.robot.subsystems.SimDrive; // S
+import jdk.jfr.Threshold;
 import frc.robot.subsystems.IDrive;
 import frc.robot.subsystems.ISubsystem;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.IIntake;
 import frc.robot.helpers.DriveHelper;
+import frc.robot.helpers.NtHelper;
 import frc.robot.TrajectoryFollower;
 import frc.robot.devices.IBallTracker;
 
@@ -27,7 +31,7 @@ import java.util.HashMap;
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class GalacticSearch extends Controller {
+public class AutoNav extends Controller {
 
   private XboxController xboxController;
   private IDrive driveBase;
@@ -37,8 +41,6 @@ public class GalacticSearch extends Controller {
   private double joystickDeadband = 0.17;
 
   private TrajectoryFollower follower;
-
-  private IIntake intake;
 
   String trajectoryJSON = "Forward";
 
@@ -53,13 +55,12 @@ public class GalacticSearch extends Controller {
     xboxController = new XboxController(0);
 
     driveBase = (IDrive)subsystems.get("drive");
-    shooter = (Shooter)subsystems.get("shooter");
+    shooter = new Shooter();
 
     ballTracker = (IBallTracker)devices.get("ballTracker");
 
     follower = new TrajectoryFollower(driveBase);
-
-    intake = (IIntake)devices.get("intake");
+    follower.addTrajectory(trajectoryJSON);
 
     ballTracker.addSimulatedBall(10, 0);
   }
@@ -92,17 +93,13 @@ public class GalacticSearch extends Controller {
 
   @Override
   public void autonomousInit() {
-    String field = detectField();
-    follower.addTrajectory(field);
-    follower.initFollowing(field);
-    intake.intakeDown();
+    follower.initFollowing(trajectoryJSON);
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
     follower.follow();
-    intake.intake();
   }
 
   /** This function is called once when teleop is enabled. */
@@ -119,8 +116,8 @@ public class GalacticSearch extends Controller {
     double y = RobotBase.isReal() ? xboxController.getY(Hand.kRight) : xboxController.getRawAxis(1);
 
     driveBase.setArcadePercent(
-      DriveHelper.squareInputs(DriveHelper.applyDeadband(-y, joystickDeadband)), 
-      DriveHelper.squareInputs(DriveHelper.applyDeadband(x, joystickDeadband))
+      DriveHelper.applyDeadband(-y, joystickDeadband), 
+      DriveHelper.applyDeadband(x, joystickDeadband)
     );
 
     if (xboxController.getBumperPressed(Hand.kLeft)) {

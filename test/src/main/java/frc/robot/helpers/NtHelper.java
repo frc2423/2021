@@ -24,4 +24,8 @@ public class NtHelper {
     public static void setDouble(String key, double value) {
         getEntry(key).setDouble(value);
     }
+
+    public static String getString(String key, String defaultValue) {
+        return getEntry(key).getString(defaultValue);
+    }
 }

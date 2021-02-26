@@ -88,8 +88,8 @@ public class GalacticSearch extends Controller {
     double y = RobotBase.isReal() ? xboxController.getY(Hand.kRight) : xboxController.getRawAxis(1);
 
     driveBase.setArcadePercent(
-      DriveHelper.applyDeadband(-y, joystickDeadband), 
-      DriveHelper.applyDeadband(x, joystickDeadband)
+      DriveHelper.squareInputs(DriveHelper.applyDeadband(-y, joystickDeadband)), 
+      DriveHelper.squareInputs(DriveHelper.applyDeadband(x, joystickDeadband))
     );
 
     if (xboxController.getBumperPressed(Hand.kLeft)) {

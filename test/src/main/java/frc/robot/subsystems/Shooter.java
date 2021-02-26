@@ -6,6 +6,9 @@ import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.ControlType;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
+import frc.robot.helpers.NtHelper;
+
 import frc.robot.devices.IMotor;
 import frc.robot.devices.NeoMotor;
 
@@ -38,6 +41,9 @@ public class Shooter implements ISubsystem{
 
         shooterWheel1 = new NeoMotor(10);
         shooterWheel2 = new NeoMotor(11);
+
+        NtHelper.listen("/shooter/wheelSpeed", (table) -> setWheelSpeeds());
+        NtHelper.listen("/shooter/motorSpeed", (table) -> setShooterMotorSpeed());
     }
 
     public void init() {
@@ -66,12 +72,20 @@ public class Shooter implements ISubsystem{
         return false;
     }
 
-    public void setWheelSpeeds(double speed) {
-        wheelSpeed = speed;
+    public double getWheelSpeed() {
+        return NtHelper.getDouble("/shooter/wheelSpeed", 0);
+    }
+    
+    public void setWheelSpeeds() {
+        wheelSpeed = getWheelSpeed();
     }
 
-    public void setShooterMotorSpeed(double speed) {
-        shooterSpeed = speed;
+    public double getShooterMotorSpeed() {
+        return NtHelper.getDouble("/shooter/motorSpeed", 0);
+    }
+
+    public void setShooterMotorSpeed() {
+        shooterSpeed = getShooterMotorSpeed();
     }
 
     public void shoot() {

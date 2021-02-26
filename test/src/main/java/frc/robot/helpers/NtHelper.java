@@ -28,4 +28,8 @@ public class NtHelper {
     public static String getString(String key, String defaultValue) {
         return getEntry(key).getString(defaultValue);
     }
+
+    public static void setString(String key, String value) {
+        getEntry(key).setString(value);
+    }
 }

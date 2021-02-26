@@ -13,15 +13,6 @@ public class BallTracker implements IBallTracker{
     double camPitch =  Units.degreesToRadians(15); //Units.radiansToDegrees(Robot.CAMERA_PITCH_RADIANS); // degrees // tbd
     PhotonCamera camera = new PhotonCamera("kwarqsPhotonVision1");
 
-    private void bestTarget() {
-        var result = camera.getLatestResult();
-        if (result.hasTargets()) {
-            //result.getBestTarget().
-            // Rotation speed is the output of the PID controller
-            // rotationSpeed = controller.calculate(result.getBestTarget().getYaw(), 0);
-        }
-    }
-
     public boolean hasTargets(){
         return camera.getLatestResult().hasTargets();
     }

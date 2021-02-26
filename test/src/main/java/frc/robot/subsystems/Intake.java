@@ -1,6 +1,9 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.devices.NeoMotor;
+import frc.robot.devices.IMotor;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANEncoder;
@@ -14,23 +17,21 @@ public class Intake implements IIntake{
     private State state = State.NOTHING;
     private Timer timer = new Timer();
     private double zoom  = 0.6;
-    private CANSparkMax motor;
+    private IMotor motor;
     private Boolean running;
-    private CANEncoder encoder;
     private double stallZone = 1500.0;
     private DoubleSolenoid intakeValve;
-    private CANSparkMax greenWheel;
+    private IMotor greenWheel;
 
     private double motorSpeed = 0.0;
     private double greenWheelSpeed = 0.0;
     private DoubleSolenoid.Value intakeValue = DoubleSolenoid.Value.kOff;
 
     public Intake() {
-        motor = new CANSparkMax(7, MotorType.kBrushless);
-        encoder = motor.getEncoder();
+        motor = new NeoMotor(7);
         running = false;
         intakeValve = new DoubleSolenoid(2, 3);
-        greenWheel = new CANSparkMax(2, MotorType.kBrushless);
+        greenWheel = new NeoMotor(2);
     }
 
     public void init() {
@@ -74,7 +75,7 @@ public class Intake implements IIntake{
               break;
             case INTAKEBALLS :
                 motorSpeed = zoom;
-                if(encoder.getVelocity() > -stallZone && encoder.getVelocity() < stallZone){
+                if(motor.getSpeed() > -stallZone && motor.getSpeed() < stallZone){
                   state = State.STALLED;
                   timer.stop();
                   timer.reset();
@@ -86,7 +87,7 @@ public class Intake implements IIntake{
                 break;
             case STALLED :
                 motorSpeed = zoom;
-                if(encoder.getVelocity() < -stallZone && encoder.getVelocity() > stallZone){
+                if(motor.getSpeed() < -stallZone && motor.getSpeed() > stallZone){
                   state = State.INTAKEBALLS;
                   timer.stop();
                   timer.reset();
@@ -118,8 +119,8 @@ public class Intake implements IIntake{
     }
 
     public void execute() {
-      motor.set(motorSpeed);
-      greenWheel.set(greenWheelSpeed);
+      motor.setSpeed(motorSpeed);
+      greenWheel.setSpeed(greenWheelSpeed);
       intakeValve.set(intakeValue);
     }
   

@@ -18,4 +18,5 @@ public interface IBallTracker {
 
     public void giveRobotPose(Pose2d pose);
 
+    public double getPitchFromTarget();
 }

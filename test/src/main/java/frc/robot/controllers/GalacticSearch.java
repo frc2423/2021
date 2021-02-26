@@ -17,6 +17,8 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.helpers.DriveHelper;
 import frc.robot.helpers.NtHelper;
 import frc.robot.TrajectoryFollower;
+import frc.robot.devices.IBallTracker;
+
 import java.util.HashMap;
 
 
@@ -32,6 +34,7 @@ public class GalacticSearch extends Controller {
   private XboxController xboxController;
   private IDrive driveBase;
   private Shooter shooter;
+  private IBallTracker ballTracker;
 
   private double joystickDeadband = 0.17;
 
@@ -45,15 +48,19 @@ public class GalacticSearch extends Controller {
    */
 
   @Override
-  public void robotInit(HashMap<String, ISubsystem> subsystems) {
+  public void robotInit(HashMap<String, ISubsystem> subsystems, HashMap<String, Object> devices) {
 
     xboxController = new XboxController(0);
 
     driveBase = (IDrive)subsystems.get("drive");
     shooter = new Shooter();
 
+    ballTracker = (IBallTracker)devices.get("ballTracker");
+
     follower = new TrajectoryFollower(driveBase);
     follower.addTrajectory(trajectoryJSON);
+
+    ballTracker.addSimulatedBall(10, 0);
   }
 
   @Override
@@ -89,6 +96,9 @@ public class GalacticSearch extends Controller {
       driveBase.switchGears();
     }
 
+    ballTracker.giveRobotPose(driveBase.getPose());
+
+    System.out.println("Has targets:" + ballTracker.hasTargets() + ", Distance from target:" + ballTracker.getDistanceFromTarget() + ", Angle from target:" + ballTracker.getAngleFromTarget() + ", Pitch:" + ballTracker.getPitchFromTarget());
   }
 
   /** This function is called periodically during test mode. */

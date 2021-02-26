@@ -8,6 +8,9 @@ package frc.robot;
 import frc.robot.subsystems.Drive; // Q
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.SimDrive; // S
+import frc.robot.subsystems.SimIntake;
+import frc.robot.subsystems.SimStorage;
+import frc.robot.subsystems.Storage;
 import frc.robot.controllers.GalacticSearch;
 import frc.robot.controllers.ShooterTesting;
 
@@ -31,10 +34,14 @@ public class Robot extends KwarqsRobot {
     if (isSimulation()){
       addSubsystem("drive", new SimDrive());
       addSubsystem("shooter", new Shooter());
+      addSubsystem("storage", new SimStorage());
+      addSubsystem("intake", new SimIntake());
       addDevice("ballTracker", new SimBallTracker());
     } else {
       addSubsystem("drive", new Drive());
       addSubsystem("shooter", new Shooter());
+      addSubsystem("storage", new Storage());
+      addSubsystem("intake", new Intake());
       addDevice("ballTracker", new BallTracker());
     }
 

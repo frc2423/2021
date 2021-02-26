@@ -10,6 +10,7 @@ public abstract class KwarqsRobot extends TimedRobot {
 
     private HashMap<String ,ISubsystem> subsystems;
     private HashMap<String, Controller> controllers;
+    private HashMap<String, Object> devices;
 
     private Controller currController;
 
@@ -18,6 +19,7 @@ public abstract class KwarqsRobot extends TimedRobot {
     public KwarqsRobot(){
         subsystems = new HashMap<String, ISubsystem>();
         controllers = new HashMap<String, Controller>();
+        devices = new HashMap<String, Object>();
     }
 
     public abstract void init();
@@ -26,8 +28,16 @@ public abstract class KwarqsRobot extends TimedRobot {
         subsystems.put(name, subsystem);
     }
 
+    public void addDevice(String name, Object device){
+        devices.put(name, device);
+    }
+
     public ISubsystem getSubsystem(String name){
         return subsystems.get(name);
+    }
+
+    public Object getDevice(String name) {
+        return devices.get(name);
     }
 
     public void initSubsystem(String name){

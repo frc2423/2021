@@ -37,8 +37,8 @@ public class Robot extends KwarqsRobot {
       addSubsystem("shooter", new Shooter());
       addDevice("ballTracker", new BallTracker());
     }
-    
-    addSubsystem("intake", new Intake());
+
+    addDevice("intake", new Intake());
 
     addController("Galactic Search", new GalacticSearch());
     addController("Shooter Tester", new ShooterTesting());

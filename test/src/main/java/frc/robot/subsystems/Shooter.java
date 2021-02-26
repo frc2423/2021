@@ -18,7 +18,8 @@ public class Shooter implements ISubsystem{
 
     private IMotor shooterWheel1;
     private IMotor shooterWheel2;
-    private double wheelSpeed = .2;
+    private double wheelSpeed = 0;
+    private double shooterSpeed = 0;
 
     //placeholder
     private double kp = 1.0;
@@ -69,6 +70,10 @@ public class Shooter implements ISubsystem{
         wheelSpeed = speed;
     }
 
+    public void setShooterMotorSpeed(double speed) {
+        shooterSpeed = speed;
+    }
+
     public void shoot() {
         speed = -1.0;
     }
@@ -78,7 +83,7 @@ public class Shooter implements ISubsystem{
     }
 
     public void execute() {
-        //shooterMotor.setSpeed(speed);
+        shooterMotor.setPercent(shooterSpeed);
         shooterWheel1.setPercent(wheelSpeed);
         shooterWheel2.setPercent(-wheelSpeed);
     }

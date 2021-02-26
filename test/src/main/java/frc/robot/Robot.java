@@ -11,7 +11,10 @@ import frc.robot.subsystems.SimDrive; // S
 import frc.robot.controllers.GalacticSearch;
 
 import frc.robot.devices.SimBallTracker;
+import frc.robot.helpers.NtHelper;
 import frc.robot.devices.BallTracker;
+
+import frc.robot.subsystems.Shooter;
 
 
 /**
@@ -26,13 +29,18 @@ public class Robot extends KwarqsRobot {
   public void init(){
     if (isSimulation()){
       addSubsystem("drive", new SimDrive());
+      addSubsystem("shooter", new Shooter());
       addDevice("ballTracker", new SimBallTracker());
     } else {
       addSubsystem("drive", new Drive());
+      addSubsystem("shooter", new Shooter());
       addDevice("ballTracker", new BallTracker());
     }
-    addController("galacticSearch", new GalacticSearch());
+    addController("Galactic Search", new GalacticSearch());
 
-    setCurrController("galacticSearch");
+    setCurrController("Galactic Search");
+    NtHelper.listen("/controllerPicker/value", (table) -> {
+      setCurrController(NtHelper.getString("/controllerPicker/value", "Galactic Search"));
+    });
   }
 }

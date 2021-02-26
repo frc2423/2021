@@ -4,21 +4,16 @@
 
 package frc.robot.controllers;
 
-import edu.wpi.first.wpilibj.TimedRobot; // K
 import edu.wpi.first.wpilibj.GenericHID.Hand; // W
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj.XboxController; // A
 import edu.wpi.first.wpilibj.RobotBase; // R
 
-import frc.robot.subsystems.Drive; // Q
-import frc.robot.subsystems.SimDrive; // S
-import jdk.jfr.Threshold;
 import frc.robot.subsystems.IDrive;
 import frc.robot.subsystems.ISubsystem;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.IIntake;
 import frc.robot.helpers.DriveHelper;
-import frc.robot.helpers.NtHelper;
 import frc.robot.TrajectoryFollower;
 import frc.robot.devices.IBallTracker;
 

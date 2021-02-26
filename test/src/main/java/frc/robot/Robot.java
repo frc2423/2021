@@ -4,17 +4,14 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.TimedRobot; // K
-import edu.wpi.first.wpilibj.GenericHID.Hand; // W
 import edu.wpi.first.wpilibj.XboxController; // A
-import edu.wpi.first.wpilibj.RobotBase; // R
 
 import frc.robot.subsystems.Drive; // Q
 import frc.robot.subsystems.SimDrive; // S
-import frc.robot.subsystems.IDrive;
 import frc.robot.controllers.GalacticSearch;
-import frc.robot.helpers.DriveHelper;
-import frc.robot.helpers.NtHelper;
+
+import frc.robot.devices.SimBallTracker;
+import frc.robot.devices.BallTracker;
 
 
 /**
@@ -25,14 +22,14 @@ import frc.robot.helpers.NtHelper;
  */
 public class Robot extends KwarqsRobot {
 
-  private XboxController xboxController;
-
   @Override
   public void init(){
     if (isSimulation()){
       addSubsystem("drive", new SimDrive());
+      addDevice("ballTracker", new SimBallTracker());
     } else {
       addSubsystem("drive", new Drive());
+      addDevice("ballTracker", new BallTracker());
     }
     addController("galacticSearch", new GalacticSearch());
 

@@ -22,11 +22,14 @@ public class BallTracker implements IBallTracker{
     }
 
     public double getDistanceFromTarget(){ // uhhhhhh
-        return PhotonUtils.calculateDistanceToTargetMeters(
-            camHeightOffGround,
-            0.2,
-            Units.degreesToRadians(camPitch),
-            Units.degreesToRadians(camera.getLatestResult().getBestTarget().getPitch()));
+        if (hasTargets()) {
+            return PhotonUtils.calculateDistanceToTargetMeters(
+                camHeightOffGround,
+                0.2,
+                Units.degreesToRadians(camPitch),
+                Units.degreesToRadians(camera.getLatestResult().getBestTarget().getPitch()));
+        }
+        return 0;
     }
 
     public double getAngleFromTarget(){

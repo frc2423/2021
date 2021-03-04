@@ -42,7 +42,7 @@ public class AutoNav extends Controller {
 
   private TrajectoryFollower follower;
 
-  String trajectoryJSON = "Forward";
+  String trajectoryJSON = "Straight";
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -94,6 +94,8 @@ public class AutoNav extends Controller {
   @Override
   public void autonomousInit() {
     follower.initFollowing(trajectoryJSON);
+    driveBase.setDefaultPIDs();
+
   }
 
   /** This function is called periodically during autonomous. */
@@ -106,6 +108,8 @@ public class AutoNav extends Controller {
   @Override
   public void teleopInit() {
     driveBase.init();
+    driveBase.setDefaultPIDs();
+
   }
 
   /** This function is called periodically during operator control. */
@@ -115,10 +119,13 @@ public class AutoNav extends Controller {
     double x = RobotBase.isReal() ? xboxController.getX(Hand.kRight) : xboxController.getRawAxis(0);
     double y = RobotBase.isReal() ? xboxController.getY(Hand.kRight) : xboxController.getRawAxis(1);
 
-    driveBase.setArcadePercent(
+    /*driveBase.setArcadePercent(
       DriveHelper.applyDeadband(-y, joystickDeadband), 
       DriveHelper.applyDeadband(x, joystickDeadband)
-    );
+    ); */
+   // driveBase.setArcadeSpeeds(2,0);
+   driveBase.setArcadeSpeeds(4, 0);
+    System.out.println("In teleop");
 
     if (xboxController.getBumperPressed(Hand.kLeft)) {
       driveBase.switchGears();

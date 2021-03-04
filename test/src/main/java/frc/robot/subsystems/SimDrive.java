@@ -95,6 +95,10 @@ public class SimDrive implements IDrive, ISubsystem{
         rb_motor.setD(getD());
     }
 
+    public void setDefaultPIDs(){
+        
+    }
+
     public void init() {
         setArcadeSpeeds(0.0, 0.0);
         toLowGear();

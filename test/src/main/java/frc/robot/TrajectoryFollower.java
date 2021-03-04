@@ -70,6 +70,7 @@ public class TrajectoryFollower {
             double elapsed = timer.get();
             Trajectory.State reference = curTrajectory.sample(elapsed);
             ChassisSpeeds speeds = ramsete.calculate(drive.getPose(), reference);
+            //System.out.println("speeds " + speeds);
 
             // set robot speed and rotation 
             drive.setArcadeSpeeds(

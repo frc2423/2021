@@ -109,11 +109,13 @@ public class GalacticSearch extends Controller {
   @Override
   public void teleopInit() {
     driveBase.init();
+    driveBase.setDefaultPIDs();
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+    System.out.println("RUNNING GLACTIC");
 
     double x = RobotBase.isReal() ? xboxController.getX(Hand.kRight) : xboxController.getRawAxis(0);
     double y = RobotBase.isReal() ? xboxController.getY(Hand.kRight) : xboxController.getRawAxis(1);

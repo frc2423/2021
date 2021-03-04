@@ -13,6 +13,7 @@ import frc.robot.subsystems.SimStorage;
 import frc.robot.subsystems.Storage;
 import frc.robot.controllers.GalacticSearch;
 import frc.robot.controllers.ShooterTesting;
+import frc.robot.controllers.AutoNav;
 
 import frc.robot.devices.SimBallTracker;
 import frc.robot.helpers.NtHelper;
@@ -47,12 +48,13 @@ public class Robot extends KwarqsRobot {
 
     addController("Galactic Search", new GalacticSearch());
     addController("Shooter Tester", new ShooterTesting());
+    addController("Auto Nav", new AutoNav());
 
-    setCurrController("Galactic Search");
+    setCurrController("Auto Nav");
     
     NtHelper.listen("/controllerPicker/selected", (table) -> {
-      setCurrController(NtHelper.getString("/controllerPicker/selected", "Galactic Search"));
+      setCurrController(NtHelper.getString("/controllerPicker/selected", "Auto Nav"));
     });
-    NtHelper.setString("/controllerPicker/selected", "Galactic Search");
+    NtHelper.setString("/controllerPicker/selected", "Auto Nav");
   }
 }

@@ -35,4 +35,6 @@ public interface IDrive {
     public void setArcadePercent(double speed, double rot);
 
     public void setTankPercent(double leftSpeed, double rightSpeed);
+
+    public void setDefaultPIDs();
 }

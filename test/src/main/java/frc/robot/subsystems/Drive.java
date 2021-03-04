@@ -37,11 +37,16 @@ public class Drive implements IDrive, ISubsystem{
     private static final double kTrackWidth = 1.9375;
     private static final double kWheelRadius = 0.5;
     private final DrivePosition drivePosition;
+
+    private double defaultP = 0.0001;
+    private double defaultI = 0.0;
+    private double defaultD = 0.000015;
+    private double defaultF = 0.0;
     
     public Drive () {
 
         double conversionFactor = ftPerRev / countsPerRev;
-
+        conversionFactor = conversionFactor *10 /7.5;
         lf_motor = new NeoMotor(1);
         lb_motor = new NeoMotor(4);
         rf_motor = new NeoMotor(6);
@@ -63,12 +68,12 @@ public class Drive implements IDrive, ISubsystem{
         setPids();
         gear_switcher = new DoubleSolenoid(0, 1);
 
-        NtHelper.listen("/drive/kP", (table) -> setPids());
+        /*NtHelper.listen("/drive/kP", (table) -> setPids());
         NtHelper.listen("/drive/kI", (table) -> setPids());
         NtHelper.listen("/drive/kD", (table) -> setPids());
         NtHelper.listen("/drive/kF", (table) -> setPids());
         NtHelper.listen("/drive/setPoint", (table) -> setSetPoints());
-
+*/
         drivePosition = new DrivePosition(kTrackWidth, kWheelRadius, gyro.getRotation2d());
     }
 
@@ -85,25 +90,36 @@ public class Drive implements IDrive, ISubsystem{
     private double getP() {
         // return NtHelper.getDouble("/drive/kP", 6e-5);
         // return NtHelper.getDouble("/drive/kP", 0.0001);
-        return NtHelper.getDouble("/drive/kP", 0.0001);
+        return NtHelper.getDouble("/drive/kP", defaultP);
         // return NtHelper.getDouble("/drive/kP", 0.0002);
     }
 
     private double getI() {
-        return NtHelper.getDouble("/drive/kI", 0);
+        return NtHelper.getDouble("/drive/kI", defaultI);
         // return NtHelper.getDouble("/drive/kI", 1e-9);
         // return NtHelper.getDouble("/drive/kI", 0);
     }
 
     private double getD() {
-        return NtHelper.getDouble("/drive/kD", 0.000015);
+        return NtHelper.getDouble("/drive/kD", defaultD);
 
         // return NtHelper.getDouble("/drive/kD", 0.0);
     }
 
     private double getF() {
-        return NtHelper.getDouble("/drive/kF", 0.0);
+        return NtHelper.getDouble("/drive/kF", defaultF);
         // return NtHelper.getDouble("/drive/kF", 0.0);
+    }
+
+    public void setDefaultPIDs() {
+        lb_motor.setP(defaultP);
+        lb_motor.setI(defaultI);
+        lb_motor.setD(defaultD);
+        lb_motor.setF(defaultF);
+        rb_motor.setP(defaultP);
+        rb_motor.setI(defaultI);
+        rb_motor.setD(defaultD);
+        rb_motor.setF(defaultF);
     }
 
     private void setPids() {
@@ -201,13 +217,14 @@ public class Drive implements IDrive, ISubsystem{
         DifferentialDriveWheelSpeeds wheelSpeeds = drivePosition.getWheelSpeeds(feetPerSecond, degreesPerSecond);
         double leftFeetPerSecond = Units.metersToFeet(wheelSpeeds.leftMetersPerSecond);
         double rightFeetPerSecond = Units.metersToFeet(wheelSpeeds.rightMetersPerSecond);
+        System.out.println("arcade speeds left" + leftFeetPerSecond + " right" + rightFeetPerSecond + " degrees" + degreesPerSecond + " speed" + feetPerSecond + " encoder value" + lb_motor.getDistance());
         setTankSpeeds(leftFeetPerSecond, rightFeetPerSecond);
     }
 
     public void execute() {
         lb_motor.setSpeed(leftSpeed);
         rb_motor.setSpeed(rightSpeed);
-       // System.out.println("Drive velocity" + getRightVelocity() + "  inverted" + lb_motor.getInverted() + " " + rb_motor.getInverted());
+   //    System.out.println("Drive velocity" + getRightVelocity() + "  left" + leftSpeed + " right" + rightSpeed);
         NtHelper.setDouble("/drive/velocity", getLeftVelocity() /maxSpeed);
         NtHelper.setDouble("/gyroAngle", gyro.getRotation2d().getDegrees());
 

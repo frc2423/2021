@@ -36,7 +36,7 @@ public class NeoMotor implements IMotor {
     }
 
     public void setPercent(double percent){
-        pidController.setReference(percent, ControlType.kVoltage);
+        pidController.setReference(percent, ControlType.kDutyCycle);
         voltage = percent;
     }
 

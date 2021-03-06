@@ -32,6 +32,11 @@ public class Robot extends TimedRobot {
   private CANSparkMax rb_motor;
   private CANSparkMax rf_motor;
 
+  private CANPIDController lb_pidController;
+  private CANPIDController lf_pidController;
+  private CANPIDController rb_pidController;
+  private CANPIDController rf_pidController;
+
   private XboxController xboxController;
 
   private double defaultP = 0.0001;
@@ -55,34 +60,40 @@ public class Robot extends TimedRobot {
     rf_motor = new CANSparkMax(6, MotorType.kBrushless);
     rb_motor = new CANSparkMax(5, MotorType.kBrushless);
 
+    lb_pidController = lb_motor.getPIDController();
+    lf_pidController = lf_motor.getPIDController();
+    rb_pidController = rb_motor.getPIDController();
+    rf_pidController = rf_motor.getPIDController();
+    
+
     lf_motor.restoreFactoryDefaults();
     lb_motor.restoreFactoryDefaults();
     rf_motor.restoreFactoryDefaults();
     rb_motor.restoreFactoryDefaults();
 
-    setConversionFactor(lf_motor, conversionFactor);
-    setConversionFactor(lb_motor, conversionFactor);
-    setConversionFactor(rf_motor, conversionFactor);
-    setConversionFactor(rb_motor, conversionFactor);
+    // setConversionFactor(lf_motor, conversionFactor);
+    // setConversionFactor(lb_motor, conversionFactor);
+    // setConversionFactor(rf_motor, conversionFactor);
+    // setConversionFactor(rb_motor, conversionFactor);
 
     rf_motor.setInverted(true);
     rb_motor.setInverted(true);
 
     lf_motor.follow(lb_motor);
     rf_motor.follow(rb_motor);
+    // rb_motor.follow(rf_motor);
 
 
     // setPids(lf_motor);
-    setPids(lb_motor);
+    setPids(lb_pidController);
     // setPids(rf_motor);
-    setPids(rb_motor);
+    setPids(rb_pidController);
 
     System.out.println("robotInit");
 
   }
 
-  private void setPids(CANSparkMax motor) {
-    CANPIDController pidController = motor.getPIDController();
+  private void setPids(CANPIDController pidController) {
     pidController.setP(defaultP);
     pidController.setI(defaultI);
     pidController.setD(defaultD);
@@ -107,7 +118,10 @@ public class Robot extends TimedRobot {
     double left = xboxController.getY(Hand.kLeft);
     double right = xboxController.getY(Hand.kRight);
 
-    lb_motor.getPIDController().setReference(left * maxSpeed, ControlType.kVelocity);
-    rb_motor.getPIDController().setReference(right * maxSpeed, ControlType.kVelocity);
+    // lb_motor.set(left);
+    // rf_motor.set(right);
+
+    lb_pidController.setReference(left, ControlType.kDutyCycle);
+    rb_pidController.setReference(right, ControlType.kDutyCycle);
   }
 }

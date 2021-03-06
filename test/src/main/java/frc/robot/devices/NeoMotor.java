@@ -125,4 +125,8 @@ public class NeoMotor implements IMotor {
     }
     public void setEncoderPositionAndRate(double position, double rate){
     }
+
+    public double getEncoderCount() {
+        return getDistance() / getConversionFactor();
+    }
 }

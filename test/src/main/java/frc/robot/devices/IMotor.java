@@ -49,6 +49,6 @@ public interface IMotor {
 
     public void setEncoderPositionAndRate(double position, double rate); //poop
 
-    
+    public double getEncoderCount();
 
 }

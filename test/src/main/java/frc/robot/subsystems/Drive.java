@@ -42,6 +42,8 @@ public class Drive implements IDrive, ISubsystem{
     private double defaultI = 0.0;
     private double defaultD = 0.000015;
     private double defaultF = 0.0;
+
+    private boolean voltageMode = false;
     
     public Drive () {
 
@@ -198,19 +200,29 @@ public class Drive implements IDrive, ISubsystem{
         return rb_motor.getSpeed();
     }
 
+    public void setArcadeVoltage(double speed, double rot) {
+        var driveArray = DriveHelper.getArcadeSpeeds(speed, rot, true);
+        leftSpeed = driveArray[0];
+        rightSpeed = driveArray[1];
+        voltageMode = true;
+    }
+
     public void setArcadePercent(double speed, double rot) {
         var driveArray = DriveHelper.getArcadeSpeeds(speed, rot, true);
         setTankPercent(driveArray[0], driveArray[1]);
+        voltageMode = false;
     }
 
     public void setTankPercent(double leftSpeed, double rightSpeed) {
         this.leftSpeed = leftSpeed * maxSpeed;
         this.rightSpeed = rightSpeed * maxSpeed;
+        voltageMode = false;
     }
 
     public void setTankSpeeds(double leftFeetPerSecond, double rightFeetPerSecond) {
         leftSpeed = leftFeetPerSecond;
         rightSpeed = rightFeetPerSecond;
+        voltageMode = false;
     }
 
     public void setArcadeSpeeds(double feetPerSecond, double degreesPerSecond) {
@@ -218,15 +230,42 @@ public class Drive implements IDrive, ISubsystem{
         double leftFeetPerSecond = Units.metersToFeet(wheelSpeeds.leftMetersPerSecond);
         double rightFeetPerSecond = Units.metersToFeet(wheelSpeeds.rightMetersPerSecond);
         System.out.println("arcade speeds left" + leftFeetPerSecond + " right" + rightFeetPerSecond + " degrees" + degreesPerSecond + " speed" + feetPerSecond + " encoder value" + lb_motor.getDistance());
+    
         setTankSpeeds(leftFeetPerSecond, rightFeetPerSecond);
+        voltageMode = false;
+    }
+
+    public double getEncoder(){
+        return lb_motor.getEncoderCount();
     }
 
     public void execute() {
+    if (!voltageMode) {
+        if (leftSpeed != 0) {
+            lb_motor.setSpeed(leftSpeed);
+        } else {
+            lb_motor.setPercent(0);
+        }
+        if (rightSpeed != 0) {
+            rb_motor.setSpeed(rightSpeed);
+        } else {
+            rb_motor.setPercent(0);
+        }
+    } else {
         lb_motor.setSpeed(leftSpeed);
         rb_motor.setSpeed(rightSpeed);
+    }
    //    System.out.println("Drive velocity" + getRightVelocity() + "  left" + leftSpeed + " right" + rightSpeed);
         NtHelper.setDouble("/drive/velocity", getLeftVelocity() /maxSpeed);
-        NtHelper.setDouble("/gyroAngle", gyro.getRotation2d().getDegrees());
+        NtHelper.setDouble("/drive/gyroAngle", gyro.getRotation2d().getDegrees());
+        NtHelper.setDouble("/drive/encoderCount", lf_motor.getEncoderCount());
+        NtHelper.setDouble("/drive/leftSpeed", leftSpeed);
+        NtHelper.setDouble("/drive/rightSpeed", leftSpeed);
+        NtHelper.setDouble("/drive/kP", lb_motor.getP());
+        NtHelper.setDouble("/drive/kI", lb_motor.getI());
+        NtHelper.setDouble("/drive/kD", lb_motor.getD());
+        NtHelper.setDouble("/drive/kF", lb_motor.getF());
+        NtHelper.setBoolean("/drive/voltageMode", voltageMode);
 
         if (isHighGear()) {
             gear_switcher.set(DoubleSolenoid.Value.kReverse);

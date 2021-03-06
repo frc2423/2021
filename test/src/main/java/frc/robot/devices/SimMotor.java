@@ -48,6 +48,11 @@ public class SimMotor implements IMotor {
         return motor.get();
     }
 
+
+    public double getEncoderCount() {
+        return getDistance() / getConversionFactor();
+    }
+
     public void setDistance(double dist) {
         double output = pidController.calculate(getDistance(), dist);
         pidController.setSetpoint(output);
@@ -135,5 +140,7 @@ public class SimMotor implements IMotor {
         encoderSim.setDistance(position);
         encoderSim.setRate(rate);
     }
+
+    
 
 }

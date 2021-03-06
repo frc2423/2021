@@ -191,6 +191,14 @@ public class SimDrive implements IDrive, ISubsystem{
         setTankSpeeds(leftFeetPerSecond, rightFeetPerSecond);
     }
 
+    public double getEncoder(){
+        return 0;
+    }
+
+    public void setArcadeVoltage(double speed, double rot) {
+        
+    }
+
     public void execute() {
 
         lb_motor.setSpeed(leftSpeed);

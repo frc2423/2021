@@ -37,4 +37,8 @@ public interface IDrive {
     public void setTankPercent(double leftSpeed, double rightSpeed);
 
     public void setDefaultPIDs();
+
+    public double getEncoder();
+
+    public void setArcadeVoltage(double speed, double rot);
 }

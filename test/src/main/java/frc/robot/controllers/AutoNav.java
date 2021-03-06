@@ -93,9 +93,10 @@ public class AutoNav extends Controller {
 
   @Override
   public void autonomousInit() {
+    follower.stopFollowing();
     follower.initFollowing(trajectoryJSON);
     driveBase.setDefaultPIDs();
-
+    driveBase.reset();
   }
 
   /** This function is called periodically during autonomous. */
@@ -107,9 +108,10 @@ public class AutoNav extends Controller {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
+    follower.stopFollowing();
     driveBase.init();
     driveBase.setDefaultPIDs();
-
+    driveBase.reset();
   }
 
   /** This function is called periodically during operator control. */
@@ -119,13 +121,13 @@ public class AutoNav extends Controller {
     double x = RobotBase.isReal() ? xboxController.getX(Hand.kRight) : xboxController.getRawAxis(0);
     double y = RobotBase.isReal() ? xboxController.getY(Hand.kRight) : xboxController.getRawAxis(1);
 
-    /*driveBase.setArcadePercent(
+    driveBase.setArcadeVoltage(
       DriveHelper.applyDeadband(-y, joystickDeadband), 
       DriveHelper.applyDeadband(x, joystickDeadband)
-    ); */
+    );
    // driveBase.setArcadeSpeeds(2,0);
-   driveBase.setArcadeSpeeds(4, 0);
-    System.out.println("In teleop");
+   //driveBase.setArcadeSpeeds(4, 0);
+    System.out.println("In teleop" + driveBase.getEncoder());
 
     if (xboxController.getBumperPressed(Hand.kLeft)) {
       driveBase.switchGears();
@@ -134,6 +136,12 @@ public class AutoNav extends Controller {
     ballTracker.giveRobotPose(driveBase.getPose());
 
     System.out.println("Has targets:" + ballTracker.hasTargets() + ", Distance from target:" + ballTracker.getDistanceFromTarget() + ", Angle from target:" + ballTracker.getAngleFromTarget() + ", Pitch:" + ballTracker.getPitchFromTarget());
+  }
+
+  @Override
+  public void testInit() {
+    follower.stopFollowing();
+    driveBase.reset();
   }
 
   /** This function is called periodically during test mode. */
@@ -151,7 +159,6 @@ public class AutoNav extends Controller {
     }
 
     if (xboxController.getAButton()) {
-        shooter.execute();
     } 
 
 

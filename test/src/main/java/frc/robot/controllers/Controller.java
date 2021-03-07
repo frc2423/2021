@@ -1,11 +1,11 @@
 package frc.robot.controllers;
 
 import java.util.HashMap;
-import frc.robot.subsystems.ISubsystem;
+import frc.robot.subsystems.Subsystem;
 
 public abstract class Controller {
 
-    public abstract void robotInit(HashMap<String, ISubsystem> subsystems, HashMap<String, Object> devices);
+    public abstract void robotInit(HashMap<String, Subsystem> subsystems, HashMap<String, Object> devices);
 
     public void robotPeriodic(){
 

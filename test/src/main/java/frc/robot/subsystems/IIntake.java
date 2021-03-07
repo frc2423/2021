@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-public interface IIntake extends ISubsystem{
+public interface IIntake extends Subsystem{
 
     public void init();
 

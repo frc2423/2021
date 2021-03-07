@@ -3,14 +3,14 @@ package frc.robot;
 import java.util.HashMap;
 
 import frc.robot.devices.Device;
-import frc.robot.subsystems.ISubsystem;
+import frc.robot.subsystems.Subsystem;
 
 public class Manager {
 
-    private static HashMap<String ,ISubsystem> subsystems = new HashMap<String, ISubsystem>();
+    private static HashMap<String ,Subsystem> subsystems = new HashMap<String, Subsystem>();
     private static HashMap<String, Device> devices = new HashMap<String, Device>();
 
-    public static void addSubsystem(String name, ISubsystem subsystem){
+    public static void addSubsystem(String name, Subsystem subsystem){
         if (subsystems.containsKey(name)) {
             throw new Error("Subsystem " + name + " already exists");
         }
@@ -24,7 +24,7 @@ public class Manager {
         devices.put(name, device);
     }
 
-    public static ISubsystem getSubsystem(String name){
+    public static Subsystem getSubsystem(String name){
         return subsystems.get(name);
     }
 

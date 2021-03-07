@@ -4,11 +4,11 @@ import java.util.HashMap;
 
 import frc.robot.controllers.Controller;
 import edu.wpi.first.wpilibj.TimedRobot;
-import frc.robot.subsystems.ISubsystem;
+import frc.robot.subsystems.Subsystem;
 
 public abstract class KwarqsRobot extends TimedRobot {
 
-    private HashMap<String ,ISubsystem> subsystems;
+    private HashMap<String ,Subsystem> subsystems;
     private HashMap<String, Controller> controllers;
     private HashMap<String, Object> devices;
 
@@ -17,14 +17,14 @@ public abstract class KwarqsRobot extends TimedRobot {
     private boolean isInitialized = false;
 
     public KwarqsRobot(){
-        subsystems = new HashMap<String, ISubsystem>();
+        subsystems = new HashMap<String, Subsystem>();
         controllers = new HashMap<String, Controller>();
         devices = new HashMap<String, Object>();
     }
 
     public abstract void init();
 
-    public void addSubsystem(String name, ISubsystem subsystem){
+    public void addSubsystem(String name, Subsystem subsystem){
         subsystems.put(name, subsystem);
     }
 
@@ -32,7 +32,7 @@ public abstract class KwarqsRobot extends TimedRobot {
         devices.put(name, device);
     }
 
-    public ISubsystem getSubsystem(String name){
+    public Subsystem getSubsystem(String name){
         return subsystems.get(name);
     }
 

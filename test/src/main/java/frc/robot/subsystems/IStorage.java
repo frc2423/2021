@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-public interface IStorage extends ISubsystem{
+public interface IStorage extends Subsystem{
 
     public void init();
 

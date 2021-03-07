@@ -10,7 +10,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 
-public class SimStorage implements ISubsystem{
+public class SimStorage implements Subsystem{
     private IMotor beltMotor;
     private AnalogInput ballSensor;
   

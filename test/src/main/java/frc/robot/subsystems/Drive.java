@@ -14,7 +14,7 @@ import frc.robot.helpers.NtHelper;
 import frc.robot.helpers.DriveHelper;
 import frc.robot.DrivePosition;
 
-public class Drive implements IDrive, ISubsystem{
+public class Drive extends Subsystem implements IDrive {
 
     private double countsPerRev = 16.35;
     private double ftPerRev = 1.57;
@@ -46,13 +46,13 @@ public class Drive implements IDrive, ISubsystem{
     private boolean voltageMode = false;
     
     public Drive () {
-
+        super("drive");
         double conversionFactor = ftPerRev / countsPerRev;
         conversionFactor = conversionFactor *10 /7.5;
-        lf_motor = new NeoMotor(1);
-        lb_motor = new NeoMotor(4);
-        rf_motor = new NeoMotor(6);
-        rb_motor = new NeoMotor(5);
+        lf_motor = new NeoMotor(1, "lf_motor");
+        lb_motor = new NeoMotor(4, "lb_motor");
+        rf_motor = new NeoMotor(6, "rf_motor");
+        rb_motor = new NeoMotor(5, "rb_motor");
         gyro = new Gyro();
 
 
@@ -202,37 +202,39 @@ public class Drive implements IDrive, ISubsystem{
 
     public void setArcadeVoltage(double speed, double rot) {
         var driveArray = DriveHelper.getArcadeSpeeds(speed, rot, true);
-        leftSpeed = driveArray[0];
-        rightSpeed = driveArray[1];
-        voltageMode = true;
+        lb_motor.setSpeed(driveArray[0]);
+        rb_motor.setSpeed(driveArray[1]);
     }
 
     public void setArcadePercent(double speed, double rot) {
         var driveArray = DriveHelper.getArcadeSpeeds(speed, rot, true);
         setTankPercent(driveArray[0], driveArray[1]);
-        voltageMode = false;
     }
 
     public void setTankPercent(double leftSpeed, double rightSpeed) {
-        this.leftSpeed = leftSpeed * maxSpeed;
-        this.rightSpeed = rightSpeed * maxSpeed;
-        voltageMode = false;
+        if (leftSpeed != 0) {
+            lb_motor.setSpeed(leftSpeed * maxSpeed);
+        } else {
+            lb_motor.setPercent(0);
+        }
+        if (rightSpeed != 0) {
+            rb_motor.setSpeed(rightSpeed * maxSpeed);
+        } else {
+            rb_motor.setPercent(0);
+        }
     }
 
     public void setTankSpeeds(double leftFeetPerSecond, double rightFeetPerSecond) {
-        leftSpeed = leftFeetPerSecond;
-        rightSpeed = rightFeetPerSecond;
-        voltageMode = false;
+        lb_motor.setSpeed(leftFeetPerSecond);
+        rb_motor.setSpeed(rightFeetPerSecond);
     }
 
     public void setArcadeSpeeds(double feetPerSecond, double degreesPerSecond) {
         DifferentialDriveWheelSpeeds wheelSpeeds = drivePosition.getWheelSpeeds(feetPerSecond, degreesPerSecond);
         double leftFeetPerSecond = Units.metersToFeet(wheelSpeeds.leftMetersPerSecond);
         double rightFeetPerSecond = Units.metersToFeet(wheelSpeeds.rightMetersPerSecond);
-        System.out.println("arcade speeds left" + leftFeetPerSecond + " right" + rightFeetPerSecond + " degrees" + degreesPerSecond + " speed" + feetPerSecond + " encoder value" + lb_motor.getDistance());
     
         setTankSpeeds(leftFeetPerSecond, rightFeetPerSecond);
-        voltageMode = false;
     }
 
     public double getEncoder(){
@@ -240,21 +242,7 @@ public class Drive implements IDrive, ISubsystem{
     }
 
     public void execute() {
-    if (!voltageMode) {
-        if (leftSpeed != 0) {
-            lb_motor.setSpeed(leftSpeed);
-        } else {
-            lb_motor.setPercent(0);
-        }
-        if (rightSpeed != 0) {
-            rb_motor.setSpeed(rightSpeed);
-        } else {
-            rb_motor.setPercent(0);
-        }
-    } else {
-        lb_motor.setSpeed(leftSpeed);
-        rb_motor.setSpeed(rightSpeed);
-    }
+    
    //    System.out.println("Drive velocity" + getRightVelocity() + "  left" + leftSpeed + " right" + rightSpeed);
         NtHelper.setDouble("/drive/velocity", getLeftVelocity() /maxSpeed);
         NtHelper.setDouble("/drive/gyroAngle", gyro.getRotation2d().getDegrees());
@@ -275,5 +263,19 @@ public class Drive implements IDrive, ISubsystem{
 
         drivePosition.setInputs(lb_motor.getPercent(), rb_motor.getPercent());
         drivePosition.updateOdometry(gyro.getRotation2d(), lb_motor.getDistance(), rb_motor.getDistance());
+    }
+
+    @Override
+    public void report() {
+        NtHelper.setDouble("/drive/velocity", getLeftVelocity() /maxSpeed);
+        NtHelper.setDouble("/drive/gyroAngle", gyro.getRotation2d().getDegrees());
+        NtHelper.setDouble("/drive/encoderCount", lf_motor.getEncoderCount());
+        NtHelper.setDouble("/drive/leftSpeed", leftSpeed);
+        NtHelper.setDouble("/drive/rightSpeed", leftSpeed);
+        NtHelper.setDouble("/drive/kP", lb_motor.getP());
+        NtHelper.setDouble("/drive/kI", lb_motor.getI());
+        NtHelper.setDouble("/drive/kD", lb_motor.getD());
+        NtHelper.setDouble("/drive/kF", lb_motor.getF());
+        NtHelper.setBoolean("/drive/voltageMode", voltageMode);
     }
 }

@@ -12,7 +12,7 @@ import frc.robot.helpers.NtHelper;
 import frc.robot.devices.IMotor;
 import frc.robot.devices.NeoMotor;
 
-public class Shooter implements ISubsystem{
+public class Shooter implements Subsystem{
     private IMotor shooterMotor;
     private double speed = 0.0;
     private double previousVelocity = 0.0;

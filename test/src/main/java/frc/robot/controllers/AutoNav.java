@@ -14,7 +14,7 @@ import frc.robot.subsystems.Drive; // Q
 import frc.robot.subsystems.SimDrive; // S
 import jdk.jfr.Threshold;
 import frc.robot.subsystems.IDrive;
-import frc.robot.subsystems.ISubsystem;
+import frc.robot.subsystems.Subsystem;
 import frc.robot.subsystems.Shooter;
 import frc.robot.helpers.DriveHelper;
 import frc.robot.helpers.NtHelper;
@@ -50,7 +50,7 @@ public class AutoNav extends Controller {
    */
 
   @Override
-  public void robotInit(HashMap<String, ISubsystem> subsystems, HashMap<String, Object> devices) {
+  public void robotInit(HashMap<String, Subsystem> subsystems, HashMap<String, Object> devices) {
 
     xboxController = new XboxController(0);
 

@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.XboxController; // A
 import edu.wpi.first.wpilibj.RobotBase; // R
 
 import frc.robot.subsystems.IDrive;
-import frc.robot.subsystems.ISubsystem;
+import frc.robot.subsystems.Subsystem;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.IIntake;
 import frc.robot.helpers.DriveHelper;
@@ -48,7 +48,7 @@ public class GalacticSearch extends Controller {
    */
 
   @Override
-  public void robotInit(HashMap<String, ISubsystem> subsystems, HashMap<String, Object> devices) {
+  public void robotInit(HashMap<String, Subsystem> subsystems, HashMap<String, Object> devices) {
 
     xboxController = new XboxController(0);
 

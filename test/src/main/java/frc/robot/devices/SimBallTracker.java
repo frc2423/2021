@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj.geometry.Transform2d;
 
-public class SimBallTracker implements IBallTracker{
+public class SimBallTracker extends Device implements IBallTracker{
     
         // Simulated Vision System.
     // Configure these to match your PhotonVision Camera,
@@ -36,6 +36,10 @@ public class SimBallTracker implements IBallTracker{
                     camResolutionWidth,
                     camResolutionHeight,
                     minTargetArea);
+
+    public SimBallTracker() {
+        super("ballTracker");
+    }
 
     public boolean hasTargets(){
         return camera.getLatestResult().hasTargets();
@@ -79,4 +83,7 @@ public class SimBallTracker implements IBallTracker{
         return 0;
     }
 
+    @Override
+    public void report() {
+    }
 }

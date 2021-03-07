@@ -6,14 +6,17 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 
-public class NeoMotor implements IMotor {
+public class NeoMotor extends Device implements IMotor {
 
     protected CANSparkMax motor;
     private CANEncoder encoder;
     private CANPIDController pidController;
     private double voltage = 0.0;
+    private double motorValue = 0.0;
+    private ControlType motorControlType = ControlType.kDutyCycle;
 
-    public NeoMotor(int port) {
+    public NeoMotor(int port, String name) {
+        super(name);
        motor = new CANSparkMax(port, MotorType.kBrushless);
        motor.restoreFactoryDefaults();
        encoder = motor.getEncoder();
@@ -26,7 +29,8 @@ public class NeoMotor implements IMotor {
 
 
     public void setSpeed(double speed){
-        pidController.setReference(speed / encoder.getVelocityConversionFactor(), ControlType.kVelocity);
+        motorValue = speed / encoder.getVelocityConversionFactor();
+        motorControlType = ControlType.kVelocity;
     }
 
     public double getSpeed(){
@@ -36,7 +40,8 @@ public class NeoMotor implements IMotor {
     }
 
     public void setPercent(double percent){
-        pidController.setReference(percent, ControlType.kDutyCycle);
+        motorValue = percent;
+        motorControlType = ControlType.kDutyCycle;
         voltage = percent;
     }
 
@@ -45,7 +50,8 @@ public class NeoMotor implements IMotor {
     }
 
     public void setDistance(double dist){
-        pidController.setReference(dist, ControlType.kPosition);
+        motorValue = dist;
+        motorControlType = ControlType.kPosition;
     }
 
     public void resetEncoder(double distance) {
@@ -128,5 +134,13 @@ public class NeoMotor implements IMotor {
 
     public double getEncoderCount() {
         return getDistance() / getConversionFactor();
+    }
+
+    @Override
+    public void report() {
+    }
+
+    public void execute() {
+        pidController.setReference(motorValue, motorControlType);
     }
 }

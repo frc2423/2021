@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import java.util.ArrayList;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 
-public class SimMotor implements IMotor {
+public class SimMotor extends Device implements IMotor {
 
     private PWMVictorSPX  motor;
     private PIDController pidController;  
@@ -17,8 +17,13 @@ public class SimMotor implements IMotor {
     private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(1, 3);
     private double encoderOffset = 0;
     private final EncoderSim encoderSim;
+    private String controlType = "voltage";
+    private double desiredDistance = 0;
+    private double desiredSpeed = 0;
+    private double desiredPercent = 0;
 
-    public SimMotor(int port, int channelA, int channelB) {
+    public SimMotor(int port, int channelA, int channelB, String name) {
+        super(name);
        motor = new PWMVictorSPX(port);
        encoder = new Encoder(channelA, channelB);
        encoderSim = new EncoderSim(encoder);
@@ -27,12 +32,8 @@ public class SimMotor implements IMotor {
     }
 
     public void setSpeed(double speed) {
-        double output = pidController.calculate(getSpeed(), speed);
-        motor.setVoltage(output + feedForward.calculate(speed));
-                        
-        for (SimMotor follower : followers) {
-            follower.setSpeed(speed);
-        }
+        desiredSpeed = speed;
+        controlType = "speed";
     }
 
     public double getSpeed(){
@@ -41,7 +42,8 @@ public class SimMotor implements IMotor {
     }
 
     public void setPercent(double percent) {
-        motor.setVoltage(percent);
+        desiredPercent = percent;
+        controlType = "percent";
     }
 
     public double getPercent(){
@@ -54,8 +56,8 @@ public class SimMotor implements IMotor {
     }
 
     public void setDistance(double dist) {
-        double output = pidController.calculate(getDistance(), dist);
-        pidController.setSetpoint(output);
+        desiredDistance = dist;
+        controlType = "distance";
     }
 
     public void resetEncoder(double distance) {
@@ -141,6 +143,27 @@ public class SimMotor implements IMotor {
         encoderSim.setRate(rate);
     }
 
-    
+    @Override
+    public void report() {
+    }
 
+    public void execute() {
+        if (controlType == "distance") {
+            double output = pidController.calculate(getDistance(), desiredDistance);
+            pidController.setSetpoint(output);
+        } else if (controlType == "speed") {
+            double output = pidController.calculate(getSpeed(), desiredSpeed);
+            motor.setVoltage(output + feedForward.calculate(desiredSpeed));
+                            
+            for (SimMotor follower : followers) {
+                follower.setSpeed(desiredSpeed);
+            }
+        } else if (controlType == "percent") {
+            motor.setVoltage(desiredPercent);
+
+            for (SimMotor follower : followers) {
+                follower.setPercent(desiredPercent);
+            }
+        }
+    }
 }

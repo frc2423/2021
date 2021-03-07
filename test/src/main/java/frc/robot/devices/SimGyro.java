@@ -4,18 +4,20 @@ import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.simulation.AnalogGyroSim;
 
-public class SimGyro implements IGyro{
+public class SimGyro extends Device implements IGyro{
 
     private AnalogGyroSim gyroSim;
     private AnalogGyro gyro;//gyroSim wants an AnalogGyro not AHRS
 
 
     public SimGyro(){
+        super("gyro");
         gyro = new AnalogGyro(0);
         gyroSim = new AnalogGyroSim(gyro);
     }
 
     public SimGyro(int port){
+        super("gyro");
         gyro = new AnalogGyro(port);
         gyroSim = new AnalogGyroSim(gyro);
     }
@@ -43,5 +45,9 @@ public class SimGyro implements IGyro{
     public Rotation2d getRotation2d() {
         return Rotation2d.fromDegrees(getAngle());
     }
-    
+
+    @Override
+    public void report() {
+        reportValue("angle", getAngle());
+    }
 }

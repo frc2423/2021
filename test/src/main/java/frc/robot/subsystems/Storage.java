@@ -10,18 +10,19 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 
-public class Storage implements Subsystem{
+public class Storage extends Subsystem{
     private IMotor beltMotor;
     private AnalogInput ballSensor;
   
     private final int BALL_READING_COUNT = 25;
     private ArrayList<Boolean> ballReadings = new ArrayList<Boolean>();
 
-    private double beltMotorSpeed = 0.0;
+   
   
   
     public Storage (){
-      beltMotor = new NeoMotor(3);
+        super("storage");
+      beltMotor = new NeoMotor(3,"beltMotor");
       ballSensor = new AnalogInput(0);
       for (int x = 0; x < BALL_READING_COUNT; x++) {
           ballReadings.add(false);
@@ -34,7 +35,7 @@ public class Storage implements Subsystem{
     }
 
     public void turnBelt(double speed) {
-      beltMotorSpeed = speed;
+        beltMotor.setSpeed(speed);
     }
 
     public void stop() {
@@ -76,7 +77,7 @@ public class Storage implements Subsystem{
         return trueReadings > falseReadings;
     }
 
-    public void execute() {
-      beltMotor.setSpeed(beltMotorSpeed);
-    }
+  
+     
+    
 }

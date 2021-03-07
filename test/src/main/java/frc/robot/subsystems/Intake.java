@@ -9,7 +9,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANEncoder;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
-public class Intake implements IIntake{
+public class Intake extends Subsystem {
     enum State{
       INTAKEBALLS, OUTTAKE, STALLED, NOTHING
     }
@@ -28,10 +28,11 @@ public class Intake implements IIntake{
     private DoubleSolenoid.Value intakeValue = DoubleSolenoid.Value.kOff;
 
     public Intake() {
-        motor = new NeoMotor(7);
+        super("intake");
+        motor = new NeoMotor(7,"intakeMotor");
         running = false;
         intakeValve = new DoubleSolenoid(2, 3);
-        greenWheel = new NeoMotor(2);
+        greenWheel = new NeoMotor(2,"greenWheel");
     }
 
     public void init() {

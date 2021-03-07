@@ -12,63 +12,39 @@ import frc.robot.helpers.NtHelper;
 import frc.robot.devices.IMotor;
 import frc.robot.devices.NeoMotor;
 
-public class Shooter implements Subsystem{
-    private IMotor shooterMotor;
-    private double speed = 0.0;
+public class Shooter extends Subsystem{
+    private IMotor shooterFeederMotor;
+   
     private double previousVelocity = 0.0;
      // need to change this, value not right
     private double atVelocityConstant = 100.0;
 
-    private IMotor shooterWheel1;
-    private IMotor shooterWheel2;
-    private double wheelSpeed = 0;
-    private double shooterSpeed = 0;
-
+    private IMotor shooterBottomWheel;
+    private IMotor shooterTopWheel;
+   
     //placeholder
     private double kp = 1.0;
     private double ki = 0.0;
     private double kd = 0.0;
 
     public Shooter() {
-        shooterMotor = new NeoMotor(8);
-       // shooterMotor.setPids(kp, ki, kd);
-
-        // NtHelper.listen("/shooter/kP", (table) -> setPids());
-        // NtHelper.listen("/shooter/kI", (table) -> setPids());
-        // NtHelper.listen("/shooter/kD", (table) -> setPids());
-        // NtHelper.listen("/shooter/kF", (table) -> setPids());
-        // NtHelper.listen("/shooter/setPoint", (table) -> setSetPoints());
-
-        shooterWheel1 = new NeoMotor(10);
-        shooterWheel2 = new NeoMotor(11);
+        super("shooter");
+        shooterFeederMotor = new NeoMotor(8,"shooterFeederMotor");
+       
+        shooterBottomWheel = new NeoMotor(10,"shooterBottomWheel");
+        shooterTopWheel = new NeoMotor(11,"shooterTopWheel");
 
         NtHelper.listen("/shooter/wheelSpeed", (table) -> setWheelSpeeds());
-        NtHelper.listen("/shooter/motorSpeed", (table) -> setShooterMotorSpeed());
+        NtHelper.listen("/shooter/motorSpeed", (table) -> setshooterFeederMotorSpeed());
     }
 
     public void init() {
         stop();
     }
 
-    // private double getP() {
-    //     return NtHelper.getDouble("/drive/kP", 0.0001);
-    // }
-
-    // private double getI() {
-    //     return NtHelper.getDouble("/drive/kI", 0);
-    // }
-
-    // private double getD() {
-    //     return NtHelper.getDouble("/drive/kD", 0.000015);
-    // }
-
-    // private double getF() {
-    //     return NtHelper.getDouble("/drive/kF", 0.0);
-    // }
-
     public boolean atVelocity() {
-      //  boolean diff = (shooterMotor.getVelocity() - previousVelocity) < atVelocityConstant;
-      //  previousVelocity = shooterMotor.getVelocity();
+      //  boolean diff = (shooterFeederMotor.getVelocity() - previousVelocity) < atVelocityConstant;
+      //  previousVelocity = shooterFeederMotor.getVelocity();
         return false;
     }
 
@@ -77,28 +53,24 @@ public class Shooter implements Subsystem{
     }
     
     public void setWheelSpeeds() {
-        wheelSpeed = getWheelSpeed();
+        shooterBottomWheel.setPercent(getWheelSpeed());
+        shooterTopWheel.setPercent(-getWheelSpeed());
     }
 
-    public double getShooterMotorSpeed() {
+    public double getshooterFeederMotorSpeed() {
         return NtHelper.getDouble("/shooter/motorSpeed", 0);
     }
 
-    public void setShooterMotorSpeed() {
-        shooterSpeed = getShooterMotorSpeed();
+    public void setshooterFeederMotorSpeed() {
+          shooterFeederMotor.setPercent(getshooterFeederMotorSpeed());
     }
 
     public void shoot() {
-        speed = -1.0;
+        
     }
 
     public void stop() {
-        speed = 0.0;
+    
     }
 
-    public void execute() {
-        shooterMotor.setPercent(shooterSpeed);
-        shooterWheel1.setPercent(wheelSpeed);
-        shooterWheel2.setPercent(-wheelSpeed);
-    }
 }

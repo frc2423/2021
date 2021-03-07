@@ -13,8 +13,9 @@ import frc.robot.devices.IGyro;
 import frc.robot.helpers.NtHelper;
 import frc.robot.helpers.DriveHelper;
 import frc.robot.DrivePosition;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 
-public class Drive extends Subsystem implements IDrive {
+public class Drive extends Subsystem {
 
     private double countsPerRev = 16.35;
     private double ftPerRev = 1.57;
@@ -145,6 +146,10 @@ public class Drive extends Subsystem implements IDrive {
         lb_motor.resetEncoder(0.0);
         rb_motor.resetEncoder(0.0);
         gyro.reset();
+        drivePosition.reset(pose, gyro.getRotation2d());
+    }
+     public Rotation2d getRotation2d(){
+        return gyro.getRotation2d();
     }
 
     public void reset() {
@@ -243,18 +248,7 @@ public class Drive extends Subsystem implements IDrive {
 
     public void execute() {
     
-   //    System.out.println("Drive velocity" + getRightVelocity() + "  left" + leftSpeed + " right" + rightSpeed);
-        NtHelper.setDouble("/drive/velocity", getLeftVelocity() /maxSpeed);
-        NtHelper.setDouble("/drive/gyroAngle", gyro.getRotation2d().getDegrees());
-        NtHelper.setDouble("/drive/encoderCount", lf_motor.getEncoderCount());
-        NtHelper.setDouble("/drive/leftSpeed", leftSpeed);
-        NtHelper.setDouble("/drive/rightSpeed", leftSpeed);
-        NtHelper.setDouble("/drive/kP", lb_motor.getP());
-        NtHelper.setDouble("/drive/kI", lb_motor.getI());
-        NtHelper.setDouble("/drive/kD", lb_motor.getD());
-        NtHelper.setDouble("/drive/kF", lb_motor.getF());
-        NtHelper.setBoolean("/drive/voltageMode", voltageMode);
-
+ 
         if (isHighGear()) {
             gear_switcher.set(DoubleSolenoid.Value.kReverse);
         } else {
@@ -262,6 +256,17 @@ public class Drive extends Subsystem implements IDrive {
         }
 
         drivePosition.setInputs(lb_motor.getPercent(), rb_motor.getPercent());
+                lb_motor.setEncoderPositionAndRate(
+            drivePosition.getLeftPos(),
+            drivePosition.getLeftVel()
+        );
+        rb_motor.setEncoderPositionAndRate(
+            drivePosition.getRightPos(),
+            drivePosition.getRightVel()
+        );
+
+        gyro.setAngle(drivePosition.getDegrees());
+
         drivePosition.updateOdometry(gyro.getRotation2d(), lb_motor.getDistance(), rb_motor.getDistance());
     }
 

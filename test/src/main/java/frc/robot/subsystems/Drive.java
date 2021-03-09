@@ -7,13 +7,12 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.util.Units;
 
 import frc.robot.devices.IMotor;
-import frc.robot.devices.NeoMotor;
-import frc.robot.devices.Gyro;
 import frc.robot.devices.IGyro;
 import frc.robot.helpers.NtHelper;
 import frc.robot.helpers.DriveHelper;
 import frc.robot.DrivePosition;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import frc.robot.Manager;
 
 public class Drive extends Subsystem {
 
@@ -50,12 +49,12 @@ public class Drive extends Subsystem {
         super("drive");
         double conversionFactor = ftPerRev / countsPerRev;
         conversionFactor = conversionFactor *10 /7.5;
-        lf_motor = new NeoMotor(1, "lf_motor");
-        lb_motor = new NeoMotor(4, "lb_motor");
-        rf_motor = new NeoMotor(6, "rf_motor");
-        rb_motor = new NeoMotor(5, "rb_motor");
-        gyro = new Gyro();
 
+        lf_motor = (IMotor)Manager.getDevice("lf_motor");
+        lb_motor = (IMotor)Manager.getDevice("lb_motor");
+        rf_motor = (IMotor)Manager.getDevice("rf_motor");
+        rb_motor = (IMotor)Manager.getDevice("rb_motor");
+        gyro = (IGyro)Manager.getDevice("gyro");
 
         lf_motor.setConversionFactor(conversionFactor);
         lb_motor.setConversionFactor(conversionFactor);

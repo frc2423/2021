@@ -25,10 +25,17 @@ public class Manager {
     }
 
     public static Subsystem getSubsystem(String name){
+        if (!subsystems.containsKey(name)) {
+            throw new Error("Subsystem " + name + " does not exist");
+        }
         return subsystems.get(name);
+        
     }
 
     public static Device getDevice(String name) {
+        if (!devices.containsKey(name)) {
+            throw new Error("Device " + name + " does not exist");
+        }
         return devices.get(name);
     }
 

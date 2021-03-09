@@ -1,16 +1,10 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANPIDController;
-import com.revrobotics.ControlType;
-
+import frc.robot.Manager;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.helpers.NtHelper;
 
 import frc.robot.devices.IMotor;
-import frc.robot.devices.NeoMotor;
 
 public class Shooter extends Subsystem{
     private IMotor shooterFeederMotor;
@@ -29,10 +23,9 @@ public class Shooter extends Subsystem{
 
     public Shooter() {
         super("shooter");
-        shooterFeederMotor = new NeoMotor(8,"shooterFeederMotor");
-       
-        shooterBottomWheel = new NeoMotor(10,"shooterBottomWheel");
-        shooterTopWheel = new NeoMotor(11,"shooterTopWheel");
+        shooterFeederMotor = (IMotor)Manager.getDevice("shooterFeederMotor");
+        shooterBottomWheel = (IMotor)Manager.getDevice("shooterBottomWheel");
+        shooterTopWheel = (IMotor)Manager.getDevice("shooterTopWheel");
 
         NtHelper.listen("/shooter/wheelSpeed", (table) -> setWheelSpeeds());
         NtHelper.listen("/shooter/motorSpeed", (table) -> setshooterFeederMotorSpeed());

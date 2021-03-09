@@ -1,13 +1,9 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.devices.NeoMotor;
 import frc.robot.devices.IMotor;
-
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.CANEncoder;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import frc.robot.Manager;
 
 public class Intake extends Subsystem {
     enum State{
@@ -29,10 +25,11 @@ public class Intake extends Subsystem {
 
     public Intake() {
         super("intake");
-        motor = new NeoMotor(7,"intakeMotor");
         running = false;
         intakeValve = new DoubleSolenoid(2, 3);
-        greenWheel = new NeoMotor(2,"greenWheel");
+
+        motor = (IMotor)Manager.getDevice("intakeMotor");
+        greenWheel = (IMotor)Manager.getDevice("greenWheel");
     }
 
     public void init() {

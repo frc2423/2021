@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-
 import frc.robot.subsystems.Drive; // Q
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Storage;
@@ -19,7 +18,6 @@ import frc.robot.devices.BallTracker;
 import frc.robot.devices.Gyro;
 import frc.robot.devices.SimGyro;
 import frc.robot.subsystems.Shooter;
-
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -36,6 +34,7 @@ public class Robot extends KwarqsRobot {
     new Shooter();
     new Storage();
     new Intake();
+
     //Devices
     new NeoMotor(7,"intakeMotor");
     new NeoMotor(2,"greenWheel");
@@ -43,6 +42,7 @@ public class Robot extends KwarqsRobot {
     new NeoMotor(10,"shooterBottomWheel");
     new NeoMotor(11,"shooterTopWheel");
     new NeoMotor(3,"beltMotor");
+
     if (isSimulation()){
         new SimMotor(1, 0, 1, "lf_motor");
         new SimMotor(4, 2, 3, "lb_motor");

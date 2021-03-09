@@ -3,12 +3,8 @@ package frc.robot.subsystems;
 import java.util.ArrayList;
 import edu.wpi.first.wpilibj.AnalogInput;
 import frc.robot.devices.IMotor;
-import frc.robot.devices.NeoMotor;
-
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import frc.robot.Manager;
 import edu.wpi.first.networktables.NetworkTableInstance;
-
 
 public class Storage extends Subsystem{
     private IMotor beltMotor;
@@ -16,22 +12,20 @@ public class Storage extends Subsystem{
   
     private final int BALL_READING_COUNT = 25;
     private ArrayList<Boolean> ballReadings = new ArrayList<Boolean>();
-
-   
-  
   
     public Storage (){
         super("storage");
-      beltMotor = new NeoMotor(3,"beltMotor");
-      ballSensor = new AnalogInput(0);
-      for (int x = 0; x < BALL_READING_COUNT; x++) {
-          ballReadings.add(false);
-      }
-      setBallCount(0);
+        ballSensor = new AnalogInput(0);
+        beltMotor = (IMotor)Manager.getDevice("beltMotor");
+
+        for (int x = 0; x < BALL_READING_COUNT; x++) {
+            ballReadings.add(false);
+        }
+        setBallCount(0);
     }
 
     public void init() {
-      stop();
+        stop();
     }
 
     public void turnBelt(double speed) {
@@ -39,23 +33,23 @@ public class Storage extends Subsystem{
     }
 
     public void stop() {
-      turnBelt(0.0);
+        turnBelt(0.0);
     }
 
     private int getBallCount() {
-      return (int)(NetworkTableInstance.getDefault().getEntry("/ballCount").getNumber(0)); // hopefully casting wont mess anything up :)
+        return (int)(NetworkTableInstance.getDefault().getEntry("/ballCount").getNumber(0)); // hopefully casting wont mess anything up :)
     }
 
     private void setBallCount(int count) {
-      NetworkTableInstance.getDefault().getEntry("/ballCount").setNumber(count);
+        NetworkTableInstance.getDefault().getEntry("/ballCount").setNumber(count);
     }
     
     public void resetCount() {
-      setBallCount(0); // attempting to break the water-speed world record is the most dangerous activity one can engage in
+        setBallCount(0); // attempting to break the water-speed world record is the most dangerous activity one can engage in
     }
 
     public void addBall() {
-      setBallCount(getBallCount() + 1);
+        setBallCount(getBallCount() + 1);
     }
 
 
@@ -76,8 +70,5 @@ public class Storage extends Subsystem{
         }
         return trueReadings > falseReadings;
     }
-
-  
-     
     
 }

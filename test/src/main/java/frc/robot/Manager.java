@@ -32,11 +32,13 @@ public class Manager {
         
     }
 
-    public static <T extends Device> T getDevice(String name, Class<T> type) {
+    public static <T> T getDevice(String name, Class<T> type) {
         if (!devices.containsKey(name)) {
             throw new Error("Device " + name + " does not exist");
         }
-
+        if (!devices.get(name).getClass().isAssignableFrom(type) ) {
+            throw new Error("Device " + name + " is not of type " + type.toString());
+        }
         return type.cast(devices.get(name));
     }
 

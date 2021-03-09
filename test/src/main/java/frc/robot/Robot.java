@@ -7,18 +7,17 @@ package frc.robot;
 
 import frc.robot.subsystems.Drive; // Q
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.SimDrive; // S
-import frc.robot.subsystems.SimIntake;
-import frc.robot.subsystems.SimStorage;
 import frc.robot.subsystems.Storage;
 import frc.robot.controllers.GalacticSearch;
 import frc.robot.controllers.ShooterTesting;
 import frc.robot.controllers.AutoNav;
-
+import frc.robot.devices.NeoMotor;
+import frc.robot.devices.SimMotor;
 import frc.robot.devices.SimBallTracker;
 import frc.robot.helpers.NtHelper;
 import frc.robot.devices.BallTracker;
-
+import frc.robot.devices.Gyro;
+import frc.robot.devices.SimGyro;
 import frc.robot.subsystems.Shooter;
 
 
@@ -32,18 +31,34 @@ public class Robot extends KwarqsRobot {
 
   @Override
   public void init(){
+    //Subsystems 
+    new Drive();
+    new Shooter();
+    new Storage();
+    new Intake();
+    //Devices
+    new NeoMotor(7,"intakeMotor");
+    new NeoMotor(2,"greenWheel");
+    new NeoMotor(8,"shooterFeederMotor");
+    new NeoMotor(10,"shooterBottomWheel");
+    new NeoMotor(11,"shooterTopWheel");
+    new NeoMotor(3,"beltMotor");
     if (isSimulation()){
-      addSubsystem("drive", new SimDrive());
-      addSubsystem("shooter", new Shooter());
-      // addSubsystem("storage", new SimStorage());
-      addSubsystem("intake", new SimIntake());
-      addDevice("ballTracker", new SimBallTracker());
+        new SimMotor(1, 0, 1, "lf_motor");
+        new SimMotor(4, 2, 3, "lb_motor");
+        new SimMotor(6, 4, 5, "rf_motor");
+        new SimMotor(5, 6, 7, "rb_motor");
+
+        new SimBallTracker();
+        
     } else {
-      addSubsystem("drive", new Drive());
-      addSubsystem("shooter", new Shooter());
-      // addSubsystem("storage", new Storage());
-      addSubsystem("intake", new Intake());
-      addDevice("ballTracker", new BallTracker());
+        new NeoMotor(1, "lf_motor");
+        new NeoMotor(4, "lb_motor");
+        new NeoMotor(6, "rf_motor");
+        new NeoMotor(5, "rb_motor");
+        new Gyro();
+        new BallTracker();
+
     }
 
     addController("Galactic Search", new GalacticSearch());

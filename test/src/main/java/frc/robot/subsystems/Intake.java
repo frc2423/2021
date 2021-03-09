@@ -28,8 +28,8 @@ public class Intake extends Subsystem {
         running = false;
         intakeValve = new DoubleSolenoid(2, 3);
 
-        motor = (IMotor)Manager.getDevice("intakeMotor");
-        greenWheel = (IMotor)Manager.getDevice("greenWheel");
+        motor = Manager.getDevice("intakeMotor", IMotor.class);
+        greenWheel = Manager.getDevice("greenWheel", IMotor.class);
     }
 
     public void init() {

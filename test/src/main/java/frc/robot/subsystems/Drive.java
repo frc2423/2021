@@ -50,11 +50,11 @@ public class Drive extends Subsystem {
         double conversionFactor = ftPerRev / countsPerRev;
         conversionFactor = conversionFactor *10 /7.5;
 
-        lf_motor = (IMotor)Manager.getDevice("lf_motor");
-        lb_motor = (IMotor)Manager.getDevice("lb_motor");
-        rf_motor = (IMotor)Manager.getDevice("rf_motor");
-        rb_motor = (IMotor)Manager.getDevice("rb_motor");
-        gyro = (IGyro)Manager.getDevice("gyro");
+        lf_motor = Manager.getDevice("lf_motor", IMotor.class);
+        lb_motor = Manager.getDevice("lb_motor", IMotor.class);
+        rf_motor = Manager.getDevice("rf_motor", IMotor.class);
+        rb_motor = Manager.getDevice("rb_motor", IMotor.class);
+        gyro = Manager.getDevice("gyro", IGyro.class);
 
         lf_motor.setConversionFactor(conversionFactor);
         lb_motor.setConversionFactor(conversionFactor);

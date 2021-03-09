@@ -16,7 +16,7 @@ public class Storage extends Subsystem{
     public Storage (){
         super("storage");
         ballSensor = new AnalogInput(0);
-        beltMotor = (IMotor)Manager.getDevice("beltMotor");
+        beltMotor = Manager.getDevice("beltMotor", IMotor.class);
 
         for (int x = 0; x < BALL_READING_COUNT; x++) {
             ballReadings.add(false);

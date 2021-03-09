@@ -24,11 +24,14 @@ public class Manager {
         devices.put(name, device);
     }
 
-    public static Subsystem getSubsystem(String name){
+    public static <T> T  getSubsystem(String name, Class<T> type){
         if (!subsystems.containsKey(name)) {
             throw new Error("Subsystem " + name + " does not exist");
         }
-        return subsystems.get(name);
+         if (!subsystems.get(name).getClass().isAssignableFrom(type) ) {
+            throw new Error("Subsystem " + name + " is not of type " + type.toString());
+        }
+        return type.cast(subsystems.get(name));
         
     }
 

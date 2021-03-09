@@ -9,15 +9,14 @@ import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj.XboxController; // A
 import edu.wpi.first.wpilibj.RobotBase; // R
 
-import frc.robot.subsystems.IDrive;
-import frc.robot.subsystems.Subsystem;
+import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.IIntake;
+import frc.robot.subsystems.Intake;
 import frc.robot.helpers.DriveHelper;
+import frc.robot.Manager;
 import frc.robot.TrajectoryFollower;
 import frc.robot.devices.IBallTracker;
 
-import java.util.HashMap;
 
 
 
@@ -30,7 +29,7 @@ import java.util.HashMap;
 public class GalacticSearch extends Controller {
 
   private XboxController xboxController;
-  private IDrive driveBase;
+  private Drive driveBase;
   private Shooter shooter;
   private IBallTracker ballTracker;
 
@@ -38,7 +37,7 @@ public class GalacticSearch extends Controller {
 
   private TrajectoryFollower follower;
 
-  private IIntake intake;
+  private Intake intake;
 
   String trajectoryJSON = "Forward";
 
@@ -48,18 +47,18 @@ public class GalacticSearch extends Controller {
    */
 
   @Override
-  public void robotInit(HashMap<String, Subsystem> subsystems, HashMap<String, Object> devices) {
+  public void robotInit() {
 
     xboxController = new XboxController(0);
 
-    driveBase = (IDrive)subsystems.get("drive");
-    shooter = (Shooter)subsystems.get("shooter");
+    driveBase = (Drive)Manager.getSubsystem("drive");
+    shooter = (Shooter)Manager.getSubsystem("shooter");
 
-    ballTracker = (IBallTracker)devices.get("ballTracker");
+    ballTracker = (IBallTracker)Manager.getDevice("ballTracker");
 
     follower = new TrajectoryFollower(driveBase);
 
-    intake = (IIntake)subsystems.get("intake");
+    intake = (Intake)Manager.getSubsystem("intake");
 
     ballTracker.addSimulatedBall(10, 0);
   }

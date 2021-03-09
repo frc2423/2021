@@ -4,24 +4,19 @@
 
 package frc.robot.controllers;
 
-import edu.wpi.first.wpilibj.TimedRobot; // K
+//k
 import edu.wpi.first.wpilibj.GenericHID.Hand; // W
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj.XboxController; // A
 import edu.wpi.first.wpilibj.RobotBase; // R
 
 import frc.robot.subsystems.Drive; // Q
-import frc.robot.subsystems.SimDrive; // S
-import jdk.jfr.Threshold;
-import frc.robot.subsystems.IDrive;
-import frc.robot.subsystems.Subsystem;
 import frc.robot.subsystems.Shooter;
 import frc.robot.helpers.DriveHelper;
-import frc.robot.helpers.NtHelper;
+import frc.robot.Manager;
 import frc.robot.TrajectoryFollower;
 import frc.robot.devices.IBallTracker;
 
-import java.util.HashMap;
 
 
 
@@ -34,7 +29,7 @@ import java.util.HashMap;
 public class AutoNav extends Controller {
 
   private XboxController xboxController;
-  private IDrive driveBase;
+  private Drive driveBase;
   private Shooter shooter;
   private IBallTracker ballTracker;
 
@@ -50,14 +45,14 @@ public class AutoNav extends Controller {
    */
 
   @Override
-  public void robotInit(HashMap<String, Subsystem> subsystems, HashMap<String, Object> devices) {
+  public void robotInit() {
 
     xboxController = new XboxController(0);
 
-    driveBase = (IDrive)subsystems.get("drive");
-    shooter = (Shooter)subsystems.get("shooter");
+    driveBase = (Drive)Manager.getSubsystem("drive");
+    shooter = (Shooter)Manager.getSubsystem("shooter");
 
-    ballTracker = (IBallTracker)devices.get("ballTracker");
+    ballTracker = Manager.getDevice("ballTracker", IBallTracker.class);
 
     follower = new TrajectoryFollower(driveBase);
     follower.addTrajectory(trajectoryJSON);

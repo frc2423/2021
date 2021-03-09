@@ -1,6 +1,6 @@
 package frc.robot; // G
 
-import frc.robot.subsystems.IDrive; // A
+import frc.robot.subsystems.Drive; // A
 
 import java.util.HashMap; // M
 
@@ -19,14 +19,14 @@ import edu.wpi.first.wpilibj.RobotBase;
 
 public class TrajectoryFollower {
 
-    private IDrive drive;
+    private Drive drive;
     private HashMap<String, Trajectory> trajectories = new HashMap<String, Trajectory>();
     private final Timer timer = new Timer();
     private Trajectory curTrajectory;
     private final RamseteController ramsete = new RamseteController();
 
     
-    public TrajectoryFollower(IDrive drive) {
+    public TrajectoryFollower(Drive drive) {
         this.drive = drive;
     }
 

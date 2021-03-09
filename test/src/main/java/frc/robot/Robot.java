@@ -48,7 +48,7 @@ public class Robot extends KwarqsRobot {
         new SimMotor(4, 2, 3, "lb_motor");
         new SimMotor(6, 4, 5, "rf_motor");
         new SimMotor(5, 6, 7, "rb_motor");
-
+        new SimGyro();
         new SimBallTracker();
         
     } else {

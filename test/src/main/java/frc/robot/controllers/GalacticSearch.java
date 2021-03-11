@@ -116,7 +116,6 @@ public class GalacticSearch extends Controller {
     double y = RobotBase.isReal() ? xboxController.getY(Hand.kRight) : xboxController.getRawAxis(1);
 
 
-    System.out.println("Y:" + DriveHelper.squareInputs(DriveHelper.applyDeadband(-y, joystickDeadband)));
 
     driveBase.setArcadePercent(
       DriveHelper.squareInputs(DriveHelper.applyDeadband(-y, joystickDeadband)), 
@@ -128,8 +127,6 @@ public class GalacticSearch extends Controller {
     }
 
     ballTracker.giveRobotPose(driveBase.getPose());
-
-    System.out.println("Has targets:" + ballTracker.hasTargets() + ", Distance from target:" + ballTracker.getDistanceFromTarget() + ", Angle from target:" + ballTracker.getAngleFromTarget() + ", Pitch:" + ballTracker.getPitchFromTarget());
   }
 
   /** This function is called periodically during test mode. */

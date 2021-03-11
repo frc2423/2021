@@ -60,10 +60,6 @@ public class AutoNav extends Controller {
     ballTracker.addSimulatedBall(10, 0);
   }
 
-  public void distAndAngle(){
-    System.out.println("DIST: " + ballTracker.getDistanceFromTarget() + ", ANGLE: " + ballTracker.getAngleFromTarget());
-  }
-
   public String detectField() {
     double dist = ballTracker.getDistanceFromTarget();
     double angle = ballTracker.getAngleFromTarget();
@@ -122,15 +118,12 @@ public class AutoNav extends Controller {
     );
    // driveBase.setArcadeSpeeds(2,0);
    //driveBase.setArcadeSpeeds(4, 0);
-    System.out.println("In teleop" + driveBase.getEncoder());
 
     if (xboxController.getBumperPressed(Hand.kLeft)) {
       driveBase.switchGears();
     }
 
     ballTracker.giveRobotPose(driveBase.getPose());
-
-    System.out.println("Has targets:" + ballTracker.hasTargets() + ", Distance from target:" + ballTracker.getDistanceFromTarget() + ", Angle from target:" + ballTracker.getAngleFromTarget() + ", Pitch:" + ballTracker.getPitchFromTarget());
   }
 
   @Override

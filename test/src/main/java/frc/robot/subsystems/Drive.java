@@ -49,7 +49,7 @@ public class Drive extends Subsystem {
         super("drive");
     }
     
-    public void Init() {
+    public void init() {
         double conversionFactor = ftPerRev / countsPerRev;
         conversionFactor = conversionFactor *10 /7.5;
 

@@ -25,7 +25,7 @@ public class Subsystem {
     }
 
     public void reportValue(String key, Boolean value) {
-        NtHelper.setBoolean("/kwarqsRobot/subsytesms/" + this.name + "/" + key, value);
+        NtHelper.setBoolean("/kwarqsRobot/subsystems/" + this.name + "/" + key, value);
     }
 
     public void reportValue(String key, String value) {

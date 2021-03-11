@@ -36,4 +36,8 @@ public class NtHelper {
     public static void setBoolean(String key, Boolean value) {
         getEntry(key).setBoolean(value);
     }
+
+    public static void setStringArray(String key, String[] value) {
+        getEntry(key).setStringArray(value);
+    }
 }

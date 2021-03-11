@@ -5,6 +5,7 @@ import java.util.HashMap;
 import frc.robot.controllers.Controller;
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.subsystems.Subsystem;
+import frc.robot.devices.Device;
 
 public abstract class KwarqsRobot extends TimedRobot {
 
@@ -34,9 +35,16 @@ public abstract class KwarqsRobot extends TimedRobot {
         }
     }
 
-    public void executeAllSubsystems(){
+    public void callAllSubsystemsAndDevices(){
         for(String key : Manager.getSubsystemNames()) {
+            System.out.println("subsystemName: " + key);
             Manager.getSubsystem(key, Subsystem.class).execute();
+            Manager.getSubsystem(key, Subsystem.class).report();
+        }
+        for(String key : Manager.getDeviceNames()) {
+            System.out.println("deviceName: " + key);
+            Manager.getDevice(key, Device.class).execute();
+            Manager.getDevice(key, Device.class).report();
         }
     }
 
@@ -81,7 +89,7 @@ public abstract class KwarqsRobot extends TimedRobot {
     }
 
     public void robotPeriodic(){
-        executeAllSubsystems();
+        callAllSubsystemsAndDevices();
     }
 
     public void teleopPeriodic(){

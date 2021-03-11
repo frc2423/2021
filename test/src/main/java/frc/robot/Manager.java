@@ -6,6 +6,8 @@ import java.util.Set;
 import frc.robot.devices.Device;
 import frc.robot.subsystems.Subsystem;
 
+import frc.robot.helpers.NtHelper;
+
 public class Manager {
 
     private static HashMap<String ,Subsystem> subsystems = new HashMap<String, Subsystem>();
@@ -16,6 +18,8 @@ public class Manager {
             throw new Error("Subsystem " + name + " already exists");
         }
         subsystems.put(name, subsystem);
+        Set<String> subsystemNames = getSubsystemNames();
+        NtHelper.setStringArray("/kwarqsRobot/subsystemList", subsystemNames.toArray(new String[subsystemNames.size()]));
     }
 
     public static void addDevice(String name, Device device){
@@ -23,10 +27,11 @@ public class Manager {
             throw new Error("Device " + name + " already exists");
         }
         devices.put(name, device);
+        Set<String> deviceNames = getDeviceNames();
+        NtHelper.setStringArray("/kwarqsRobot/deviceList", deviceNames.toArray(new String[deviceNames.size()]));
     }
 
     public static <T> T  getSubsystem(String name, Class<T> type){
-        System.out.println("String subsystem: " + name);
         if (!subsystems.containsKey(name)) {
             throw new Error("Subsystem " + name + " does not exist");
         }

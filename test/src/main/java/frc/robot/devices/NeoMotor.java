@@ -136,11 +136,20 @@ public class NeoMotor extends Device implements IMotor {
         return getDistance() / getConversionFactor();
     }
 
-    @Override
-    public void report() {
-    }
-
     public void execute() {
         pidController.setReference(motorValue, motorControlType);
+    }
+
+    @Override
+    public void report() {
+        reportValue("P", getP());
+        reportValue("I", getI());
+        reportValue("D", getD());
+        reportValue("F", getF());
+        reportValue("distance", getDistance());
+        reportValue("percent", getPercent());
+        reportValue("speed", getSpeed());
+        reportValue("motorValue", motorValue);
+        reportValue("motorControlType", motorControlType.toString());
     }
 }

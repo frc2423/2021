@@ -143,17 +143,6 @@ public class SimMotor extends Device implements IMotor {
         encoderSim.setRate(rate);
     }
 
-    @Override
-    public void report() {
-        reportValue("P", getP());
-        reportValue("I", getI());
-        reportValue("D", getD());
-        reportValue("F", getF());
-        reportValue("distance", getDistance());
-        reportValue("percent", getPercent());
-        reportValue("speed", getSpeed());
-    }
-
     public void execute() {
         if (controlType == "distance") {
             double output = pidController.calculate(getDistance(), desiredDistance);
@@ -172,5 +161,16 @@ public class SimMotor extends Device implements IMotor {
                 follower.setPercent(desiredPercent);
             }
         }
+    }
+
+    @Override
+    public void report() {
+        reportValue("P", getP());
+        reportValue("I", getI());
+        reportValue("D", getD());
+        reportValue("F", getF());
+        reportValue("distance", getDistance());
+        reportValue("percent", getPercent());
+        reportValue("speed", getSpeed());
     }
 }

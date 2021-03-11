@@ -45,7 +45,7 @@ public class Drive extends Subsystem {
     private double defaultD = 0.000015;
     private double defaultF = 0.0;
 
-    private boolean voltageMode = false;
+    private String driveMode = "";
 
     public Drive() {
         super("drive");
@@ -212,31 +212,43 @@ public class Drive extends Subsystem {
 
     public void setArcadeVoltage(double speed, double rot) {
         var driveArray = DriveHelper.getArcadeSpeeds(speed, rot, true);
-        lb_motor.setSpeed(driveArray[0]);
-        rb_motor.setSpeed(driveArray[1]);
+        leftSpeed = driveArray[0];
+        rightSpeed = driveArray[1];
+        lb_motor.setSpeed(leftSpeed);
+        rb_motor.setSpeed(rightSpeed);
+        driveMode = "Arcade Voltage";
     }
 
     public void setArcadePercent(double speed, double rot) {
         var driveArray = DriveHelper.getArcadeSpeeds(speed, rot, true);
         setTankPercent(driveArray[0], driveArray[1]);
+        driveMode = "Arcade Speed Percent";
     }
 
     public void setTankPercent(double leftSpeed, double rightSpeed) {
         if (leftSpeed != 0) {
-            lb_motor.setSpeed(leftSpeed * maxSpeed);
+            this.leftSpeed = leftSpeed * maxSpeed;
+            lb_motor.setSpeed(this.leftSpeed);
         } else {
-            lb_motor.setPercent(0);
+            this.leftSpeed = 0;
+            lb_motor.setPercent(this.leftSpeed);
         }
         if (rightSpeed != 0) {
-            rb_motor.setSpeed(rightSpeed * maxSpeed);
+            this.rightSpeed = rightSpeed * maxSpeed;
+            rb_motor.setSpeed(this.rightSpeed);
         } else {
-            rb_motor.setPercent(0);
+            this.rightSpeed = 0;
+            rb_motor.setPercent(this.rightSpeed);
         }
+        driveMode = "Tank Speed Percent";
     }
 
     public void setTankSpeeds(double leftFeetPerSecond, double rightFeetPerSecond) {
+        this.leftSpeed = leftFeetPerSecond;
+        this.rightSpeed = rightFeetPerSecond;
         lb_motor.setSpeed(leftFeetPerSecond);
         rb_motor.setSpeed(rightFeetPerSecond);
+        driveMode = "Tank Speed";
     }
 
     public void setArcadeSpeeds(double feetPerSecond, double degreesPerSecond) {
@@ -245,6 +257,7 @@ public class Drive extends Subsystem {
         double rightFeetPerSecond = Units.metersToFeet(wheelSpeeds.rightMetersPerSecond);
     
         setTankSpeeds(leftFeetPerSecond, rightFeetPerSecond);
+        driveMode = "Arcade Speed";
     }
 
     public double getEncoder(){
@@ -277,15 +290,18 @@ public class Drive extends Subsystem {
 
     @Override
     public void report() {
-        NtHelper.setDouble("/drive/velocity", getLeftVelocity() /maxSpeed);
-        NtHelper.setDouble("/drive/gyroAngle", gyro.getRotation2d().getDegrees());
-        NtHelper.setDouble("/drive/encoderCount", lf_motor.getEncoderCount());
-        NtHelper.setDouble("/drive/leftSpeed", leftSpeed);
-        NtHelper.setDouble("/drive/rightSpeed", leftSpeed);
-        NtHelper.setDouble("/drive/kP", lb_motor.getP());
-        NtHelper.setDouble("/drive/kI", lb_motor.getI());
-        NtHelper.setDouble("/drive/kD", lb_motor.getD());
-        NtHelper.setDouble("/drive/kF", lb_motor.getF());
-        NtHelper.setBoolean("/drive/voltageMode", voltageMode);
+        reportValue("velocity", getLeftVelocity() /maxSpeed);
+        reportValue("gyroAngle", gyro.getRotation2d().getDegrees());
+        reportValue("encoderCount", lf_motor.getEncoderCount());
+        reportValue("leftDistance", getLeftDistance());
+        reportValue("rightDistance", getRightDistance());
+        reportValue("leftSpeed", leftSpeed);
+        reportValue("rightSpeed", leftSpeed);
+        reportValue("kP", lb_motor.getP());
+        reportValue("kI", lb_motor.getI());
+        reportValue("kD", lb_motor.getD());
+        reportValue("kF", lb_motor.getF());
+        reportValue("driveMode", driveMode);
     }
+    
 }

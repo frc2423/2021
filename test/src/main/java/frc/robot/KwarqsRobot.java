@@ -1,11 +1,13 @@
 package frc.robot;
 
 import java.util.HashMap;
+import java.util.Set;
 
 import frc.robot.controllers.Controller;
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.subsystems.Subsystem;
 import frc.robot.devices.Device;
+import frc.robot.helpers.NtHelper;
 
 public abstract class KwarqsRobot extends TimedRobot {
 
@@ -17,6 +19,8 @@ public abstract class KwarqsRobot extends TimedRobot {
 
     public KwarqsRobot(){
         controllers = new HashMap<String, Controller>();
+        NtHelper.setString("/kwarqsRobot/currentController", "");
+        NtHelper.setStringArray("/kwarqsRobot/controllerList", new String[0]);
     }
 
     public abstract void init();
@@ -47,15 +51,23 @@ public abstract class KwarqsRobot extends TimedRobot {
     }
 
     public void addController(String name, Controller controller){
+        if (controllers.containsKey(name)) {
+            throw new Error("Controller " + name + " already exists.");
+        }
         controllers.put(name, controller);
+        Set<String> controllerNames = controllers.keySet();
+        NtHelper.setStringArray("/kwarqsRobot/controllerList", controllerNames.toArray(new String[controllerNames.size()]));
     }
 
     public Controller getController(String name){
+        if (!controllers.containsKey(name)) {
+            throw new Error("Controller " + name + " does not exist.");
+        }
         return controllers.get(name);
     }
 
     public void setCurrController(String name){
-        currController = controllers.get(name);
+        currController = getController(name);
         if(isInitialized){
             if(this.isTest()) {
                 testInit();
@@ -67,13 +79,13 @@ public abstract class KwarqsRobot extends TimedRobot {
                 disabledInit(); // for safety of course ;)
             }
         }
+        NtHelper.setString("/kwarqsRobot/currentController", name);
     }
 
     public Controller getCurrController(){
         return currController;
     }
     
-    // controller crap
     // WARNING: !!!EPIC CODE BELOW!!!
 
     @Override
@@ -91,34 +103,50 @@ public abstract class KwarqsRobot extends TimedRobot {
     }
 
     public void teleopPeriodic(){
-        currController.teleopPeriodic();
+        if (currController != null) {
+            currController.teleopPeriodic();
+        }
     }
 
     public void autonomousPeriodic(){
-        currController.autonomousPeriodic();
+        if (currController != null) {
+            currController.autonomousPeriodic();
+        }
     }
 
     public void teleopInit(){
-        currController.teleopInit();
+        if (currController != null) {
+            currController.teleopInit();
+        }
     }
 
     public void autonomousInit(){
-        currController.autonomousInit();
+        if (currController != null) {
+            currController.autonomousInit();
+        }
     }
 
     public void disabledInit(){
-        currController.disabledInit();
+        if (currController != null) {
+            currController.disabledInit();
+        }
     }
 
     public void disabledPeriodic(){
-        currController.disabledInit();
+        if (currController != null) {
+            currController.disabledInit();
+        }
     }
 
     public void testInit(){
-        currController.testInit();
+        if (currController != null) {
+            currController.testInit();
+        }
     }
 
     public void testPeriodic(){
-        currController.testPeriodic();
+        if (currController != null) {
+            currController.testPeriodic();
+        }
     }
 }

@@ -14,6 +14,7 @@ public class NeoMotor extends Device implements IMotor {
     private double voltage = 0.0;
     private double motorValue = 0.0;
     private ControlType motorControlType = ControlType.kDutyCycle;
+    private NeoMotor leaderMotor;
 
     public NeoMotor(int port, String name) {
         super(name);
@@ -125,8 +126,8 @@ public class NeoMotor extends Device implements IMotor {
 
     public void follow(IMotor leader){
         if(leader.getClass() == NeoMotor.class) {
-            NeoMotor leadDriveMotor = (NeoMotor)leader;
-            this.motor.follow(leadDriveMotor.motor);
+            leaderMotor = (NeoMotor)leader;
+            this.motor.follow(leaderMotor.motor);
         }
     }
     public void setEncoderPositionAndRate(double position, double rate){
@@ -142,15 +143,19 @@ public class NeoMotor extends Device implements IMotor {
 
     @Override
     public void report() {
-        reportValue("P", getP());
-        reportValue("I", getI());
-        reportValue("D", getD());
-        reportValue("F", getF());
-        reportValue("distance", getDistance());
-        reportValue("percent", getPercent());
-        reportValue("speed", getSpeed());
-        reportValue("motorValue", motorValue);
-        reportValue("motorControlType", motorControlType.toString());
+        boolean isFollower = motor.isFollower();
         reportValue("isFollower", motor.isFollower());
+        reportValue("followerName", isFollower ? ((Device)leaderMotor).getName() : "");
+        IMotor reportedMotor = isFollower ? leaderMotor : this;
+
+        reportValue("P", reportedMotor.getP());
+        reportValue("I", reportedMotor.getI());
+        reportValue("D", reportedMotor.getD());
+        reportValue("F", reportedMotor.getF());
+        reportValue("distance", reportedMotor.getDistance());
+        reportValue("percent", reportedMotor.getPercent());
+        reportValue("speed", reportedMotor.getSpeed());
+        reportValue("motorValue", motorValue);
+        reportValue("motorControlType",  motorControlType.toString());
     }
 }

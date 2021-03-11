@@ -11,6 +11,10 @@ public class Device {
         Manager.addDevice(name, this);
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void reportValue(String key, Boolean value) {
         NtHelper.setBoolean("/kwarqsRobot/devices/" + this.name + "/" + key, value);
     }

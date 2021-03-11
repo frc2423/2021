@@ -28,7 +28,6 @@ public class Device {
     }
 
     public void report() {
-        System.out.println("deviceName: " + this.name);
     }
 
     public void execute() {

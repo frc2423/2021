@@ -145,7 +145,7 @@ public class NeoMotor extends Device implements IMotor {
     public void report() {
         boolean isFollower = motor.isFollower();
         reportValue("isFollower", motor.isFollower());
-        reportValue("followerName", isFollower ? ((Device)leaderMotor).getName() : "");
+        reportValue("leaderName", isFollower ? ((Device)leaderMotor).getName() : "");
         IMotor reportedMotor = isFollower ? leaderMotor : this;
 
         reportValue("P", reportedMotor.getP());

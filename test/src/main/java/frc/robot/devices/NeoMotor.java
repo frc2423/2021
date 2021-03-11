@@ -155,7 +155,7 @@ public class NeoMotor extends Device implements IMotor {
         reportValue("distance", reportedMotor.getDistance());
         reportValue("percent", reportedMotor.getPercent());
         reportValue("speed", reportedMotor.getSpeed());
-        reportValue("motorValue", motorValue);
-        reportValue("motorControlType",  motorControlType.toString());
+        reportValue("neo/motorValue", motorValue);
+        reportValue("neo/motorControlType",  motorControlType.toString());
     }
 }

@@ -41,7 +41,7 @@ public class Drive extends Subsystem {
     private DrivePosition drivePosition;
 
     private double defaultP = 0.0001;
-    private double defaultI = 0.0;
+    private double defaultI = 0.00001;
     private double defaultD = 0.000015;
     private double defaultF = 0.0;
 

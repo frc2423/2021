@@ -1,18 +1,16 @@
 package frc.robot.controllers;
 
 import edu.wpi.first.wpilibj.XboxController; // A
-import frc.robot.subsystems.Subsystem;
 import frc.robot.subsystems.Shooter;
-import frc.robot.helpers.NtHelper;
-import java.util.HashMap;
+import frc.robot.Manager;
 
 public class ShooterTesting extends Controller{
 
     private XboxController xboxController;
     private Shooter shooter;
     
-    public void robotInit(HashMap<String, Subsystem> subsystems, HashMap<String, Object> devices) {
-        shooter = (Shooter)subsystems.get("shooter");
+    public void robotInit() {
+        shooter = Manager.getSubsystem("shooter", Shooter.class);
         xboxController = new XboxController(0);
     }
 
@@ -21,10 +19,9 @@ public class ShooterTesting extends Controller{
     }
 
     public void teleopPeriodic() {
-        shooter.setShooterMotorSpeed();
         shooter.setWheelSpeeds();
         
-        System.out.println("Motor speed: " + shooter.getShooterMotorSpeed() + " Wheel speed: " + shooter.getWheelSpeed());
+        // System.out.println("Motor speed: " + shooter.getShooterMotorSpeed() + " Wheel speed: " + shooter.getWheelSpeed());
     }
 
 }

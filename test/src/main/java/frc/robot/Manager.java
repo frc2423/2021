@@ -1,6 +1,7 @@
 package frc.robot;
 
 import java.util.HashMap;
+import java.util.Set;
 
 import frc.robot.devices.Device;
 import frc.robot.subsystems.Subsystem;
@@ -45,5 +46,12 @@ public class Manager {
         return type.cast(devices.get(name));
     }
 
+    public static Set<String> getDeviceNames() {
+        return devices.keySet();
+    }
+
+    public static Set<String> getSubsystemNames() {
+        return subsystems.keySet();
+    }
 
 }

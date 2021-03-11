@@ -51,20 +51,16 @@ public class GalacticSearch extends Controller {
 
     xboxController = new XboxController(0);
 
-    driveBase = (Drive)Manager.getSubsystem("drive");
-    shooter = (Shooter)Manager.getSubsystem("shooter");
+    driveBase = Manager.getSubsystem("drive", Drive.class);
+    shooter = Manager.getSubsystem("shooter", Shooter.class);
 
-    ballTracker = (IBallTracker)Manager.getDevice("ballTracker");
+    ballTracker = Manager.getDevice("ballTracker", IBallTracker.class);
 
     follower = new TrajectoryFollower(driveBase);
 
-    intake = (Intake)Manager.getSubsystem("intake");
+    intake = Manager.getSubsystem("intake", Intake.class);
 
     ballTracker.addSimulatedBall(10, 0);
-  }
-
-  public void distAndAngle(){
-    System.out.println("DIST: " + ballTracker.getDistanceFromTarget() + ", ANGLE: " + ballTracker.getAngleFromTarget());
   }
 
   public String detectField() {

@@ -8,55 +8,35 @@ import frc.robot.subsystems.Subsystem;
 
 public abstract class KwarqsRobot extends TimedRobot {
 
-    private HashMap<String ,Subsystem> subsystems;
     private HashMap<String, Controller> controllers;
-    private HashMap<String, Object> devices;
 
     private Controller currController;
 
     private boolean isInitialized = false;
 
     public KwarqsRobot(){
-        subsystems = new HashMap<String, Subsystem>();
         controllers = new HashMap<String, Controller>();
-        devices = new HashMap<String, Object>();
     }
 
     public abstract void init();
 
-    public void addSubsystem(String name, Subsystem subsystem){
-        subsystems.put(name, subsystem);
-    }
-
-    public void addDevice(String name, Object device){
-        devices.put(name, device);
-    }
-
-    public Subsystem getSubsystem(String name){
-        return subsystems.get(name);
-    }
-
-    public Object getDevice(String name) {
-        return devices.get(name);
-    }
-
     public void initSubsystem(String name){
-        subsystems.get(name).init();
+        Manager.getSubsystem(name, Subsystem.class).init();
     }
 
     public void executeSubsystem(String name){
-        subsystems.get(name).execute();
+        Manager.getSubsystem(name, Subsystem.class).execute();
     }
 
     public void initAllSubsystems(){
-        for(String key : subsystems.keySet()) {
-            subsystems.get(key).init();
+        for(String key : Manager.getSubsystemNames()) {
+            Manager.getSubsystem(key, Subsystem.class).init();
         }
     }
 
     public void executeAllSubsystems(){
-        for(String key : subsystems.keySet()) {
-            subsystems.get(key).execute();
+        for(String key : Manager.getSubsystemNames()) {
+            Manager.getSubsystem(key, Subsystem.class).execute();
         }
     }
 
@@ -95,7 +75,7 @@ public abstract class KwarqsRobot extends TimedRobot {
         init();
         initAllSubsystems();
         for(String key : controllers.keySet()) {
-            controllers.get(key).robotInit(subsystems, devices);
+            controllers.get(key).robotInit();
         }
         isInitialized = true;
     }

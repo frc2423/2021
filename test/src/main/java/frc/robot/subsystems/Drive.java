@@ -290,18 +290,31 @@ public class Drive extends Subsystem {
 
     @Override
     public void report() {
-        reportValue("velocity", getLeftVelocity() /maxSpeed);
-        reportValue("gyroAngle", gyro.getRotation2d().getDegrees());
-        reportValue("encoderCount", lf_motor.getEncoderCount());
-        reportValue("leftDistance", getLeftDistance());
-        reportValue("rightDistance", getRightDistance());
-        reportValue("leftSpeed", leftSpeed);
-        reportValue("rightSpeed", leftSpeed);
-        reportValue("kP", lb_motor.getP());
-        reportValue("kI", lb_motor.getI());
-        reportValue("kD", lb_motor.getD());
-        reportValue("kF", lb_motor.getF());
-        reportValue("driveMode", driveMode);
+        reportValue("raw/velocity", getLeftVelocity() /maxSpeed);
+        reportValue("raw/gyroAngle", gyro.getRotation2d().getDegrees());
+        reportValue("raw/encoderCount", lf_motor.getEncoderCount());
+        reportValue("raw/leftDistance", getLeftDistance());
+        reportValue("raw/rightDistance", getRightDistance());
+        reportValue("raw/leftSpeed", leftSpeed);
+        reportValue("raw/rightSpeed", leftSpeed);
+        reportValue("raw/kP", lb_motor.getP());
+        reportValue("raw/kI", lb_motor.getI());
+        reportValue("raw/kD", lb_motor.getD());
+        reportValue("raw/kF", lb_motor.getF());
+        reportValue("raw/driveMode", driveMode);
+
+        reportValue("left velocity", getLeftVelocity() + " ft/s");
+        reportValue("right velocity", getRightVelocity() + " ft/s");
+        reportValue("robot heading", gyro.getRotation2d().getDegrees() + " degrees");
+        reportValue("left distance", getLeftDistance() + " feet");
+        reportValue("right distance", getRightDistance() + " feet");
+        if (driveMode == "Arcade Voltage") {
+            reportValue("desired left speed", leftSpeed * 100 + "% speed");
+            reportValue("desired right speed", rightSpeed * 100 + "% speed");
+        } else {
+            reportValue("desired left speed", leftSpeed + " ft/s");
+            reportValue("desired right speed", rightSpeed  + " ft/s");
+        }
     }
     
 }

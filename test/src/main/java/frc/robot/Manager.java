@@ -26,10 +26,11 @@ public class Manager {
     }
 
     public static <T> T  getSubsystem(String name, Class<T> type){
+        System.out.println("String subsystem: " + name);
         if (!subsystems.containsKey(name)) {
             throw new Error("Subsystem " + name + " does not exist");
         }
-         if (!subsystems.get(name).getClass().isAssignableFrom(type) ) {
+         if (!type.isAssignableFrom(subsystems.get(name).getClass())) {
             throw new Error("Subsystem " + name + " is not of type " + type.toString());
         }
         return type.cast(subsystems.get(name));
@@ -40,7 +41,7 @@ public class Manager {
         if (!devices.containsKey(name)) {
             throw new Error("Device " + name + " does not exist");
         }
-        if (!devices.get(name).getClass().isAssignableFrom(type) ) {
+        if (!type.isAssignableFrom(devices.get(name).getClass())) {
             throw new Error("Device " + name + " is not of type " + type.toString());
         }
         return type.cast(devices.get(name));

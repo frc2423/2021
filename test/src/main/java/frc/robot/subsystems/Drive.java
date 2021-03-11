@@ -36,7 +36,7 @@ public class Drive extends Subsystem {
 
     private static final double kTrackWidth = 1.9375;
     private static final double kWheelRadius = 0.5;
-    private final DrivePosition drivePosition;
+    private DrivePosition drivePosition;
 
     private double defaultP = 0.0001;
     private double defaultI = 0.0;
@@ -44,9 +44,12 @@ public class Drive extends Subsystem {
     private double defaultF = 0.0;
 
     private boolean voltageMode = false;
-    
-    public Drive () {
+
+    public Drive() {
         super("drive");
+    }
+    
+    public void Init() {
         double conversionFactor = ftPerRev / countsPerRev;
         conversionFactor = conversionFactor *10 /7.5;
 
@@ -135,7 +138,7 @@ public class Drive extends Subsystem {
         rb_motor.setF(getF());
     }
 
-    public void init() {
+    public void begin() {
         setTankPercent(0.0, 0.0);
         toLowGear();
         reset();

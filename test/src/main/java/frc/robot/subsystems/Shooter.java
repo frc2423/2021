@@ -23,15 +23,15 @@ public class Shooter extends Subsystem{
 
     public Shooter() {
         super("shooter");
+    }
+
+    public void init() {
         shooterFeederMotor = Manager.getDevice("shooterFeederMotor", IMotor.class);
         shooterBottomWheel = Manager.getDevice("shooterBottomWheel", IMotor.class);
         shooterTopWheel = Manager.getDevice("shooterTopWheel", IMotor.class);
 
         NtHelper.listen("/shooter/wheelSpeed", (table) -> setWheelSpeeds());
         NtHelper.listen("/shooter/motorSpeed", (table) -> setshooterFeederMotorSpeed());
-    }
-
-    public void init() {
         stop();
     }
 

@@ -103,7 +103,7 @@ public class GalacticSearch extends Controller {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    driveBase.init();
+    driveBase.begin();
     driveBase.setDefaultPIDs();
   }
 

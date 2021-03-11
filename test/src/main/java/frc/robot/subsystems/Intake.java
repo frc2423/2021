@@ -25,14 +25,14 @@ public class Intake extends Subsystem {
 
     public Intake() {
         super("intake");
-        running = false;
+    }
+
+    public void init() {
+      running = false;
         intakeValve = new DoubleSolenoid(2, 3);
 
         motor = Manager.getDevice("intakeMotor", IMotor.class);
         greenWheel = Manager.getDevice("greenWheel", IMotor.class);
-    }
-
-    public void init() {
       stop();
     }
 

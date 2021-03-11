@@ -104,7 +104,7 @@ public class AutoNav extends Controller {
   @Override
   public void teleopInit() {
     follower.stopFollowing();
-    driveBase.init();
+    driveBase.begin();
     driveBase.setDefaultPIDs();
     driveBase.reset();
   }

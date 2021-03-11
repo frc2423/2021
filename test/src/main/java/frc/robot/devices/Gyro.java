@@ -45,7 +45,6 @@ public class Gyro extends Device implements IGyro{
 
     @Override
     public void report() {
-        System.out.println("GYRO");
         reportValue("angle", getAngle());
     }
 }

@@ -145,6 +145,13 @@ public class SimMotor extends Device implements IMotor {
 
     @Override
     public void report() {
+        reportValue("P", getP());
+        reportValue("I", getI());
+        reportValue("D", getD());
+        reportValue("F", getF());
+        reportValue("distance", getDistance());
+        reportValue("percent", getPercent());
+        reportValue("speed", getSpeed());
     }
 
     public void execute() {

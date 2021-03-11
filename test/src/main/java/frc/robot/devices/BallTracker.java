@@ -59,5 +59,8 @@ public class BallTracker extends Device implements IBallTracker{
     @Override
     public void report() {
         reportValue("hasTargets", hasTargets());
+        reportValue("distanceFromTarget", getDistanceFromTarget());
+        reportValue("pitchFromTarget", getPitchFromTarget());
+        reportValue("angleFromTarget", getAngleFromTarget());
     }
 }

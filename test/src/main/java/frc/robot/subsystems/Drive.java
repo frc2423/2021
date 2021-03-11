@@ -14,6 +14,8 @@ import frc.robot.DrivePosition;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import frc.robot.Manager;
 
+import edu.wpi.first.wpilibj.RobotBase;
+
 public class Drive extends Subsystem {
 
     private double countsPerRev = 16.35;
@@ -50,8 +52,9 @@ public class Drive extends Subsystem {
     }
     
     public void init() {
-        double conversionFactor = ftPerRev / countsPerRev;
-        conversionFactor = conversionFactor *10 /7.5;
+        double conversionFactor = RobotBase.isReal()
+            ? (ftPerRev / countsPerRev * 10 / 7.5)
+            : (2 * Math.PI * kWheelRadius / 4096);
 
         lf_motor = Manager.getDevice("lf_motor", IMotor.class);
         lb_motor = Manager.getDevice("lb_motor", IMotor.class);

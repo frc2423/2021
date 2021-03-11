@@ -37,12 +37,10 @@ public abstract class KwarqsRobot extends TimedRobot {
 
     public void callAllSubsystemsAndDevices(){
         for(String key : Manager.getSubsystemNames()) {
-            System.out.println("subsystemName: " + key);
             Manager.getSubsystem(key, Subsystem.class).execute();
             Manager.getSubsystem(key, Subsystem.class).report();
         }
         for(String key : Manager.getDeviceNames()) {
-            System.out.println("deviceName: " + key);
             Manager.getDevice(key, Device.class).execute();
             Manager.getDevice(key, Device.class).report();
         }

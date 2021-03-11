@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.subsystems.Subsystem;
 import frc.robot.devices.Device;
 import frc.robot.helpers.NtHelper;
+import edu.wpi.first.wpilibj.Timer;
 
 public abstract class KwarqsRobot extends TimedRobot {
 
@@ -16,11 +17,15 @@ public abstract class KwarqsRobot extends TimedRobot {
     private Controller currController;
 
     private boolean isInitialized = false;
+    private boolean reporting = true;
+    private Timer reportingTimer = new Timer();
+    private double reportingPeriod = .5;
 
     public KwarqsRobot(){
         controllers = new HashMap<String, Controller>();
         NtHelper.setString("/kwarqsRobot/currentController", "");
         NtHelper.setStringArray("/kwarqsRobot/controllerList", new String[0]);
+        reportingTimer.start();
     }
 
     public abstract void init();
@@ -39,14 +44,24 @@ public abstract class KwarqsRobot extends TimedRobot {
         }
     }
 
+    public void isReporting(boolean value) {
+        reporting = value;
+    }
+
     public void callAllSubsystemsAndDevices(){
         for(String key : Manager.getSubsystemNames()) {
             Manager.getSubsystem(key, Subsystem.class).execute();
-            Manager.getSubsystem(key, Subsystem.class).report();
+            if (reporting && reportingTimer.get() > reportingPeriod) {
+                Manager.getSubsystem(key, Subsystem.class).report();
+                reportingTimer.reset();
+            }
         }
         for(String key : Manager.getDeviceNames()) {
             Manager.getDevice(key, Device.class).execute();
-            Manager.getDevice(key, Device.class).report();
+            if (reporting && reportingTimer.get() > reportingPeriod) {
+                Manager.getDevice(key, Device.class).report();
+                reportingTimer.reset();
+            }
         }
     }
 

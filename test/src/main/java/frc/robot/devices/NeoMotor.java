@@ -127,7 +127,8 @@ public class NeoMotor extends Device implements IMotor {
     public void follow(IMotor leader){
         if(leader.getClass() == NeoMotor.class) {
             leaderMotor = (NeoMotor)leader;
-            this.motor.follow(leaderMotor.motor);
+            this.motor.follow(this.leaderMotor.motor);
+        
         }
     }
     public void setEncoderPositionAndRate(double position, double rate){
@@ -145,8 +146,8 @@ public class NeoMotor extends Device implements IMotor {
     public void report() {
         boolean isFollower = motor.isFollower();
         reportValue("isFollower", motor.isFollower());
-        reportValue("leaderName", isFollower ? ((Device)leaderMotor).getName() : "");
-        IMotor reportedMotor = isFollower ? leaderMotor : this;
+        reportValue("leaderName", isFollower ? (this.leaderMotor).getName() : "");
+        IMotor reportedMotor = isFollower ? this.leaderMotor : this;
 
         reportValue("P", reportedMotor.getP());
         reportValue("I", reportedMotor.getI());

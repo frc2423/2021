@@ -214,8 +214,8 @@ public class Drive extends Subsystem {
         var driveArray = DriveHelper.getArcadeSpeeds(speed, rot, true);
         leftSpeed = driveArray[0];
         rightSpeed = driveArray[1];
-        lb_motor.setSpeed(leftSpeed);
-        rb_motor.setSpeed(rightSpeed);
+        lb_motor.setPercent(leftSpeed);
+        rb_motor.setPercent(rightSpeed);
         driveMode = "Arcade Voltage";
     }
 

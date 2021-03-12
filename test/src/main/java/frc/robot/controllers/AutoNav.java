@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.GenericHID.Hand; // W
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj.XboxController; // A
 import edu.wpi.first.wpilibj.RobotBase; // R
+import edu.wpi.first.wpilibj.SlewRateLimiter;
 
 import frc.robot.subsystems.Drive; // Q
 import frc.robot.subsystems.Shooter;
@@ -16,6 +17,7 @@ import frc.robot.helpers.DriveHelper;
 import frc.robot.Manager;
 import frc.robot.TrajectoryFollower;
 import frc.robot.devices.IBallTracker;
+import frc.robot.helpers.DriveHelper;
 
 
 
@@ -38,6 +40,11 @@ public class AutoNav extends Controller {
   private TrajectoryFollower follower;
 
   String trajectoryJSON = "Straight";
+
+  private SlewRateLimiter speedLimiter = new SlewRateLimiter(3);
+  private SlewRateLimiter rotLimiter = new SlewRateLimiter(3);
+  private double prevSpeed = 0;
+  private double prevRotation = 0;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -108,14 +115,35 @@ public class AutoNav extends Controller {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-
-    double x = RobotBase.isReal() ? xboxController.getX(Hand.kRight) : xboxController.getRawAxis(0);
-    double y = RobotBase.isReal() ? xboxController.getY(Hand.kRight) : xboxController.getRawAxis(1);
-
-    driveBase.setArcadePercent(
-      DriveHelper.applyDeadband(-y, joystickDeadband), 
-      DriveHelper.applyDeadband(x, joystickDeadband)
+    
+    double x = DriveHelper.applyDeadband(
+      RobotBase.isReal() ? xboxController.getX(Hand.kRight) : xboxController.getRawAxis(0)
     );
+    double y = -DriveHelper.applyDeadband(
+      RobotBase.isReal() ? xboxController.getY(Hand.kRight) : xboxController.getRawAxis(1)
+    );
+    double turnRate = 0;
+    double speed = 0;
+
+    boolean isXSlower = Math.abs(x) < Math.abs(prevRotation);
+    boolean isYSlower = Math.abs(y) < Math.abs(prevSpeed);
+    if (isXSlower){
+      rotLimiter.reset(x);
+      turnRate = x;
+    } else {
+      turnRate = rotLimiter.calculate(x);
+    }
+    if (isYSlower){
+      speedLimiter.reset(y);
+      speed = y;
+    } else {
+      speed = speedLimiter.calculate(y);
+    }
+
+    driveBase.setArcadePercent(speed, turnRate); 
+    prevRotation = turnRate;
+    prevSpeed = speed;
+
    // driveBase.setArcadeSpeeds(2,0);
    //driveBase.setArcadeSpeeds(4, 0);
 

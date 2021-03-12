@@ -283,7 +283,9 @@ public class Drive extends Subsystem {
             drivePosition.getRightVel()
         );
 
-        gyro.setAngle(drivePosition.getDegrees());
+        if (RobotBase.isSimulation()) {
+            gyro.setAngle(drivePosition.getDegrees());
+        }
 
         drivePosition.updateOdometry(gyro.getRotation2d(), lb_motor.getDistance(), rb_motor.getDistance());
     }

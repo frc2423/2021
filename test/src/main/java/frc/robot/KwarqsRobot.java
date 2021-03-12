@@ -19,7 +19,7 @@ public abstract class KwarqsRobot extends TimedRobot {
     private boolean isInitialized = false;
     private boolean reporting = true;
     private Timer reportingTimer = new Timer();
-    private double reportingPeriod = .5;
+    private double reportingPeriod = .2;
 
     public KwarqsRobot(){
         controllers = new HashMap<String, Controller>();
@@ -53,16 +53,17 @@ public abstract class KwarqsRobot extends TimedRobot {
             Manager.getSubsystem(key, Subsystem.class).execute();
             if (reporting && reportingTimer.get() > reportingPeriod) {
                 Manager.getSubsystem(key, Subsystem.class).report();
-                reportingTimer.reset();
+              //  reportingTimer.reset();
             }
         }
         for(String key : Manager.getDeviceNames()) {
             Manager.getDevice(key, Device.class).execute();
             if (reporting && reportingTimer.get() > reportingPeriod) {
                 Manager.getDevice(key, Device.class).report();
-                reportingTimer.reset();
+               // reportingTimer.reset();
             }
         }
+        if( reportingTimer.get() > reportingPeriod ) reportingTimer.reset();
     }
 
     public void addController(String name, Controller controller){

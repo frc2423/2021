@@ -111,7 +111,7 @@ public class AutoNav extends Controller {
 
     double x = RobotBase.isReal() ? xboxController.getX(Hand.kRight) : xboxController.getRawAxis(0);
     double y = RobotBase.isReal() ? xboxController.getY(Hand.kRight) : xboxController.getRawAxis(1);
-
+    
     driveBase.setArcadePercent(
       DriveHelper.applyDeadband(-y, joystickDeadband), 
       DriveHelper.applyDeadband(x, joystickDeadband)

@@ -274,7 +274,8 @@ public class Drive extends Subsystem {
         }
 
         drivePosition.setInputs(lb_motor.getPercent(), rb_motor.getPercent());
-                lb_motor.setEncoderPositionAndRate(
+        
+        lb_motor.setEncoderPositionAndRate(
             drivePosition.getLeftPos(),
             drivePosition.getLeftVel()
         );
@@ -315,6 +316,7 @@ public class Drive extends Subsystem {
             reportValue("desired left speed", leftSpeed + " ft/s");
             reportValue("desired right speed", rightSpeed  + " ft/s");
         }
+
     }
     
 }

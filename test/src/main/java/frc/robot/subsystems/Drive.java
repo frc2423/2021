@@ -316,6 +316,10 @@ public class Drive extends Subsystem {
             reportValue("desired left speed", leftSpeed + " ft/s");
             reportValue("desired right speed", rightSpeed  + " ft/s");
         }
+        reportValue("Position X ", drivePosition.getPose().getX());
+        reportValue("Position Y ", drivePosition.getPose().getY());
+        reportValue("Rotation ", drivePosition.getPose().getRotation().getDegrees());
+
 
     }
     

@@ -114,7 +114,7 @@ public class AutoNav extends Controller {
     
     driveBase.setArcadePercent(
       DriveHelper.applyDeadband(-y, joystickDeadband), 
-      DriveHelper.applyDeadband(x, joystickDeadband)
+      DriveHelper.applyDeadband(x, joystickDeadband) 
     );
    // driveBase.setArcadeSpeeds(2,0);
    //driveBase.setArcadeSpeeds(4, 0);

@@ -49,21 +49,20 @@ public abstract class KwarqsRobot extends TimedRobot {
     }
 
     public void callAllSubsystemsAndDevices(){
+        double currTime = reportingTimer.get();
         for(String key : Manager.getSubsystemNames()) {
             Manager.getSubsystem(key, Subsystem.class).execute();
-            if (reporting && reportingTimer.get() > reportingPeriod) {
+            if (reporting && currTime > reportingPeriod) {
                 Manager.getSubsystem(key, Subsystem.class).report();
-              //  reportingTimer.reset();
             }
         }
         for(String key : Manager.getDeviceNames()) {
             Manager.getDevice(key, Device.class).execute();
-            if (reporting && reportingTimer.get() > reportingPeriod) {
+            if (reporting && currTime > reportingPeriod) {
                 Manager.getDevice(key, Device.class).report();
-               // reportingTimer.reset();
             }
         }
-        if( reportingTimer.get() > reportingPeriod ) reportingTimer.reset();
+        if(currTime > reportingPeriod) reportingTimer.reset();
     }
 
     public void addController(String name, Controller controller){

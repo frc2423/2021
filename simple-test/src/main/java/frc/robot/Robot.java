@@ -14,7 +14,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANEncoder;
 
-
+import frc.robot.DriveHelper;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
@@ -112,16 +112,27 @@ public class Robot extends TimedRobot {
     System.out.println("teleopInit");
   }
 
+  public void tank(double left, double right) {
+    lb_motor.set(left);
+    rb_motor.set(right);
+  }
+
+  public void arcade(double speed, double turn) {
+    double[] speeds = DriveHelper.getArcadeSpeeds(speed, turn, false);
+    double leftSpeed = speeds[0];
+    double rightSpeed = speeds[1];
+    lb_motor.set(leftSpeed);
+    rb_motor.set(rightSpeed);
+  }
+
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+    double x = xboxController.getX(Hand.kRight);
+    double y = xboxController.getY(Hand.kRight);
+
     double left = xboxController.getY(Hand.kLeft);
     double right = xboxController.getY(Hand.kRight);
-
-    // lb_motor.set(left);
-    // rf_motor.set(right);
-
-    lb_pidController.setReference(left, ControlType.kDutyCycle);
-    rb_pidController.setReference(right, ControlType.kDutyCycle);
+    arcade(-y, x);
   }
 }

@@ -37,7 +37,7 @@ public class Drive extends Subsystem {
     private double rightSpeed = 0.0;
 
     private static final double kTrackWidth = 1.9375;
-    private static final double kWheelRadius = 0.5;
+    private static final double kWheelRadius = 0.25;
     private DrivePosition drivePosition;
 
     private double defaultP = 0.0001;

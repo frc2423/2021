@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj.XboxController; // A
 import edu.wpi.first.wpilibj.RobotBase; // R
 import edu.wpi.first.wpilibj.SlewRateLimiter;
+import frc.robot.helpers.DriveRateLimiter;
 
 import frc.robot.subsystems.Drive; // Q
 import frc.robot.subsystems.Shooter;
@@ -41,10 +42,8 @@ public class AutoNav extends Controller {
 
   String trajectoryJSON = "Straight";
 
-  private SlewRateLimiter speedLimiter = new SlewRateLimiter(3);
-  private SlewRateLimiter rotLimiter = new SlewRateLimiter(3);
-  private double prevSpeed = 0;
-  private double prevRotation = 0;
+  private DriveRateLimiter speedLimiter = new DriveRateLimiter(3);
+  private DriveRateLimiter turnRateLimiter = new DriveRateLimiter(3);
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -122,30 +121,11 @@ public class AutoNav extends Controller {
     double y = -DriveHelper.applyDeadband(
       RobotBase.isReal() ? xboxController.getY(Hand.kRight) : xboxController.getRawAxis(1)
     );
-    double turnRate = 0;
-    double speed = 0;
 
-    boolean isXSlower = Math.abs(x) < Math.abs(prevRotation);
-    boolean isYSlower = Math.abs(y) < Math.abs(prevSpeed);
-    if (isXSlower){
-      rotLimiter.reset(x);
-      turnRate = x;
-    } else {
-      turnRate = rotLimiter.calculate(x);
-    }
-    if (isYSlower){
-      speedLimiter.reset(y);
-      speed = y;
-    } else {
-      speed = speedLimiter.calculate(y);
-    }
+    double turnRate = turnRateLimiter.calculate(x);
+    double speed = speedLimiter.calculate(y);
 
     driveBase.setArcadePercent(speed, turnRate); 
-    prevRotation = turnRate;
-    prevSpeed = speed;
-
-   // driveBase.setArcadeSpeeds(2,0);
-   //driveBase.setArcadeSpeeds(4, 0);
 
     if (xboxController.getBumperPressed(Hand.kLeft)) {
       driveBase.switchGears();

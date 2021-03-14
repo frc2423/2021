@@ -75,7 +75,9 @@ public class DrivePosition {
     }
 
     public void updateOdometry(Rotation2d rotation, double leftDistance, double rightDistance){
-        odometry.update(rotation, leftDistance, rightDistance);
+        leftDistance = Units.feetToMeters(leftDistance);
+        rightDistance = Units.feetToMeters(rightDistance);
+        odometry.update(rotation, leftDistance, -rightDistance);
         field.setRobotPose(odometry.getPoseMeters());
     }
 

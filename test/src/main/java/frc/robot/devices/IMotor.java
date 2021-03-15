@@ -2,13 +2,32 @@ package frc.robot.devices;
 
 public interface IMotor {
 
-
+    /**
+     * Sets the desired speed in feet/ second.
+     * 
+     * @param speed Positive means motor is spinning forward.
+     */
     public void setSpeed(double speed);
 
+    /**
+     * Gets speed in feet/ second based on encoder rate.
+     * 
+     * @return Positive means motor is spinning forward.
+     */
     public double getSpeed();
 
+    /**
+     * Sets speed as a percentage of max speed.
+     * 
+     * @param percent  Positive means motor is spinning forward.
+     */
     public void setPercent(double percent); // set speed as percent ofmams dksdkjsd max speed
 
+    /**
+     * Gets percentage of max speed based on value passed into setPercent().
+     * 
+     * @return Positive means motor is spinning forward
+     */
     public double getPercent();
 
     public void setDistance(double dist);

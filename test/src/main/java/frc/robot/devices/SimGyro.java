@@ -42,10 +42,6 @@ public class SimGyro extends Device implements IGyro{
         gyro.calibrate();
     }
 
-    public Rotation2d getRotation2d() {
-        return Rotation2d.fromDegrees(getAngle());
-    }
-
     @Override
     public void report() {
         reportValue("angle", getAngle());

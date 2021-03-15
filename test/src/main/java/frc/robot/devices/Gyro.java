@@ -39,10 +39,6 @@ public class Gyro extends Device implements IGyro{
         gyro.calibrate();
     }
 
-    public Rotation2d getRotation2d() {
-        return gyro.getRotation2d();
-    }
-
     @Override
     public void report() {
         reportValue("angle", getAngle());

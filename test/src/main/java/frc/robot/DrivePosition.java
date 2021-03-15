@@ -35,7 +35,8 @@ public class DrivePosition {
     private final Field2d field = new Field2d();
     private final DifferentialDriveOdometry odometry;
 
-    public DrivePosition(double trackWidth, double wheelRadius, Rotation2d rotation2d){
+    public DrivePosition(double trackWidth, double wheelRadius, double angle){
+        Rotation2d rotation2d = Rotation2d.fromDegrees(-angle);
         kTrackWidth = Units.feetToMeters(trackWidth);
         kWheelRadius = Units.feetToMeters(wheelRadius);
 
@@ -51,7 +52,8 @@ public class DrivePosition {
         SmartDashboard.putData("Field", field);
 
     }
-    public void reset(Pose2d pose, Rotation2d rotation){
+    public void reset(Pose2d pose, double angle){
+        Rotation2d rotation = Rotation2d.fromDegrees(-angle);
         drivetrainSimulator.setPose(pose);
         odometry.resetPosition(pose, rotation);
     }
@@ -74,10 +76,20 @@ public class DrivePosition {
         drivetrainSimulator.update(0.02);
     }
 
-    public void updateOdometry(Rotation2d rotation, double leftDistance, double rightDistance){
-        leftDistance = Units.feetToMeters(leftDistance);
-        rightDistance = Units.feetToMeters(rightDistance);
-        odometry.update(rotation, leftDistance, -rightDistance);
+
+    /**
+     * Updates the robot position on the field using distance measurements from encoders. 
+     * If the robot is moving forward in a straight line, both distances (left and right) must be positive.
+     * 
+     * @param angle The angle reported by the gyroscope. Positive angles must be clockwise.
+     * @param leftDistanceFeet The distance traveled by the left encoder in feet. Forward must be positive.
+     * @param rightDistanceFeet The distance traveled by the right encoder in feet. Forward must be positive.
+     */
+    public void updateOdometry(double angle, double leftDistanceFeet, double rightDistanceFeet){
+        Rotation2d rotation = Rotation2d.fromDegrees(-angle);
+        double leftDistanceMeters = Units.feetToMeters(leftDistanceFeet);
+        double rightDistanceMeters = Units.feetToMeters(rightDistanceFeet);
+        odometry.update(rotation, leftDistanceMeters, rightDistanceMeters);
         field.setRobotPose(odometry.getPoseMeters());
     }
 

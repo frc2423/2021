@@ -82,7 +82,7 @@ public class Drive extends Subsystem {
         NtHelper.listen("/drive/kF", (table) -> setPids());
         NtHelper.listen("/drive/setPoint", (table) -> setSetPoints());
 */
-        drivePosition = new DrivePosition(kTrackWidth, kWheelRadius, gyro.getRotation2d());
+        drivePosition = new DrivePosition(kTrackWidth, kWheelRadius, gyro.getAngle());
     }
 
     private double getSetPoint() {
@@ -151,10 +151,7 @@ public class Drive extends Subsystem {
         lb_motor.resetEncoder(0.0);
         rb_motor.resetEncoder(0.0);
         gyro.reset();
-        drivePosition.reset(pose, gyro.getRotation2d());
-    }
-     public Rotation2d getRotation2d(){
-        return gyro.getRotation2d();
+        drivePosition.reset(pose, gyro.getAngle());
     }
 
     public void reset() {
@@ -288,13 +285,13 @@ public class Drive extends Subsystem {
             gyro.setAngle(drivePosition.getDegrees());
         }
 
-        drivePosition.updateOdometry(gyro.getRotation2d(), lb_motor.getDistance(), rb_motor.getDistance());
+        drivePosition.updateOdometry(gyro.getAngle(), lb_motor.getDistance(), rb_motor.getDistance());
     }
 
     @Override
     public void report() {
         reportValue("raw/velocity", getLeftVelocity() /maxSpeed);
-        reportValue("raw/gyroAngle", gyro.getRotation2d().getDegrees());
+        reportValue("raw/gyroAngle", gyro.getAngle());
         reportValue("raw/encoderCount", lf_motor.getEncoderCount());
         reportValue("raw/leftDistance", getLeftDistance());
         reportValue("raw/rightDistance", getRightDistance());
@@ -308,7 +305,7 @@ public class Drive extends Subsystem {
 
         reportValue("left velocity", getLeftVelocity() + " ft/s");
         reportValue("right velocity", getRightVelocity() + " ft/s");
-        reportValue("robot heading", gyro.getRotation2d().getDegrees() + " degrees");
+        reportValue("robot heading", gyro.getAngle() + " degrees");
         reportValue("left distance", getLeftDistance() + " feet");
         reportValue("right distance", getRightDistance() + " feet");
         if (driveMode == "Arcade Voltage") {
@@ -318,9 +315,9 @@ public class Drive extends Subsystem {
             reportValue("desired left speed", leftSpeed + " ft/s");
             reportValue("desired right speed", rightSpeed  + " ft/s");
         }
-        reportValue("Position X ", drivePosition.getPose().getX());
-        reportValue("Position Y ", drivePosition.getPose().getY());
-        reportValue("Rotation ", drivePosition.getPose().getRotation().getDegrees());
+        reportValue("Pose/X", drivePosition.getPose().getX());
+        reportValue("Pose/Y", drivePosition.getPose().getY());
+        reportValue("Pose/Rotation", drivePosition.getPose().getRotation().getDegrees());
 
 
     }

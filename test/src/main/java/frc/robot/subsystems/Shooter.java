@@ -1,9 +1,7 @@
 package frc.robot.subsystems;
 
 import frc.robot.Manager;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.robot.helpers.NtHelper;
-
 import frc.robot.devices.IMotor;
 
 public class Shooter extends Subsystem{
@@ -55,15 +53,11 @@ public class Shooter extends Subsystem{
     }
 
     public void setshooterFeederMotorSpeed() {
-          shooterFeederMotor.setPercent(getshooterFeederMotorSpeed());
+        shooterFeederMotor.setPercent(getshooterFeederMotorSpeed());
     }
 
-    public void shoot() {
-        
-    }
+    public void shoot() {}
 
-    public void stop() {
-    
-    }
+    public void stop() {}
 
 }

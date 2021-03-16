@@ -5,7 +5,6 @@ import java.util.Set;
 
 import frc.robot.devices.Device;
 import frc.robot.subsystems.Subsystem;
-
 import frc.robot.helpers.NtHelper;
 
 public class Manager {

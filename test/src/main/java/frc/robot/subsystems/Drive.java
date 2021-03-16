@@ -11,18 +11,21 @@ import frc.robot.devices.IGyro;
 import frc.robot.helpers.NtHelper;
 import frc.robot.helpers.DriveHelper;
 import frc.robot.DrivePosition;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import frc.robot.Manager;
 
 import edu.wpi.first.wpilibj.RobotBase;
 
 public class Drive extends Subsystem {
 
-    private double countsPerRev = 16.35;
-    private double ftPerRev = 1.57;
-    private double maxSpeed = 9.0;  // feet per second
-
-    private boolean previous_button = false;
+    public static final double countsPerRev = 16.35;
+    public static final double ftPerRev = 1.57;
+    public static final double maxSpeed = 9.0;  // feet per second
+    public static final double kTrackWidth = 1.9375;
+    public static final double kWheelRadius = 0.25;
+    public static final double defaultP = 0.0001;
+    public static final double defaultI = 0.00001;
+    public static final double defaultD = 0.000015;
+    public static final double defaultF = 0.0;
 
     private DoubleSolenoid gear_switcher;
 
@@ -36,14 +39,7 @@ public class Drive extends Subsystem {
     private double leftSpeed = 0.0;
     private double rightSpeed = 0.0;
 
-    private static final double kTrackWidth = 1.9375;
-    private static final double kWheelRadius = 0.25;
     private DrivePosition drivePosition;
-
-    private double defaultP = 0.0001;
-    private double defaultI = 0.00001;
-    private double defaultD = 0.000015;
-    private double defaultF = 0.0;
 
     private String driveMode = "";
 
@@ -73,50 +69,25 @@ public class Drive extends Subsystem {
         lf_motor.follow(lb_motor);
         rf_motor.follow(rb_motor);
 
-        setPids();
+        setDefaultPIDs();
         gear_switcher = new DoubleSolenoid(0, 1);
-
-        /*NtHelper.listen("/drive/kP", (table) -> setPids());
-        NtHelper.listen("/drive/kI", (table) -> setPids());
-        NtHelper.listen("/drive/kD", (table) -> setPids());
-        NtHelper.listen("/drive/kF", (table) -> setPids());
-        NtHelper.listen("/drive/setPoint", (table) -> setSetPoints());
-*/
         drivePosition = new DrivePosition(kTrackWidth, kWheelRadius, gyro.getAngle());
     }
 
-    private double getSetPoint() {
-        return NtHelper.getDouble("/drive/setPoint", 0);
-        
-    }
-    
-    private void setSetPoints() {
-        //leftSpeed = getSetPoint();
-        //rightSpeed = getSetPoint();
+    public double getP() {
+        return lb_motor.getP();
     }
 
-    private double getP() {
-        // return NtHelper.getDouble("/drive/kP", 6e-5);
-        // return NtHelper.getDouble("/drive/kP", 0.0001);
-        return NtHelper.getDouble("/drive/kP", defaultP);
-        // return NtHelper.getDouble("/drive/kP", 0.0002);
+    public double getI() {
+        return lb_motor.getI();
     }
 
-    private double getI() {
-        return NtHelper.getDouble("/drive/kI", defaultI);
-        // return NtHelper.getDouble("/drive/kI", 1e-9);
-        // return NtHelper.getDouble("/drive/kI", 0);
+    public double getD() {
+        return lb_motor.getD();
     }
 
-    private double getD() {
-        return NtHelper.getDouble("/drive/kD", defaultD);
-
-        // return NtHelper.getDouble("/drive/kD", 0.0);
-    }
-
-    private double getF() {
-        return NtHelper.getDouble("/drive/kF", defaultF);
-        // return NtHelper.getDouble("/drive/kF", 0.0);
+    public double getF() {
+        return lb_motor.getF();
     }
 
     public void setDefaultPIDs() {
@@ -130,15 +101,15 @@ public class Drive extends Subsystem {
         rb_motor.setF(defaultF);
     }
 
-    private void setPids() {
-        lb_motor.setP(getP());
-        lb_motor.setI(getI());
-        lb_motor.setD(getD());
-        lb_motor.setF(getF());
-        rb_motor.setP(getP());
-        rb_motor.setI(getI());
-        rb_motor.setD(getD());
-        rb_motor.setF(getF());
+    public void setPids(double kP, double kI, double kD, double kF) {
+        lb_motor.setP(kP);
+        lb_motor.setI(kI);
+        lb_motor.setD(kD);
+        lb_motor.setF(kF);
+        rb_motor.setP(kP);
+        rb_motor.setI(kI);
+        rb_motor.setD(kD);
+        rb_motor.setF(kF);
     }
 
     public void begin() {
@@ -263,7 +234,6 @@ public class Drive extends Subsystem {
 
     public void execute() {
     
- 
         if (isHighGear()) {
             gear_switcher.set(DoubleSolenoid.Value.kReverse);
         } else {
@@ -319,7 +289,5 @@ public class Drive extends Subsystem {
         reportValue("Pose/Y", drivePosition.getPose().getY());
         reportValue("Pose/Rotation", drivePosition.getPose().getRotation().getDegrees());
 
-
     }
-    
 }

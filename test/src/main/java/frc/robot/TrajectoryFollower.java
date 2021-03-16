@@ -1,17 +1,14 @@
-package frc.robot; // G
+package frc.robot;
 
-import frc.robot.subsystems.Drive; // A
+import frc.robot.subsystems.Drive;
 
-import java.util.HashMap; // M
+import java.util.HashMap;
+import java.nio.file.Path;
 
-import edu.wpi.first.wpilibj.trajectory.Trajectory; // I
-import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil; // N
-
-import java.nio.file.Path; // G
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.util.Units;
-
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.RobotBase;

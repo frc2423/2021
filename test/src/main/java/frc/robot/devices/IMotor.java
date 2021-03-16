@@ -21,7 +21,7 @@ public interface IMotor {
      * 
      * @param percent  Positive means motor is spinning forward.
      */
-    public void setPercent(double percent); // set speed as percent ofmams dksdkjsd max speed
+    public void setPercent(double percent);
 
     /**
      * Gets percentage of max speed based on value passed into setPercent().
@@ -30,18 +30,53 @@ public interface IMotor {
      */
     public double getPercent();
 
+    /**
+     * Sets the accumulated motor distance.
+     * 
+     * @param dist New motor distance, positive means forward from initial position
+     */
     public void setDistance(double dist);
 
+    /**
+     * Gets the accumuated motor distance.
+     * 
+     * @return The current distance, positive means forward from initial position
+     */
     public double getDistance();
 
+    /**
+     * Reset the encoder postion to specified value
+     * 
+     * @param distance positive means foward from initial position
+     */
     public void resetEncoder(double distance);
 
+    /**
+     * Sets the conversion factor for position and velocity of encoders.
+     * 
+     * @param factor scale factor
+     */
     public void setConversionFactor(double factor);
 
+    /**
+     * Gets the conversion factor for position and velocity of encoders.
+     * 
+     * @return current scale factor.
+     */
     public double getConversionFactor();
 
+    /**
+     * Sets inversion of the motor.
+     * 
+     * @param isInverted true is inverted
+     */
     public void setInverted(boolean isInverted);
 
+    /**
+     * Gets the inversion setting of the motor. 
+     * 
+     * @return true if inverted
+     */
     public boolean getInverted();
 
     public void setPid(double kP, double kI, double kD);
@@ -66,6 +101,11 @@ public interface IMotor {
 
     public void follow(IMotor leader); // thats sir motor to you
 
+    /**
+     * Sets the encoder values for simulation
+     * @param position new position
+     * @param rate new rate
+     */
     public void setEncoderPositionAndRate(double position, double rate); //poop
 
     public double getEncoderCount();

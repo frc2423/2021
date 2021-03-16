@@ -5,6 +5,13 @@ import edu.wpi.first.wpiutil.math.MathUtil;
 
 public class DriveHelper {
 
+    /**
+     * Calculate arcade speeds based off of a speed and rotation
+     * @param xSpeedInput Translational speed
+     * @param zRotationInput rotational speed
+     * @param squareInputs True to square the inputs
+     * @return Positive speed is forward.
+     */
     public static double[] getArcadeSpeeds(double xSpeedInput, double zRotationInput, boolean squareInputs) {
         double xSpeed = MathUtil.clamp(xSpeedInput, -1.0, 1.0);
         double zRotation = MathUtil.clamp(zRotationInput, -1.0, 1.0);

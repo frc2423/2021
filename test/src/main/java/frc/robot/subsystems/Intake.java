@@ -7,7 +7,7 @@ import frc.robot.Manager;
 
 public class Intake extends Subsystem {
     enum State{
-      INTAKEBALLS, OUTTAKE, STALLED, NOTHING
+        INTAKEBALLS, OUTTAKE, STALLED, NOTHING
     }
   
     private State state = State.NOTHING;
@@ -28,42 +28,40 @@ public class Intake extends Subsystem {
     }
 
     public void init() {
-      running = false;
+        running = false;
         intakeValve = new DoubleSolenoid(2, 3);
-
         motor = Manager.getDevice("intakeMotor", IMotor.class);
         greenWheel = Manager.getDevice("greenWheel", IMotor.class);
-      stop();
+        stop();
     }
 
     public void stop (){
-      running = false;
-      runIntake();
-      greenWheelSpeed = 0.0;
+        running = false;
+        runIntake();
+        greenWheelSpeed = 0.0;
     }
 
     public void intake() {
-      running = true;
-      runIntake();
-      greenWheelSpeed = -.3;
+        running = true;
+        runIntake();
+        greenWheelSpeed = -.3;
     }
 
     public void turnWheel(double speed) {
-      greenWheelSpeed = speed;
+        greenWheelSpeed = speed;
     }
 
     public boolean isDown() {
-      return intakeValve.get() == DoubleSolenoid.Value.kReverse;
+        return intakeValve.get() == DoubleSolenoid.Value.kReverse;
     }
-  public void intakeUp(){
-    intakeValue = DoubleSolenoid.Value.kForward;
-  }
-  public void intakeDown(){
-    intakeValue = DoubleSolenoid.Value.kReverse;
-  }
+    public void intakeUp(){
+        intakeValue = DoubleSolenoid.Value.kForward;
+    }
+    public void intakeDown(){
+        intakeValue = DoubleSolenoid.Value.kReverse;
+    }
    
     private void runIntake(){
-      
         switch(state){
             case NOTHING: 
               motorSpeed = 0.0;
@@ -117,9 +115,9 @@ public class Intake extends Subsystem {
     }
 
     public void execute() {
-      motor.setSpeed(motorSpeed);
-      greenWheel.setSpeed(greenWheelSpeed);
-      intakeValve.set(intakeValue);
+        motor.setSpeed(motorSpeed);
+        greenWheel.setSpeed(greenWheelSpeed);
+        intakeValve.set(intakeValue);
     }
   
 }

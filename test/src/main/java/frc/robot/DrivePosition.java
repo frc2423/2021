@@ -25,7 +25,6 @@ public class DrivePosition {
     private final double kTrackWidth;
     private final double kWheelRadius;
 
-
     private final LinearSystem<N2, N2, N2> drivetrainSystem =
       LinearSystemId.identifyDrivetrainSystem(1.98, 0.2, 1.5, 0.3);
     private final DifferentialDrivetrainSim drivetrainSimulator;

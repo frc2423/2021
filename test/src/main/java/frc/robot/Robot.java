@@ -18,6 +18,7 @@ import frc.robot.devices.BallTracker;
 import frc.robot.devices.Gyro;
 import frc.robot.devices.SimGyro;
 import frc.robot.subsystems.Shooter;
+import frc.robot.config.SimConfig;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to

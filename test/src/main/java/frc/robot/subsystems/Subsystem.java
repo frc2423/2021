@@ -12,17 +12,11 @@ public class Subsystem {
         Manager.addSubsystem(name, this);
     }
 
-    public void init() {
+    public void init() {}
 
-    }
+    public void execute() {}
 
-    public void execute() {
-
-    }
-
-    public void report() {
-
-    }
+    public void report() {}
 
     public void reportValue(String key, Boolean value) {
         NtHelper.setBoolean("/kwarqsRobot/subsystems/" + this.name + "/" + key, value);

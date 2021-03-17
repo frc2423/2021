@@ -172,5 +172,6 @@ public class SimMotor extends Device implements IMotor {
         reportValue("distance", getDistance());
         reportValue("percent", getPercent());
         reportValue("speed", getSpeed());
+        reportValue("inverted", getInverted());
     }
 }

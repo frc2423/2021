@@ -178,7 +178,7 @@ public class Drive extends Subsystem {
             gear_switcher.set(DoubleSolenoid.Value.kForward);
         }
 
-        drivePosition.setInputs(leftMotor.getPercent(), leftMotor.getPercent());
+        drivePosition.setInputs(leftMotor.getPercent(), rightMotor.getPercent());
         
         leftMotor.setEncoderPositionAndRate(
             drivePosition.getLeftPos(),

@@ -107,6 +107,6 @@ public class DrivePosition {
     }
 
     public double getDegrees(){
-        return drivetrainSimulator.getHeading().getDegrees();
+        return -drivetrainSimulator.getHeading().getDegrees();
     }
 }

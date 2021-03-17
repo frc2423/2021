@@ -82,8 +82,6 @@ public class Robot extends KwarqsRobot {
       leftLeadMotor.setConversionFactor(conversionFactor);
       rightLeadMotor.setConversionFactor(conversionFactor);
 
-      rightLeadMotor.setInverted(true);
-
       leftLeadMotor.setPidf(Constants.SIM_DRIVE_KP, Constants.SIM_DRIVE_KI, Constants.SIM_DRIVE_KD, Constants.SIM_DRIVE_KF);
       rightLeadMotor.setPidf(Constants.SIM_DRIVE_KP, Constants.SIM_DRIVE_KI, Constants.SIM_DRIVE_KD, Constants.SIM_DRIVE_KF);
 

@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.GenericHID.Hand; // W
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj.XboxController; // A
 import edu.wpi.first.wpilibj.RobotBase; // R
-import edu.wpi.first.wpilibj.SlewRateLimiter;
 import frc.robot.helpers.DriveRateLimiter;
 
 import frc.robot.subsystems.Drive; // Q
@@ -17,8 +16,9 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.helpers.DriveHelper;
 import frc.robot.Manager;
 import frc.robot.TrajectoryFollower;
+import frc.robot.constants.Constants;
 import frc.robot.devices.IBallTracker;
-import frc.robot.helpers.DriveHelper;
+import frc.robot.devices.IMotor;
 
 
 
@@ -88,11 +88,20 @@ public class AutoNav extends Controller {
     }
   }
 
+  private void setDefaultPids() {
+    double kP = RobotBase.isReal() ? Constants.REAL_DRIVE_KP : Constants.SIM_DRIVE_KP;
+    double kI = RobotBase.isReal() ? Constants.REAL_DRIVE_KI : Constants.SIM_DRIVE_KI;
+    double kD = RobotBase.isReal() ? Constants.REAL_DRIVE_KD : Constants.SIM_DRIVE_KD;
+    double kF = RobotBase.isReal() ? Constants.REAL_DRIVE_KF : Constants.SIM_DRIVE_KF;
+    Manager.getDevice("leftLeadMotor", IMotor.class).setPidf(kP, kI, kD, kF);
+    Manager.getDevice("rightLeadMotor", IMotor.class).setPidf(kP, kI, kD, kF);
+  }
+
   @Override
   public void autonomousInit() {
     follower.stopFollowing();
     follower.initFollowing(trajectoryJSON);
-    driveBase.setDefaultPIDs();
+    setDefaultPids();
     driveBase.reset();
   }
 
@@ -107,7 +116,7 @@ public class AutoNav extends Controller {
   public void teleopInit() {
     follower.stopFollowing();
     driveBase.begin();
-    driveBase.setDefaultPIDs();
+    setDefaultPids();
     driveBase.reset();
   }
 

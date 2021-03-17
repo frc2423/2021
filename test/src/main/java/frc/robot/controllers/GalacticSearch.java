@@ -16,7 +16,8 @@ import frc.robot.helpers.DriveHelper;
 import frc.robot.Manager;
 import frc.robot.TrajectoryFollower;
 import frc.robot.devices.IBallTracker;
-
+import frc.robot.devices.IMotor;
+import frc.robot.constants.Constants;
 
 
 
@@ -85,12 +86,22 @@ public class GalacticSearch extends Controller {
     }
   }
 
+  private void setDefaultPids() {
+    double kP = RobotBase.isReal() ? Constants.REAL_DRIVE_KP : Constants.SIM_DRIVE_KP;
+    double kI = RobotBase.isReal() ? Constants.REAL_DRIVE_KI : Constants.SIM_DRIVE_KI;
+    double kD = RobotBase.isReal() ? Constants.REAL_DRIVE_KD : Constants.SIM_DRIVE_KD;
+    double kF = RobotBase.isReal() ? Constants.REAL_DRIVE_KF : Constants.SIM_DRIVE_KF;
+    Manager.getDevice("leftLeadMotor", IMotor.class).setPidf(kP, kI, kD, kF);
+    Manager.getDevice("rightLeadMotor", IMotor.class).setPidf(kP, kI, kD, kF);
+  }
+
   @Override
   public void autonomousInit() {
     String field = detectField();
     follower.addTrajectory(field);
     follower.initFollowing(field);
     intake.intakeDown();
+    setDefaultPids();
   }
 
   /** This function is called periodically during autonomous. */
@@ -104,7 +115,7 @@ public class GalacticSearch extends Controller {
   @Override
   public void teleopInit() {
     driveBase.begin();
-    driveBase.setDefaultPIDs();
+    setDefaultPids();
   }
 
   /** This function is called periodically during operator control. */

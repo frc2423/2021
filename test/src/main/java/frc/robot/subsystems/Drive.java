@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.util.Units;
 
 import frc.robot.devices.IMotor;
 import frc.robot.devices.IGyro;
-import frc.robot.helpers.NtHelper;
 import frc.robot.helpers.DriveHelper;
 import frc.robot.DrivePosition;
 import frc.robot.Manager;
@@ -22,17 +21,11 @@ public class Drive extends Subsystem {
     public static final double maxSpeed = 9.0;  // feet per second
     public static final double kTrackWidth = 1.9375;
     public static final double kWheelRadius = 0.25;
-    public static final double defaultP = 0.0001;
-    public static final double defaultI = 0.00001;
-    public static final double defaultD = 0.000015;
-    public static final double defaultF = 0.0;
-
+    
     private DoubleSolenoid gear_switcher;
 
-    private IMotor lf_motor; // left front motor
-    private IMotor lb_motor; // left back motor
-    private IMotor rf_motor; // right front motor
-    private IMotor rb_motor; // right back motor
+    private IMotor leftMotor;
+    private IMotor rightMotor;
 
     private IGyro gyro;
 
@@ -48,68 +41,17 @@ public class Drive extends Subsystem {
     }
     
     public void init() {
-        double conversionFactor = RobotBase.isReal()
-            ? (ftPerRev / countsPerRev * 10 / 7.5)
-            : (2 * Math.PI * kWheelRadius / 4096);
-
-        lf_motor = Manager.getDevice("lf_motor", IMotor.class);
-        lb_motor = Manager.getDevice("lb_motor", IMotor.class);
-        rf_motor = Manager.getDevice("rf_motor", IMotor.class);
-        rb_motor = Manager.getDevice("rb_motor", IMotor.class);
+        leftMotor = Manager.getDevice("leftLeadMotor", IMotor.class);
+        rightMotor = Manager.getDevice("rightLeadMotor", IMotor.class);
         gyro = Manager.getDevice("gyro", IGyro.class);
 
-        lf_motor.setConversionFactor(conversionFactor);
-        lb_motor.setConversionFactor(conversionFactor);
-        rf_motor.setConversionFactor(conversionFactor);
-        rb_motor.setConversionFactor(conversionFactor);
-
-        rf_motor.setInverted(true);
-        rb_motor.setInverted(true);
-
-        lf_motor.follow(lb_motor);
-        rf_motor.follow(rb_motor);
-
-        setDefaultPIDs();
         gear_switcher = new DoubleSolenoid(0, 1);
         drivePosition = new DrivePosition(kTrackWidth, kWheelRadius, gyro.getAngle());
     }
 
-    public double getP() {
-        return lb_motor.getP();
-    }
-
-    public double getI() {
-        return lb_motor.getI();
-    }
-
-    public double getD() {
-        return lb_motor.getD();
-    }
-
-    public double getF() {
-        return lb_motor.getF();
-    }
-
-    public void setDefaultPIDs() {
-        lb_motor.setP(defaultP);
-        lb_motor.setI(defaultI);
-        lb_motor.setD(defaultD);
-        lb_motor.setF(defaultF);
-        rb_motor.setP(defaultP);
-        rb_motor.setI(defaultI);
-        rb_motor.setD(defaultD);
-        rb_motor.setF(defaultF);
-    }
-
     public void setPids(double kP, double kI, double kD, double kF) {
-        lb_motor.setP(kP);
-        lb_motor.setI(kI);
-        lb_motor.setD(kD);
-        lb_motor.setF(kF);
-        rb_motor.setP(kP);
-        rb_motor.setI(kI);
-        rb_motor.setD(kD);
-        rb_motor.setF(kF);
+        leftMotor.setPidf(kP, kI, kD, kF);
+        rightMotor.setPidf(kP, kI, kD, kF);
     }
 
     public void begin() {
@@ -119,8 +61,8 @@ public class Drive extends Subsystem {
     }
 
     public void reset(Pose2d pose) {
-        lb_motor.resetEncoder(0.0);
-        rb_motor.resetEncoder(0.0);
+        leftMotor.resetEncoder(0.0);
+        rightMotor.resetEncoder(0.0);
         gyro.reset();
         drivePosition.reset(pose, gyro.getAngle());
     }
@@ -163,27 +105,27 @@ public class Drive extends Subsystem {
     }
 
     public double getLeftDistance() {
-        return lb_motor.getDistance();
+        return leftMotor.getDistance();
     }
 
     public double getRightDistance() {
-        return rb_motor.getDistance();
+        return rightMotor.getDistance();
     }
 
     public double getLeftVelocity() {
-        return lb_motor.getSpeed();
+        return leftMotor.getSpeed();
     }
 
     public double getRightVelocity() {
-        return rb_motor.getSpeed();
+        return rightMotor.getSpeed();
     }
 
     public void setArcadeVoltage(double speed, double rot) {
         var driveArray = DriveHelper.getArcadeSpeeds(speed, rot, true);
         leftSpeed = driveArray[0];
         rightSpeed = driveArray[1];
-        lb_motor.setPercent(leftSpeed);
-        rb_motor.setPercent(rightSpeed);
+        leftMotor.setPercent(leftSpeed);
+        rightMotor.setPercent(rightSpeed);
         driveMode = "Arcade Voltage";
     }
 
@@ -196,17 +138,17 @@ public class Drive extends Subsystem {
     public void setTankPercent(double leftSpeed, double rightSpeed) {
         if (leftSpeed != 0) {
             this.leftSpeed = leftSpeed * maxSpeed;
-            lb_motor.setSpeed(this.leftSpeed);
+            leftMotor.setSpeed(this.leftSpeed);
         } else {
             this.leftSpeed = 0;
-            lb_motor.setPercent(this.leftSpeed);
+            leftMotor.setPercent(this.leftSpeed);
         }
         if (rightSpeed != 0) {
             this.rightSpeed = rightSpeed * maxSpeed;
-            rb_motor.setSpeed(this.rightSpeed);
+            rightMotor.setSpeed(this.rightSpeed);
         } else {
             this.rightSpeed = 0;
-            rb_motor.setPercent(this.rightSpeed);
+            rightMotor.setPercent(this.rightSpeed);
         }
         driveMode = "Tank Speed Percent";
     }
@@ -214,8 +156,8 @@ public class Drive extends Subsystem {
     public void setTankSpeeds(double leftFeetPerSecond, double rightFeetPerSecond) {
         this.leftSpeed = leftFeetPerSecond;
         this.rightSpeed = rightFeetPerSecond;
-        lb_motor.setSpeed(leftFeetPerSecond);
-        rb_motor.setSpeed(rightFeetPerSecond);
+        leftMotor.setSpeed(leftFeetPerSecond);
+        rightMotor.setSpeed(rightFeetPerSecond);
         driveMode = "Tank Speed";
     }
 
@@ -228,10 +170,6 @@ public class Drive extends Subsystem {
         driveMode = "Arcade Speed";
     }
 
-    public double getEncoder(){
-        return lb_motor.getEncoderCount();
-    }
-
     public void execute() {
     
         if (isHighGear()) {
@@ -240,13 +178,13 @@ public class Drive extends Subsystem {
             gear_switcher.set(DoubleSolenoid.Value.kForward);
         }
 
-        drivePosition.setInputs(lb_motor.getPercent(), rb_motor.getPercent());
+        drivePosition.setInputs(leftMotor.getPercent(), leftMotor.getPercent());
         
-        lb_motor.setEncoderPositionAndRate(
+        leftMotor.setEncoderPositionAndRate(
             drivePosition.getLeftPos(),
             drivePosition.getLeftVel()
         );
-        rb_motor.setEncoderPositionAndRate(
+        rightMotor.setEncoderPositionAndRate(
             drivePosition.getRightPos(),
             drivePosition.getRightVel()
         );
@@ -255,22 +193,22 @@ public class Drive extends Subsystem {
             gyro.setAngle(drivePosition.getDegrees());
         }
 
-        drivePosition.updateOdometry(gyro.getAngle(), lb_motor.getDistance(), rb_motor.getDistance());
+        drivePosition.updateOdometry(gyro.getAngle(), leftMotor.getDistance(), rightMotor.getDistance());
     }
 
     @Override
     public void report() {
         reportValue("raw/velocity", getLeftVelocity() /maxSpeed);
         reportValue("raw/gyroAngle", gyro.getAngle());
-        reportValue("raw/encoderCount", lf_motor.getEncoderCount());
+        reportValue("raw/encoderCount", leftMotor.getEncoderCount());
         reportValue("raw/leftDistance", getLeftDistance());
         reportValue("raw/rightDistance", getRightDistance());
         reportValue("raw/leftSpeed", leftSpeed);
         reportValue("raw/rightSpeed", leftSpeed);
-        reportValue("raw/kP", lb_motor.getP());
-        reportValue("raw/kI", lb_motor.getI());
-        reportValue("raw/kD", lb_motor.getD());
-        reportValue("raw/kF", lb_motor.getF());
+        reportValue("raw/kP", leftMotor.getP());
+        reportValue("raw/kI", leftMotor.getI());
+        reportValue("raw/kD", leftMotor.getD());
+        reportValue("raw/kF", leftMotor.getF());
         reportValue("raw/driveMode", driveMode);
 
         reportValue("left velocity", getLeftVelocity() + " ft/s");

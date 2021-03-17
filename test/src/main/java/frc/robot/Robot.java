@@ -18,7 +18,7 @@ import frc.robot.devices.BallTracker;
 import frc.robot.devices.Gyro;
 import frc.robot.devices.SimGyro;
 import frc.robot.subsystems.Shooter;
-import frc.robot.config.SimConfig;
+import frc.robot.constants.Constants;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -43,20 +43,13 @@ public class Robot extends KwarqsRobot {
     new NeoMotor(10,"shooterBottomWheel");
     new NeoMotor(11,"shooterTopWheel");
     new NeoMotor(3,"beltMotor");
+    addDriveMotors();
 
     if (isSimulation()){
-        new SimMotor(1, 0, 1, "lf_motor");
-        new SimMotor(4, 2, 3, "lb_motor");
-        new SimMotor(6, 4, 5, "rf_motor");
-        new SimMotor(5, 6, 7, "rb_motor");
         new SimGyro();
         new SimBallTracker();
         
     } else {
-        new NeoMotor(1, "lf_motor");
-        new NeoMotor(4, "lb_motor");
-        new NeoMotor(6, "rf_motor");
-        new NeoMotor(5, "rb_motor");
         new Gyro();
         new BallTracker();
 
@@ -72,5 +65,43 @@ public class Robot extends KwarqsRobot {
       setCurrController(NtHelper.getString("/controllerPicker/selected", "Auto Nav"));
     });
     NtHelper.setString("/controllerPicker/selected", "Auto Nav");
+  }
+
+  private void addDriveMotors() {
+    if (isSimulation()){
+      double conversionFactor = Constants.WHEEL_CIRCUMFERENCE / Constants.SIM_ENCODER_PULSES_PER_ROTATION;
+
+      SimMotor leftFollowerMotor = new SimMotor(1, 0, 1, "leftFollowerMotor");
+      SimMotor leftLeadMotor = new SimMotor(4, 2, 3, "leftLeadMotor");
+      SimMotor rightFollowerMotor = new SimMotor(6, 4, 5, "rightFollowerMotor");
+      SimMotor rightLeadMotor = new SimMotor(5, 6, 7, "rightLeadMotor");
+
+      leftFollowerMotor.follow(leftLeadMotor);
+      rightFollowerMotor.follow(rightLeadMotor);
+
+      leftLeadMotor.setConversionFactor(conversionFactor);
+      rightLeadMotor.setConversionFactor(conversionFactor);
+
+      rightLeadMotor.setInverted(true);
+
+      leftLeadMotor.setPidf(Constants.SIM_DRIVE_KP, Constants.SIM_DRIVE_KI, Constants.SIM_DRIVE_KD, Constants.SIM_DRIVE_KF);
+      rightLeadMotor.setPidf(Constants.SIM_DRIVE_KP, Constants.SIM_DRIVE_KI, Constants.SIM_DRIVE_KD, Constants.SIM_DRIVE_KF);
+
+    } else {
+      double conversionFactor = Constants.WHEEL_CIRCUMFERENCE / Constants.REAL_ENCODER_PULSES_PER_ROTATION;
+      NeoMotor leftFollowerMotor = new NeoMotor(1, "leftFollowerMotor");
+      NeoMotor leftLeadMotor = new NeoMotor(4, "leftLeadMotor");
+      NeoMotor rightFollowerMotor = new NeoMotor(6, "rightFollowerMotor");
+      NeoMotor rightLeadMotor = new NeoMotor(5, "rightLeadMotor");
+
+      leftFollowerMotor.follow(leftLeadMotor);
+      rightFollowerMotor.follow(rightLeadMotor);
+
+      leftLeadMotor.setConversionFactor(conversionFactor);
+      rightLeadMotor.setConversionFactor(conversionFactor);
+
+      leftLeadMotor.setPidf(Constants.REAL_DRIVE_KP, Constants.REAL_DRIVE_KI, Constants.REAL_DRIVE_KD, Constants.REAL_DRIVE_KF);
+      rightLeadMotor.setPidf(Constants.REAL_DRIVE_KP, Constants.REAL_DRIVE_KI, Constants.REAL_DRIVE_KD, Constants.REAL_DRIVE_KF);
+    }
   }
 }

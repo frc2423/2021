@@ -133,10 +133,6 @@ public class GalacticSearch extends Controller {
       DriveHelper.squareInputs(DriveHelper.applyDeadband(x, joystickDeadband))
     );
 
-    if (xboxController.getBumperPressed(Hand.kLeft)) {
-      driveBase.switchGears();
-    }
-
     ballTracker.giveRobotPose(driveBase.getPose());
   }
 
@@ -148,11 +144,6 @@ public class GalacticSearch extends Controller {
    // double y = NtHelper.getDouble("/drive/setPoint", 0);
 
     //driveBase.setTankSpeeds(y, y);
-
-
-    if (xboxController.getBumperPressed(Hand.kLeft)) {
-      driveBase.switchGears();
-    }
 
     if (xboxController.getAButton()) {
         shooter.execute();

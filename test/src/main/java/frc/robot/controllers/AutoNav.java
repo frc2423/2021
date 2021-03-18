@@ -136,10 +136,6 @@ public class AutoNav extends Controller {
 
     driveBase.setArcadePercent(speed, turnRate); 
 
-    if (xboxController.getBumperPressed(Hand.kLeft)) {
-      driveBase.switchGears();
-    }
-
     ballTracker.giveRobotPose(driveBase.getPose());
   }
 
@@ -158,10 +154,6 @@ public class AutoNav extends Controller {
 
     //driveBase.setTankSpeeds(y, y);
 
-
-    if (xboxController.getBumperPressed(Hand.kLeft)) {
-      driveBase.switchGears();
-    }
 
     if (xboxController.getAButton()) {
     } 

@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
@@ -17,8 +16,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 
 public class Drive extends Subsystem {
     
-    private DoubleSolenoid gear_switcher;
-
     private IMotor leftMotor;
     private IMotor rightMotor;
 
@@ -40,7 +37,6 @@ public class Drive extends Subsystem {
         rightMotor = Manager.getDevice("rightLeadMotor", IMotor.class);
         gyro = Manager.getDevice("gyro", IGyro.class);
 
-        gear_switcher = new DoubleSolenoid(0, 1);
         drivePosition = new DrivePosition(Constants.TRACK_WIDTH, Constants.WHEEL_RADIUS, gyro.getAngle());
     }
 
@@ -51,7 +47,6 @@ public class Drive extends Subsystem {
 
     public void begin() {
         setTankPercent(0.0, 0.0);
-        toLowGear();
         reset();
     }
 
@@ -64,27 +59,6 @@ public class Drive extends Subsystem {
 
     public void reset() {
         reset(new Pose2d());
-    }
-
-    public void switchGears() {
-        if (gear_switcher.get() == DoubleSolenoid.Value.kForward) {
-            toLowGear();
-        } else {
-            toHighGear();
-        }
-    }
-
-    private void toHighGear() {
-        gear_switcher.set(DoubleSolenoid.Value.kForward);
-    }
-
-    private void toLowGear() {
-        gear_switcher.set(DoubleSolenoid.Value.kReverse);
-    }
-
-    private boolean isHighGear() {
-        String speed = NetworkTableInstance.getDefault().getEntry("/gear").getString("slow");
-        return speed == "fast";
     }
 
     public double getAngle() {
@@ -167,12 +141,6 @@ public class Drive extends Subsystem {
 
     public void execute() {
     
-        if (isHighGear()) {
-            gear_switcher.set(DoubleSolenoid.Value.kReverse);
-        } else {
-            gear_switcher.set(DoubleSolenoid.Value.kForward);
-        }
-
         drivePosition.setInputs(leftMotor.getPercent(), rightMotor.getPercent());
         
         leftMotor.setEncoderPositionAndRate(

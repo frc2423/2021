@@ -15,6 +15,7 @@ import com.revrobotics.CANPIDController;
 import com.revrobotics.CANEncoder;
 
 import frc.robot.DriveHelper;
+import frc.robot.DriveRateLimiter;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
@@ -48,6 +49,9 @@ public class Robot extends TimedRobot {
   private double ftPerRev = 1.57;
   private double maxSpeed = 9.0;  // feet per second
   private double conversionFactor = ftPerRev / countsPerRev;
+
+  private DriveRateLimiter speedLimiter = new DriveRateLimiter(3);
+  private DriveRateLimiter turnLimiter = new DriveRateLimiter(3);
 
 
   @Override
@@ -118,9 +122,11 @@ public class Robot extends TimedRobot {
   }
 
   public void arcade(double speed, double turn) {
+    System.out.println("speed: " + speed + " turn: " + turn);
     double[] speeds = DriveHelper.getArcadeSpeeds(speed, turn, false);
     double leftSpeed = speeds[0];
     double rightSpeed = speeds[1];
+    System.out.println("left: " + leftSpeed + " right: " + rightSpeed);
     lb_motor.set(leftSpeed);
     rb_motor.set(rightSpeed);
   }
@@ -129,10 +135,16 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     double x = xboxController.getX(Hand.kRight);
-    double y = xboxController.getY(Hand.kRight);
+    double y = -xboxController.getY(Hand.kRight);
 
-    double left = xboxController.getY(Hand.kLeft);
-    double right = xboxController.getY(Hand.kRight);
-    arcade(-y, x);
+    double speed = speedLimiter.calculate(
+       DriveHelper.applyDeadband(y * .5)
+    );
+
+    double turn = turnLimiter.calculate(
+       DriveHelper.applyDeadband(x * .5)
+    );
+  
+    arcade(speed, turn);
   }
 }

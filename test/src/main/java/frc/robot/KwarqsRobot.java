@@ -9,8 +9,11 @@ import frc.robot.subsystems.Subsystem;
 import frc.robot.devices.Device;
 import frc.robot.helpers.NtHelper;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Tracer;
 
 public abstract class KwarqsRobot extends TimedRobot {
+
+    Tracer tracer = new Tracer();
 
     private HashMap<String, Controller> controllers;
 
@@ -49,6 +52,7 @@ public abstract class KwarqsRobot extends TimedRobot {
     }
 
     public void callAllSubsystemsAndDevices(){
+        tracer.addEpoch("call one");
         double currTime = reportingTimer.get();
         for(String key : Manager.getSubsystemNames()) {
             Manager.getSubsystem(key, Subsystem.class).execute();
@@ -63,6 +67,9 @@ public abstract class KwarqsRobot extends TimedRobot {
             }
         }
         if(currTime > reportingPeriod) reportingTimer.reset();
+        tracer.addEpoch("call two");
+        tracer.printEpochs(out -> System.out.println(out));
+        tracer.resetTimer();
     }
 
     public void addController(String name, Controller controller){

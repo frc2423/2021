@@ -37,19 +37,25 @@ public class Robot extends KwarqsRobot {
     new Intake();
 
     //Devices
-    new NeoMotor(7,"intakeMotor");
-    new NeoMotor(2,"greenWheel");
-    new NeoMotor(8,"shooterFeederMotor");
-    new NeoMotor(10,"shooterBottomWheel");
-    new NeoMotor(11,"shooterTopWheel");
-    new NeoMotor(3,"beltMotor");
     addDriveMotors();
 
     if (isSimulation()){
+        new SimMotor(2, "intakeMotor");
+        new SimMotor(3, "greenWheel");
+        new SimMotor(7, "beltMotor");
+        new SimMotor(8, 8, 9, "shooterFeederMotor");
+        new SimMotor(9, 10, 11, "shooterBottomWheel");
+        new SimMotor(12, 13, 14, "shooterTopWheel");
         new SimGyro();
         new SimBallTracker();
         
     } else {
+        new NeoMotor(7,"intakeMotor");
+        new NeoMotor(2,"greenWheel");
+        new NeoMotor(3,"beltMotor");
+        new NeoMotor(8,"shooterFeederMotor");
+        new NeoMotor(10,"shooterBottomWheel");
+        new NeoMotor(11,"shooterTopWheel");
         new Gyro();
         new BallTracker();
 

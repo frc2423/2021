@@ -29,7 +29,7 @@ public class Storage extends Subsystem{
     }
 
     public void turnBelt(double speed) {
-        beltMotor.setSpeed(speed);
+        beltMotor.setPercent(speed);
     }
 
     public void stop() {

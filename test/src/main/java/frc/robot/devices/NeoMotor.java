@@ -16,6 +16,13 @@ public class NeoMotor extends Device implements IMotor {
     private ControlType motorControlType = ControlType.kDutyCycle;
     private NeoMotor leaderMotor;
 
+    // These are needed because getting these values from the PIDController
+    // takes an excessively long time for some reason
+    private double kP = 0;
+    private double kI = 0;
+    private double kD = 0;
+    private double kF = 0;
+
     public NeoMotor(int port, String name) {
         super(name);
        motor = new CANSparkMax(port, MotorType.kBrushless);
@@ -93,35 +100,39 @@ public class NeoMotor extends Device implements IMotor {
     }
 
     public void setP(double kP){
+        this.kP = kP;
         pidController.setP(kP);
     }
 
     public void setI(double kI){
+        this.kI = kI;
         pidController.setI(kI);
     }
 
     public void setD(double kD){
+        this.kD = kD;
         pidController.setD(kD);
     }
 
     public void setF(double kF) {
+        this.kF = kF;
         pidController.setFF(kF);
     }
 
     public double getP(){
-        return pidController.getP();
+        return kP;
     }
 
     public double getI(){
-        return pidController.getI();
+        return kI;
     }
 
     public double getD(){
-        return pidController.getD();
+        return kD;
     }
 
     public double getF() {
-        return pidController.getFF();
+        return kF;
     }
 
     public void follow(IMotor leader){

@@ -115,8 +115,8 @@ public class Intake extends Subsystem {
     }
 
     public void execute() {
-        motor.setSpeed(motorSpeed);
-        greenWheel.setSpeed(greenWheelSpeed);
+        motor.setPercent(motorSpeed);
+        greenWheel.setPercent(greenWheelSpeed);
         intakeValve.set(intakeValue);
     }
   

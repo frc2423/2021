@@ -16,7 +16,7 @@ public class SimMotor extends Device implements IMotor {
     protected ArrayList<SimMotor> followers = new ArrayList<SimMotor>();
     private final SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(1, 3);
     private double encoderOffset = 0;
-    private final EncoderSim encoderSim;
+    private EncoderSim encoderSim;
     private String controlType = "voltage";
     private double desiredDistance = 0;
     private double desiredSpeed = 0;
@@ -24,19 +24,32 @@ public class SimMotor extends Device implements IMotor {
 
     public SimMotor(int port, int channelA, int channelB, String name) {
         super(name);
-       motor = new PWMVictorSPX(port);
-       encoder = new Encoder(channelA, channelB);
-       encoderSim = new EncoderSim(encoder);
-       pidController = new PIDController(0, 0, 0);
-       setPercent(0);
+        motor = new PWMVictorSPX(port);
+        encoder = new Encoder(channelA, channelB);
+        encoderSim = new EncoderSim(encoder);
+        pidController = new PIDController(0, 0, 0);
+        setPercent(0);
     }
 
+    public SimMotor(int port, String name) {
+        super(name);
+        motor = new PWMVictorSPX(port);
+        setPercent(0);
+    }
+    
+
     public void setSpeed(double speed) {
+        if (encoder == null) {
+            throw new Error("Can not set speed for motor " + getName());
+        }
         desiredSpeed = speed;
         controlType = "speed";
     }
 
     public double getSpeed(){
+        if (encoder == null) {
+            return 0;
+        }
         double rate = encoder.getRate();
         return motor.getInverted() ? -rate : rate;
     }
@@ -52,29 +65,47 @@ public class SimMotor extends Device implements IMotor {
 
 
     public double getEncoderCount() {
+        if (encoder == null) {
+           return 0;
+        }
         return getDistance() / getConversionFactor();
     }
 
     public void setDistance(double dist) {
+        if (encoder == null) {
+            throw new Error("Can not set distance for motor " + getName());
+        }
         desiredDistance = dist;
         controlType = "distance";
     }
 
     public void resetEncoder(double distance) {
+        if (encoder == null) {
+            throw new Error("Can not reset encoder for motor " + getName());
+        }
         encoder.reset();
         encoderOffset = distance;
     }
 
     public double getDistance() {
+        if (encoder == null) {
+            return 0;
+        }
         double distance =  encoder.getDistance() + encoderOffset;
         return motor.getInverted() ? -distance : distance;
     }
 
     public void setConversionFactor(double factor){
+        if (encoder == null) {
+            throw new Error("Can not set conversion factor for motor " + getName());
+        }
         encoder.setDistancePerPulse(factor);
     }
 
     public double getConversionFactor(){
+        if (encoder == null) {
+            return 0;
+        }
         return encoder.getDistancePerPulse();
     }
 
@@ -100,30 +131,50 @@ public class SimMotor extends Device implements IMotor {
     }
 
     public void setP(double kP){
+        if (encoder == null) {
+            throw new Error("Can not set p for motor " + getName());
+        }
         pidController.setP(kP);
     }
 
     public void setI(double kI){
+        if (encoder == null) {
+            throw new Error("Can not set i for motor " + getName());
+        }
         pidController.setI(kI);
     }
 
     public void setD(double kD){
+        if (encoder == null) {
+            throw new Error("Can not set d for motor " + getName());
+        }
         pidController.setD(kD);
     }
 
     public void setF(double kF) {
-
+        if (encoder == null) {
+            throw new Error("Can not set f for motor " + getName());
+        }
     }
 
     public double getP(){
+        if (encoder == null) {
+            return 0;
+        }
         return pidController.getP();
     }
 
     public double getI(){
+        if (encoder == null) {
+            return 0;
+        }
         return pidController.getI();
     }
 
     public double getD(){
+        if (encoder == null) {
+            return 0;
+        }
         return pidController.getD();
     }
 
@@ -139,6 +190,9 @@ public class SimMotor extends Device implements IMotor {
     }
 
     public void setEncoderPositionAndRate(double position, double rate){
+        if (encoder == null) {
+            throw new Error("Can not set encoder position and rate for motor " + getName());
+        }
         encoderSim.setDistance(position);
         encoderSim.setRate(rate);
     }

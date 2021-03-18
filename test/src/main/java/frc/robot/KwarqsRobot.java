@@ -52,7 +52,6 @@ public abstract class KwarqsRobot extends TimedRobot {
     }
 
     public void callAllSubsystemsAndDevices(){
-        tracer.addEpoch("call one");
         double currTime = reportingTimer.get();
         for(String key : Manager.getSubsystemNames()) {
             Manager.getSubsystem(key, Subsystem.class).execute();
@@ -66,10 +65,9 @@ public abstract class KwarqsRobot extends TimedRobot {
                 Manager.getDevice(key, Device.class).report();
             }
         }
-        if(currTime > reportingPeriod) reportingTimer.reset();
-        tracer.addEpoch("call two");
-        tracer.printEpochs(out -> System.out.println(out));
-        tracer.resetTimer();
+        if(currTime > reportingPeriod) {
+            reportingTimer.reset();
+        }
     }
 
     public void addController(String name, Controller controller){

@@ -93,17 +93,17 @@ public class DrivePosition {
     }
 
     public double getLeftPos(){
-        return drivetrainSimulator.getLeftPositionMeters();
+        return Units.metersToFeet(drivetrainSimulator.getLeftPositionMeters());
     }
     public double getLeftVel(){
-        return drivetrainSimulator.getLeftVelocityMetersPerSecond();
+        return Units.metersToFeet(drivetrainSimulator.getLeftVelocityMetersPerSecond());
     }
 
     public double getRightPos(){
-        return drivetrainSimulator.getRightPositionMeters();
+        return Units.metersToFeet(drivetrainSimulator.getRightPositionMeters());
     }
     public double getRightVel(){
-        return drivetrainSimulator.getRightVelocityMetersPerSecond();
+        return Units.metersToFeet(drivetrainSimulator.getRightVelocityMetersPerSecond());
     }
 
     public double getDegrees(){

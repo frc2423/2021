@@ -106,7 +106,7 @@ public interface IMotor {
      * @param position new position
      * @param rate new rate
      */
-    public void setEncoderPositionAndRate(double position, double rate); //poop
+    public void setEncoderPositionAndRate(double position, double rate);
 
     public double getEncoderCount();
 

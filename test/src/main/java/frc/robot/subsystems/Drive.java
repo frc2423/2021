@@ -11,16 +11,11 @@ import frc.robot.devices.IGyro;
 import frc.robot.helpers.DriveHelper;
 import frc.robot.DrivePosition;
 import frc.robot.Manager;
+import frc.robot.constants.Constants;
 
 import edu.wpi.first.wpilibj.RobotBase;
 
 public class Drive extends Subsystem {
-
-    public static final double countsPerRev = 16.35;
-    public static final double ftPerRev = 1.57;
-    public static final double maxSpeed = 9.0;  // feet per second
-    public static final double kTrackWidth = 1.9375;
-    public static final double kWheelRadius = 0.25;
     
     private DoubleSolenoid gear_switcher;
 
@@ -46,7 +41,7 @@ public class Drive extends Subsystem {
         gyro = Manager.getDevice("gyro", IGyro.class);
 
         gear_switcher = new DoubleSolenoid(0, 1);
-        drivePosition = new DrivePosition(kTrackWidth, kWheelRadius, gyro.getAngle());
+        drivePosition = new DrivePosition(Constants.TRACK_WIDTH, Constants.WHEEL_RADIUS, gyro.getAngle());
     }
 
     public void setPids(double kP, double kI, double kD, double kF) {
@@ -137,14 +132,14 @@ public class Drive extends Subsystem {
 
     public void setTankPercent(double leftSpeed, double rightSpeed) {
         if (leftSpeed != 0) {
-            this.leftSpeed = leftSpeed * maxSpeed;
+            this.leftSpeed = leftSpeed * Constants.MAX_SPEED;
             leftMotor.setSpeed(this.leftSpeed);
         } else {
             this.leftSpeed = 0;
             leftMotor.setPercent(this.leftSpeed);
         }
         if (rightSpeed != 0) {
-            this.rightSpeed = rightSpeed * maxSpeed;
+            this.rightSpeed = rightSpeed * Constants.MAX_SPEED;
             rightMotor.setSpeed(this.rightSpeed);
         } else {
             this.rightSpeed = 0;
@@ -198,7 +193,7 @@ public class Drive extends Subsystem {
 
     @Override
     public void report() {
-        reportValue("raw/velocity", getLeftVelocity() /maxSpeed);
+        reportValue("raw/velocity", getLeftVelocity() / Constants.MAX_SPEED);
         reportValue("raw/gyroAngle", gyro.getAngle());
         reportValue("raw/encoderCount", leftMotor.getEncoderCount());
         reportValue("raw/leftDistance", getLeftDistance());

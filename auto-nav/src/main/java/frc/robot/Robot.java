@@ -19,6 +19,7 @@ import com.revrobotics.CANPIDController;
 import com.revrobotics.CANEncoder;
 
 import frc.robot.helpers.DriveHelper;
+import frc.robot.helpers.NtHelper;
 
 import com.kauailabs.navx.frc.AHRS;
 
@@ -119,6 +120,7 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     resetDrive();
     timer.reset();
+    timer.start();
     odometryHelper.resetOdometry(gyro.getAngle());
   }
 
@@ -126,14 +128,16 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     odometryHelper.updateOdometry(gyro.getAngle(), leftEncoder.getPosition(), rightEncoder.getPosition());
+    System.out.println(" Pos X "+ odometryHelper.getCurrentPose().getX()+ " Pos Y "+ odometryHelper.getCurrentPose().getY());
     double[] speeds = trajectoryHelper.getTrajectorySpeeds(trajectory, odometryHelper.getCurrentPose(), timer.get());
-    tank(speeds[0], speeds[1]);
+    tank(speeds[0], -speeds[1]);
+    System.out.println(speeds[0] + "  " + speeds[1]);
   }
 
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    
+    resetDrive();
   }
 
   public void tank(double leftFeetPerSecond, double rightFeetPerSecond) {
@@ -153,7 +157,24 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     double x = xboxController.getX(Hand.kRight);
     double y = xboxController.getY(Hand.kRight);
+    x = DriveHelper.applyDeadband(x);
+    y = DriveHelper.applyDeadband(y);
     arcade(-y, x);
+  }
+
+  @Override
+  public void testInit() {
+    resetDrive();
+  }
+
+  @Override
+  public void testPeriodic() {
+    double x = xboxController.getX(Hand.kRight);
+    double y = xboxController.getY(Hand.kRight);
+    //arcade(-y, x);
+    System.out.println("right " + rightEncoder.getPosition());
+    NtHelper.setDouble("/rightPosition", rightEncoder.getPosition());
+    NtHelper.setDouble("/leftPosition", leftEncoder.getPosition());
   }
 
   public void resetDrive(Pose2d pose) {
@@ -165,9 +186,4 @@ public class Robot extends TimedRobot {
   public void resetDrive() {
     resetDrive(new Pose2d());
   }
-
-  public Pose2d getPose() {
-    return null;
-  }
-
 }

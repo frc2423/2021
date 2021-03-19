@@ -157,9 +157,9 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     double x = xboxController.getX(Hand.kRight);
     double y = xboxController.getY(Hand.kRight);
-    x = DriveHelper.applyDeadband(x);
-    y = DriveHelper.applyDeadband(y);
-    arcade(-y, x);
+    double turn = DriveHelper.applyDeadband(x);
+    double speed = DriveHelper.applyDeadband(-y);
+    arcade(speed, turn);
   }
 
   @Override

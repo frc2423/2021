@@ -152,6 +152,16 @@ public class Robot extends TimedRobot {
     tank(leftSpeed, rightSpeed);
   }
 
+  public void tankPercent(double left, double right) {
+    leftPidController.setReference(left, ControlType.kDutyCycle);
+    rightPidController.setReference(right, ControlType.kDutyCycle);
+  }
+
+  public void arcadePercent(double speed, double turn) {
+    double[] speeds = DriveHelper.getArcadeSpeeds(speed, turn, false);
+    tankPercent(speeds[0], speeds[1]);
+  }
+
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
@@ -159,7 +169,7 @@ public class Robot extends TimedRobot {
     double y = xboxController.getY(Hand.kRight);
     double turn = DriveHelper.applyDeadband(x);
     double speed = DriveHelper.applyDeadband(-y);
-    arcade(speed, turn);
+    arcadePercent(speed, turn);
   }
 
   @Override

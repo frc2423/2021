@@ -19,7 +19,6 @@ import com.revrobotics.CANPIDController;
 import com.revrobotics.CANEncoder;
 
 import frc.robot.helpers.DriveHelper;
-import frc.robot.DrivePosition;
 
 import com.kauailabs.navx.frc.AHRS;
 
@@ -34,9 +33,11 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 
 import frc.robot.helpers.TrajectoryHelper;
+import frc.robot.helpers.OdometryHelper;
 import frc.robot.constants.Constants;
 
 /**
@@ -53,6 +54,7 @@ public class Robot extends TimedRobot {
   private CANEncoder leftEncoder;
   private CANEncoder rightEncoder;
   private Gyro gyro = new AHRS(Port.kMXP);
+  private DoubleSolenoid gear_switcher;
 
   private XboxController xboxController;
 
@@ -61,10 +63,14 @@ public class Robot extends TimedRobot {
   private final Timer timer = new Timer();
   private Trajectory trajectory;
   private TrajectoryHelper trajectoryHelper = new TrajectoryHelper(Constants.TRACK_WIDTH);
+  private OdometryHelper odometryHelper;
 
   @Override
   public void robotInit() {
     xboxController = new XboxController(0);
+
+    gear_switcher = new DoubleSolenoid(0, 1);
+    odometryHelper = new OdometryHelper(gyro.getAngle());
 
     CANSparkMax leftFollowerMotor = new CANSparkMax(1, MotorType.kBrushless);
     CANSparkMax leftLeadMotor = new CANSparkMax(4, MotorType.kBrushless);
@@ -113,12 +119,14 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     resetDrive();
     timer.reset();
+    odometryHelper.resetOdometry(gyro.getAngle());
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    double[] speeds = trajectoryHelper.getTrajectorySpeeds(trajectory, getPose(), timer.get());
+    odometryHelper.updateOdometry(gyro.getAngle(), leftEncoder.getPosition(), rightEncoder.getPosition());
+    double[] speeds = trajectoryHelper.getTrajectorySpeeds(trajectory, odometryHelper.getCurrentPose(), timer.get());
     tank(speeds[0], speeds[1]);
   }
 

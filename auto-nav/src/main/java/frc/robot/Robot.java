@@ -35,6 +35,8 @@ import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 
+
+import frc.robot.helpers.TrajectoryHelper;
 import frc.robot.constants.Constants;
 
 /**
@@ -45,91 +47,60 @@ import frc.robot.constants.Constants;
  */
 public class Robot extends TimedRobot {
 
-  private CANSparkMax lb_motor;
-  private CANSparkMax lf_motor;
-  private CANSparkMax rb_motor;
-  private CANSparkMax rf_motor;
 
-  private CANPIDController lb_pidController;
-  private CANPIDController lf_pidController;
-  private CANPIDController rb_pidController;
-  private CANPIDController rf_pidController;
+  private CANPIDController leftPidController;
+  private CANPIDController rightPidController;
+  private CANEncoder leftEncoder;
+  private CANEncoder rightEncoder;
+  private Gyro gyro = new AHRS(Port.kMXP);
 
   private XboxController xboxController;
 
-  private double defaultP = 0.0001;
-  private double defaultI = 0.0;
-  private double defaultD = 0.000015;
-  private double defaultF = 0.0;
+  String trajectoryName = "Straight";
 
-  private double countsPerRev = 16.35;
-  private double ftPerRev = 1.57;
-  private double maxSpeed = 9.0;  // feet per second
-  private double conversionFactor = ftPerRev / countsPerRev;
-  private CANEncoder lb_Encoder;
-  private CANEncoder rb_Encoder;
-
-  private Gyro gyro;
-
-  String trajectoryJSON = "Straight";
-
-  private HashMap<String, Trajectory> trajectories = new HashMap<String, Trajectory>();
   private final Timer timer = new Timer();
-  private Trajectory curTrajectory;
-  private final RamseteController ramsete = new RamseteController();
-  private DrivePosition drivePosition;
+  private Trajectory trajectory;
+  private TrajectoryHelper trajectoryHelper = new TrajectoryHelper(Constants.TRACK_WIDTH);
 
   @Override
   public void robotInit() {
     xboxController = new XboxController(0);
 
-    lf_motor = new CANSparkMax(1, MotorType.kBrushless);
-    lb_motor = new CANSparkMax(4, MotorType.kBrushless);
-    rf_motor = new CANSparkMax(6, MotorType.kBrushless);
-    rb_motor = new CANSparkMax(5, MotorType.kBrushless);
+    CANSparkMax leftFollowerMotor = new CANSparkMax(1, MotorType.kBrushless);
+    CANSparkMax leftLeadMotor = new CANSparkMax(4, MotorType.kBrushless);
+    CANSparkMax rightFollowerMotor = new CANSparkMax(6, MotorType.kBrushless);
+    CANSparkMax rightLeadMotor = new CANSparkMax(5, MotorType.kBrushless);
 
-    lb_pidController = lb_motor.getPIDController();
-    lf_pidController = lf_motor.getPIDController();
-    rb_pidController = rb_motor.getPIDController();
-    rf_pidController = rf_motor.getPIDController();
+    leftPidController = leftLeadMotor.getPIDController();
+    rightPidController = rightLeadMotor.getPIDController();
+    leftEncoder = leftLeadMotor.getEncoder();
+    rightEncoder = rightLeadMotor.getEncoder();
     
-    lf_motor.restoreFactoryDefaults();
-    lb_motor.restoreFactoryDefaults();
-    rf_motor.restoreFactoryDefaults();
-    rb_motor.restoreFactoryDefaults();
+    leftFollowerMotor.restoreFactoryDefaults();
+    leftLeadMotor.restoreFactoryDefaults();
+    rightFollowerMotor.restoreFactoryDefaults();
+    rightLeadMotor.restoreFactoryDefaults();
 
-    // setConversionFactor(lf_motor, conversionFactor);
-    // setConversionFactor(lb_motor, conversionFactor);
-    // setConversionFactor(rf_motor, conversionFactor);
-    // setConversionFactor(rb_motor, conversionFactor);
+    leftFollowerMotor.follow(leftLeadMotor);
+    rightFollowerMotor.follow(rightLeadMotor);
 
-    rf_motor.setInverted(true);
-    rb_motor.setInverted(true);
+    setConversionFactor(leftLeadMotor, Constants.WHEEL_CIRCUMFERENCE / Constants.REAL_ENCODER_PULSES_PER_ROTATION);
+    setConversionFactor(rightLeadMotor, Constants.WHEEL_CIRCUMFERENCE / Constants.REAL_ENCODER_PULSES_PER_ROTATION);
 
-    lf_motor.follow(lb_motor);
-    rf_motor.follow(rb_motor);
-    lb_Encoder = lb_motor.getEncoder();
-    rb_Encoder = rb_motor.getEncoder();
-    
-    gyro = new AHRS(Port.kMXP);
+    rightFollowerMotor.setInverted(true);
+    rightLeadMotor.setInverted(true);
 
-    // setPids(lf_motor);
-    setPids(lb_pidController);
-    // setPids(rf_motor);
-    setPids(rb_pidController);
+    setPids(leftPidController);
+    setPids(rightPidController);
 
-    System.out.println("robotInit");
-
-    addTrajectory(trajectoryJSON);
-    stopFollowing();
-    drivePosition = new DrivePosition(Constants.TRACK_WIDTH, Constants.WHEEL_RADIUS, gyro.getAngle());
-  } 
+    trajectory = TrajectoryHelper.getTrajectory(trajectoryName);
+  }
 
   private void setPids(CANPIDController pidController) {
-    pidController.setP(defaultP);
-    pidController.setI(defaultI);
-    pidController.setD(defaultD);
-    pidController.setFF(defaultF);
+    pidController.setP(Constants.REAL_DRIVE_KP);
+    pidController.setI(Constants.REAL_DRIVE_KI);
+    pidController.setD(Constants.REAL_DRIVE_KD);
+    pidController.setFF(Constants.REAL_DRIVE_KF);
   }
 
   private void setConversionFactor(CANSparkMax motor, double factor){
@@ -140,119 +111,55 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    stopFollowing();
-    initFollowing(trajectoryJSON);
     resetDrive();
+    timer.reset();
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    follow();
+    double[] speeds = trajectoryHelper.getTrajectorySpeeds(trajectory, getPose(), timer.get());
+    tank(speeds[0], speeds[1]);
   }
 
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-    stopFollowing();
-    System.out.println("teleopInit");
+    
   }
 
-  public void tank(double left, double right) {
-    lb_motor.set(left);
-    rb_motor.set(right);
+  public void tank(double leftFeetPerSecond, double rightFeetPerSecond) {
+    leftPidController.setReference(leftFeetPerSecond, ControlType.kVelocity);
+    rightPidController.setReference(rightFeetPerSecond, ControlType.kVelocity);
   }
 
   public void arcade(double speed, double turn) {
     double[] speeds = DriveHelper.getArcadeSpeeds(speed, turn, false);
-    double leftSpeed = speeds[0];
-    double rightSpeed = speeds[1];
-    lb_motor.set(leftSpeed);
-    rb_motor.set(rightSpeed);
+    double leftSpeed = speeds[0] * Constants.MAX_SPEED;
+    double rightSpeed = speeds[1] * Constants.MAX_SPEED;
+    tank(leftSpeed, rightSpeed);
   }
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    /*
     double x = xboxController.getX(Hand.kRight);
     double y = xboxController.getY(Hand.kRight);
-
-    double left = xboxController.getY(Hand.kLeft);
-    double right = xboxController.getY(Hand.kRight);
     arcade(-y, x);
-    */
   }
 
   public void resetDrive(Pose2d pose) {
-    rb_Encoder.setPosition(0.0);
-    lb_Encoder.setPosition(0.0);
+    leftEncoder.setPosition(0.0);
+    rightEncoder.setPosition(0.0);
     gyro.reset();
-    drivePosition.reset(pose, gyro.getAngle());
   }
 
   public void resetDrive() {
     resetDrive(new Pose2d());
   }
 
-  public void addTrajectory(String pathName, Trajectory trajectory) {
-    trajectories.put(pathName, trajectory);
-  }
-
-  public void addTrajectory(String trajectoryName) {
-    Trajectory trajectory;
-    trajectoryName = RobotBase.isReal() 
-        ? "paths/" + trajectoryName + ".wpilib.json"
-        : "paths\\" + trajectoryName + ".wpilib.json";
-
-    try {
-        Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryName);
-        trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-        trajectories.put(trajectoryName, trajectory);
-    } catch (Exception ex) {
-        System.out.println(ex);
-    }
-  }
-
-  public void initFollowing(String trajectoryName) {
-    timer.reset();
-    timer.start();
-    trajectoryName = RobotBase.isReal() 
-        ? "paths/" + trajectoryName + ".wpilib.json"
-        : "paths\\" + trajectoryName + ".wpilib.json";
-
-    Trajectory trajectory = trajectories.get(trajectoryName);
-    curTrajectory = trajectory;
-
-    if (trajectory != null) {
-      resetDrive(trajectory.getInitialPose());
-    }
-  }
-
-  public void follow() {
-    if (curTrajectory != null) {
-        double elapsed = timer.get();
-        Trajectory.State reference = curTrajectory.sample(elapsed);
-        ChassisSpeeds speeds = ramsete.calculate(getPose(), reference);
-
-        arcade(speeds.vyMetersPerSecond, speeds.vxMetersPerSecond);
-    }
-  }
-
-  public void stopFollowing() {
-    timer.stop();
-  } 
-
-  public boolean hasCompletedTrajectory() {
-    return timer.get() > curTrajectory.getTotalTimeSeconds();
-  }
-
-  public double getTimeFollowing() {
-    return timer.get();
-  }
-
   public Pose2d getPose() {
-    return drivePosition.getPose();
+    return null;
   }
 
 }

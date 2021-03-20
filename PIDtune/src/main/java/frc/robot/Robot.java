@@ -40,6 +40,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import frc.robot.helpers.TrajectoryHelper;
 import frc.robot.helpers.OdometryHelper;
 import frc.robot.constants.Constants;
+import frc.robot.helpers.DriveRateLimiter;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -70,6 +71,10 @@ public class Robot extends TimedRobot {
 
   private double leftSpeed = 0.0;
   private double rightSpeed = 0.0;
+
+
+  private DriveRateLimiter speedLimiter = new DriveRateLimiter(0.7, 1.2);
+  private DriveRateLimiter turnLimiter = new DriveRateLimiter(1, 1.2);
 
   @Override
   public void robotInit() {
@@ -134,7 +139,7 @@ public class Robot extends TimedRobot {
   }
 
   private double getI() {
-    return NtHelper.getDouble("/drive/kI", Constants.REAL_DRIVE_IP);
+    return NtHelper.getDouble("/drive/kI", Constants.REAL_DRIVE_KI);
   }
 
   private double getD() {
@@ -146,29 +151,27 @@ public class Robot extends TimedRobot {
   }
 
   private void setPidsDashboard() {
-    leftPidController.setP(getP());
-    leftPidController.setI(getI());
-    leftPidController.setD(getD());
-    leftPidController.setF(getF());
-    rightPidController.setP(getP());
-    rightPidController.setI(getI());
-    rightPidController.setD(getD());
-    rightPidController.setF(getF());
-    leftFollowerPID.setP(getP());
-    leftFollowerPID.setI(getI());
-    leftFollowerPID.setD(getD());
-    leftFollowerPID.setF(getF());
-    rightFollowerPID.setP(getP());
-    rightFollowerPID.setI(getI());
-    rightFollowerPID.setD(getD());
-    rightFollowerPID.setF(getF());
+    setPids(leftPidController);
+    setPids(rightPidController);
+    setPids(leftFollowerPID);
+    setPids(rightFollowerPID);
   }
 
   private void setPids(CANPIDController pidController) {
-    pidController.setP(Constants.REAL_DRIVE_KP);
-    pidController.setI(Constants.REAL_DRIVE_KI);
-    pidController.setD(Constants.REAL_DRIVE_KD);
-    pidController.setFF(Constants.REAL_DRIVE_KF);
+    setPids(
+      pidController,
+      getP(),
+      getI(),
+      getD(),
+      getF()
+    );
+  }
+
+  private void setPids(CANPIDController pidController, double kP, double kI, double kD, double kF) {
+    pidController.setP(kP);
+    pidController.setI(kI);
+    pidController.setD(kD);
+    pidController.setFF(kF);
   }
 
   private void setConversionFactor(CANSparkMax motor, double factor){
@@ -177,33 +180,11 @@ public class Robot extends TimedRobot {
     encoder.setVelocityConversionFactor(factor / 60);
   }
 
-  @Override
-  public void autonomousInit() {
-    resetDrive();
-    timer.reset();
-    timer.start();
-    odometryHelper.resetOdometry(gyro.getAngle());
-  }
-
-  /** This function is called periodically during autonomous. */
-  @Override
-  public void autonomousPeriodic() {
-    odometryHelper.updateOdometry(gyro.getAngle(), leftEncoder.getPosition(), rightEncoder.getPosition());
-    System.out.println(" Pos X "+ odometryHelper.getCurrentPose().getX()+ " Pos Y "+ odometryHelper.getCurrentPose().getY());
-    double[] speeds = trajectoryHelper.getTrajectorySpeeds(trajectory, odometryHelper.getCurrentPose(), timer.get());
-    tank(speeds[0], -speeds[1]);
-    System.out.println(speeds[0] + "  " + speeds[1]);
-  }
-
-  /** This function is called once when teleop is enabled. */
-  @Override
-  public void teleopInit() {
-    resetDrive();
-  }
-
   public void tank(double leftFeetPerSecond, double rightFeetPerSecond) {
     leftPidController.setReference(leftFeetPerSecond, ControlType.kVelocity);
     rightPidController.setReference(rightFeetPerSecond, ControlType.kVelocity);
+    NtHelper.setDouble("/drive/left", leftFeetPerSecond);
+    NtHelper.setDouble("/drive/right", rightFeetPerSecond);
   }
 
   public void arcade(double speed, double turn) {
@@ -223,14 +204,19 @@ public class Robot extends TimedRobot {
     tankPercent(speeds[0], speeds[1]);
   }
 
+  @Override
+  public void robotPeriodic() {
+    NtHelper.setDouble("/drive/velocity", leftEncoder.getVelocity());
+  }
+
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
     double x = xboxController.getX(Hand.kRight);
     double y = xboxController.getY(Hand.kRight);
-    double turn = DriveHelper.applyDeadband(x);
-    double speed = DriveHelper.applyDeadband(-y);
-    arcade(speed, turn);
+    double turn = turnLimiter.calculate(DriveHelper.applyDeadband(x));
+    double speed = speedLimiter.calculate(DriveHelper.applyDeadband(-y));
+    arcade(speed * 0.7, turn * 0.5);
   }
 
   @Override
@@ -242,7 +228,7 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
     double x = xboxController.getX(Hand.kRight);
     double y = xboxController.getY(Hand.kRight);
-    arcade(leftSpeed, 0);
+    tank(leftSpeed, rightSpeed);
   }
 
   public void resetDrive(Pose2d pose) {

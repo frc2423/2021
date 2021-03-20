@@ -134,7 +134,7 @@ public class Robot extends TimedRobot {
   }
 
   private double getI() {
-    return NtHelper.getDouble("/drive/kI", Constants.REAL_DRIVE_IP);
+    return NtHelper.getDouble("/drive/kI", Constants.REAL_DRIVE_KI);
   }
 
   private double getD() {
@@ -149,19 +149,19 @@ public class Robot extends TimedRobot {
     leftPidController.setP(getP());
     leftPidController.setI(getI());
     leftPidController.setD(getD());
-    leftPidController.setF(getF());
+    leftPidController.setFF(getF());
     rightPidController.setP(getP());
     rightPidController.setI(getI());
     rightPidController.setD(getD());
-    rightPidController.setF(getF());
+    rightPidController.setFF(getF());
     leftFollowerPID.setP(getP());
     leftFollowerPID.setI(getI());
     leftFollowerPID.setD(getD());
-    leftFollowerPID.setF(getF());
+    leftFollowerPID.setFF(getF());
     rightFollowerPID.setP(getP());
     rightFollowerPID.setI(getI());
     rightFollowerPID.setD(getD());
-    rightFollowerPID.setF(getF());
+    rightFollowerPID.setFF(getF());
   }
 
   private void setPids(CANPIDController pidController) {
@@ -238,10 +238,9 @@ public class Robot extends TimedRobot {
     resetDrive();
   }
 
+  //for working on PID tunning
   @Override
   public void testPeriodic() {
-    double x = xboxController.getX(Hand.kRight);
-    double y = xboxController.getY(Hand.kRight);
     arcade(leftSpeed, 0);
   }
 

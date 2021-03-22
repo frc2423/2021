@@ -11,6 +11,8 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANEncoder;
 import frc.robot.helpers.NtHelper;
+import java.util.HashMap;
+
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -22,6 +24,7 @@ public class Robot extends TimedRobot {
 
   private CANPIDController leadPidController;
   private CANEncoder leadEncoder;
+  private HashMap<Integer, CANSparkMax> motorMap = new HashMap<Integer, CANSparkMax>();
  
 
 
@@ -39,8 +42,11 @@ public class Robot extends TimedRobot {
   }
 
   private void createMotorObject()  {
-      CANSparkMax leadMotor = new CANSparkMax(getCanId(), MotorType.kBrushless);
-      leadMotor.restoreFactoryDefaults();
+    if (!motorMap.containsKey(getCanId())) {
+      motorMap.put(getCanId(), new CANSparkMax(getCanId(), MotorType.kBrushless));
+    }
+    CANSparkMax leadMotor = motorMap.get(getCanId());
+    leadMotor.restoreFactoryDefaults();
     leadEncoder = leadMotor.getEncoder();
     leadPidController = leadMotor.getPIDController();
     setPids(leadPidController);

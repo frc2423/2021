@@ -33,11 +33,11 @@ public class Robot extends TimedRobot {
     shooterFeederMotor.setConversionFactor(1, 1);
     shooterFeederMotor.setPidf(1, 0, 0, 0);
 
-    shooterBottomWheel.setConversionFactor(1, 1);
-    shooterBottomWheel.setPidf(1, 0, 0, 0);
+    shooterBottomWheel.setConversionFactor(.16, 1);
+    shooterBottomWheel.setPidf(.05, .0001, 0, 0);
 
-    shooterTopWheel.setConversionFactor(1, 1);
-    shooterTopWheel.setPidf(1, 0, 0, 0);
+    shooterTopWheel.setConversionFactor(.16, 1);
+    shooterTopWheel.setPidf(.05, .0001, 0, 0);
 
   }
 

@@ -1,0 +1,17 @@
+
+      <frc-root-layout source-provider="NetworkTables"><frc-nt-number-default slot="source-defaults" source-provider="NetworkTables" key="/shooter/shooterTopMotor" value="0"></frc-nt-number-default><frc-nt-number-default slot="source-defaults" source-provider="NetworkTables" key="/shooter/shooterBottomMotor" value="0"></frc-nt-number-default><frc-nt-number-default slot="source-defaults" source-provider="NetworkTables" key="/shooter/shooterFeederMotor" value="0"></frc-nt-number-default><frc-nt-boolean-default slot="source-defaults" source-provider="NetworkTables" key="/shooter/greenWheel"></frc-nt-boolean-default><frc-nt-boolean-default slot="source-defaults" source-provider="NetworkTables" key="/shooter/storageMotor"></frc-nt-boolean-default><style>
+	.header{
+		font-size: 30px;
+		font-family: sans-serif;
+	}
+</style>
+<frc-number-field source-provider="NetworkTables" value="0.00" label="Shooter Top Motor" placeholder="" minlength="0" maxlength="Infinity" error-message="" pattern="" theme="" min="-100" max="100" step="1" precision="2" style="transform: translate(30.7996px, 20.7989px);" name="Shooter Top Motor" has-value="" has-label="" source-key="/shooter/shooterTopMotor" has-controls=""></frc-number-field>
+<frc-number-field source-provider="NetworkTables" value="0.00" label="Shooter Bottom Motor" placeholder="" minlength="0" maxlength="Infinity" error-message="" pattern="" theme="" min="-100" max="100" step="1" precision="2" style="transform: translate(29.9959px, 109.2px);" name="Shooter Bottom Motor" has-value="" has-label="" source-key="/shooter/shooterBottomMotor" has-controls=""></frc-number-field>
+<frc-toggle-switch source-provider="NetworkTables" style="width: 60.8px; height: 33.2px; transform: translate(234.402px, 51.6003px);" name="Feeder Motor" source-key="/shooter/greenWheel"></frc-toggle-switch>
+<frc-label source-provider="NetworkTables" text="Green Wheel Motor" style="width: 130.146px; transform: translate(301.064px, 60.7987px);"></frc-label>
+<frc-label source-provider="NetworkTables" text="Shooter" class="header" style="width: 54.3542px; transform: translate(410.268px, 8.93357px);"></frc-label>
+<frc-toggle-switch source-provider="NetworkTables" style="width: 60.8px; height: 33.2px; transform: translate(234.003px, 141.336px);" name="Feeder Motor" source-key="/shooter/storageMotor"></frc-toggle-switch>
+<frc-number-field source-provider="NetworkTables" value="0.00" label="Shooter Feeder Motor" placeholder="" minlength="0" maxlength="Infinity" error-message="" pattern="" theme="" min="-100" max="100" step="1" precision="2" style="transform: translate(30.0002px, 190.67px);" name="Shooter Feeder Motor" has-value="" has-label="" source-key="/shooter/shooterFeederMotor" has-controls=""></frc-number-field>
+<frc-label source-provider="NetworkTables" text="Belt Motor" style="width: 79.4896px; transform: translate(302.662px, 149.999px);"></frc-label>
+</frc-root-layout>
+    

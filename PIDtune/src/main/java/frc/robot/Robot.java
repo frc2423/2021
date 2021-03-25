@@ -41,11 +41,18 @@ public class Robot extends TimedRobot {
 
   }
 
+  private void zeroMotorTimeout() {
+    for (CANSparkMax motor : motorMap.values()) {
+      motor.setCANTimeout(0);
+    }
+  }
+
   private void createMotorObject()  {
     if (!motorMap.containsKey(getCanId())) {
       motorMap.put(getCanId(), new CANSparkMax(getCanId(), MotorType.kBrushless));
     }
     CANSparkMax leadMotor = motorMap.get(getCanId());
+    leadMotor.setCANTimeout(1000);
     leadMotor.restoreFactoryDefaults();
     leadEncoder = leadMotor.getEncoder();
     leadPidController = leadMotor.getPIDController();
@@ -54,7 +61,7 @@ public class Robot extends TimedRobot {
   }
 
   private int getCanId() {
-    return (int)NtHelper.getDouble("/pid/canId", 0.0);
+    return (int)NtHelper.getDouble("/pid/canId", 0);
   }
   private double getWheelRadius() {
     return NtHelper.getDouble("/pid/wheelRadius", 1);
@@ -64,23 +71,23 @@ public class Robot extends TimedRobot {
   }
 
   private double getSetPoint() {
-    return NtHelper.getDouble("/drive/setPoint", 0.0);
+    return NtHelper.getDouble("/pid/setPoint", 0.0);
   }
 
   private double getP() {
-    return NtHelper.getDouble("/drive/kP", 0);
+    return NtHelper.getDouble("/pid/kP", 0);
   }
 
   private double getI() {
-    return NtHelper.getDouble("/drive/kI", 0);
+    return NtHelper.getDouble("/pid/kI", 0);
   }
 
   private double getD() {
-    return NtHelper.getDouble("/drive/kD", 0);
+    return NtHelper.getDouble("/pid/kD", 0);
   }
 
   private double getF() {
-    return NtHelper.getDouble("/drive/kF", 0);
+    return NtHelper.getDouble("/pid/kF", 0);
   }
 
   private void setPidsDashboard() {
@@ -107,14 +114,47 @@ public class Robot extends TimedRobot {
   private void setConversionFactor(){
     double circumference = getWheelRadius()*2*Math.PI;
     double factor = circumference/getEncoderPulsesPerRotation();
+
+    NtHelper.setDouble("/pid/circumference", circumference);
+    NtHelper.setDouble("/pid/factor", factor);
     leadEncoder.setPositionConversionFactor(factor);
     leadEncoder.setVelocityConversionFactor(factor / 60);
   }
 
+  public double getEncoderCount() {
+    return leadEncoder.getPosition() / leadEncoder.getPositionConversionFactor();
+  }
+
+  @Override
+  public void teleopInit() {
+    leadEncoder.setPosition(0);
+  }
+
+  @Override
+  public void autonomousInit() {
+    leadEncoder.setPosition(0);
+  }
+
+  @Override
+  public void testInit() {
+    leadEncoder.setPosition(0);
+  }
+
+  private boolean isDutyCycle() {
+    return NtHelper.getBoolean("/pid/isDutyCycle", false);
+  }
 
   /** This function is called periodically during operator control. */
   @Override
-  public void robotPeriodic() {
-    leadPidController.setReference(getSetPoint(), ControlType.kVelocity);
+  public void teleopPeriodic() {
+    if (isDutyCycle()) {
+      leadPidController.setReference(0, ControlType.kDutyCycle);
+    } else {
+      System.out.println("setPoint: " +  getSetPoint());
+      leadPidController.setReference(getSetPoint(), ControlType.kVelocity);
+    }
+    NtHelper.setDouble("/pid/encoderCount", getEncoderCount());
+    NtHelper.setDouble("/pid/encoderConversionFactor", leadEncoder.getPositionConversionFactor());
+    NtHelper.setDouble("/pid/velocity", leadEncoder.getVelocity());
   }
 }

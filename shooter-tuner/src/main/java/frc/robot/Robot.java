@@ -5,6 +5,8 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -14,24 +16,32 @@ import edu.wpi.first.wpilibj.TimedRobot;
  */
 public class Robot extends TimedRobot {
 
+  private NeoMotor intakeMotor;
   private NeoMotor greenWheel;
   private NeoMotor beltMotor;
   private NeoMotor shooterFeederMotor;
   private NeoMotor shooterBottomWheel;
   private NeoMotor shooterTopWheel;
+  private DoubleSolenoid intakeValve;
 
   @Override
   public void robotInit() {
     System.out.println("robotInit");
 
+    intakeValve = new DoubleSolenoid(2, 3);
+    intakeMotor = new NeoMotor(7);
     greenWheel = new NeoMotor(2);
     beltMotor = new NeoMotor(3);
     shooterFeederMotor = new NeoMotor(8);
     shooterBottomWheel = new NeoMotor(10);
     shooterTopWheel = new NeoMotor(11);
 
-    shooterFeederMotor.setConversionFactor(1, 1);
-    shooterFeederMotor.setPidf(1, 0, 0, 0);
+    greenWheel.setInverted(true);
+    shooterTopWheel.setInverted(true);
+    shooterFeederMotor.setInverted(true);
+
+    shooterFeederMotor.setConversionFactor(.16, .8);
+    shooterFeederMotor.setPidf(.005, .00003, 0, 0);
 
     shooterBottomWheel.setConversionFactor(.16, 1);
     shooterBottomWheel.setPidf(.05, .0001, 0, 0);
@@ -41,11 +51,11 @@ public class Robot extends TimedRobot {
 
   }
 
-  private boolean getGreenWheel() {
-    return NtHelper.getBoolean("/shooter/greenWheel", false);
+  private boolean runIntake() {
+    return NtHelper.getBoolean("/shooter/intake", false);
   }
 
-  private boolean getStorageMotor() {
+  private boolean runBelt() {
     return NtHelper.getBoolean("/shooter/storageMotor", false);
   }
 
@@ -61,6 +71,10 @@ public class Robot extends TimedRobot {
     return NtHelper.getDouble("/shooter/shooterTopMotor", 0.0);
   }
 
+  private boolean runShooter() {
+    return NtHelper.getBoolean("/shooter/runShooter", false);
+  }
+
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
@@ -68,18 +82,35 @@ public class Robot extends TimedRobot {
   }
 
   public void robotPeriodic() {
-    if (getGreenWheel()) {
+
+    if (runIntake()) {
+      intakeMotor.setPercent(.5);
+      intakeValve.set(DoubleSolenoid.Value.kReverse);
+    } else {
+      intakeMotor.setPercent(0);
+      intakeValve.set(DoubleSolenoid.Value.kForward);
+    }
+
+    if (runIntake() || runBelt()) {
       greenWheel.setPercent(0.5);
     } else {
       greenWheel.setPercent(0);
     }
-    if (getStorageMotor()) {
+
+    if (runBelt()) {
       beltMotor.setPercent(0.5);
     } else {
       beltMotor.setPercent(0);
     }
-    shooterFeederMotor.setSpeed(getShooterFeederMotor());
-    shooterBottomWheel.setSpeed(getShooterBottomMotor());
-    shooterTopWheel.setSpeed(getShooterTopMotor());
+
+    if (runShooter()) {
+      shooterFeederMotor.setSpeed(getShooterFeederMotor(), true);
+      shooterBottomWheel.setSpeed(getShooterBottomMotor(), true);
+      shooterTopWheel.setSpeed(getShooterTopMotor(), true);
+    } else {
+      shooterFeederMotor.setPercent(0);
+      shooterBottomWheel.setPercent(0);
+      shooterTopWheel.setPercent(0);
+    }
   }
 }

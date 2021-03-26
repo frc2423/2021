@@ -41,6 +41,11 @@ import frc.robot.helpers.TrajectoryHelper;
 import frc.robot.helpers.OdometryHelper;
 import frc.robot.constants.Constants;
 
+import frc.robot.BallTracker;
+import frc.robot.IBallTracker;
+
+import edu.wpi.first.wpilibj.util.Units;
+
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -59,12 +64,21 @@ public class Robot extends TimedRobot {
 
   private XboxController xboxController;
 
-  String trajectoryName = "Straight";
+  String trajectoryJSON = "Forward";
 
   private final Timer timer = new Timer();
   private Trajectory trajectory;
   private TrajectoryHelper trajectoryHelper = new TrajectoryHelper(Constants.TRACK_WIDTH);
   private OdometryHelper odometryHelper;
+
+  private Robot driveBase;
+  private IBallTracker ballTracker;
+
+  private double joystickDeadband = 0.17;
+
+  private Trajectory follower;
+
+  private Intake intake;
 
   @Override
   public void robotInit() {
@@ -100,7 +114,7 @@ public class Robot extends TimedRobot {
     setPids(leftPidController);
     setPids(rightPidController);
 
-    trajectory = TrajectoryHelper.getTrajectory(trajectoryName);
+    trajectory = TrajectoryHelper.getTrajectory(trajectoryJSON);
 
     xboxController = new XboxController(0);
   }
@@ -208,16 +222,6 @@ public class Robot extends TimedRobot {
     arcadePercent(speed, turn);
 
     System.out.println("RUNNING GLACTIC");
-
-    double x = RobotBase.isReal() ? xboxController.getX(Hand.kRight) : xboxController.getRawAxis(0);
-    double y = RobotBase.isReal() ? xboxController.getY(Hand.kRight) : xboxController.getRawAxis(1);
-
-
-
-    driveBase.setArcadePercent(
-      DriveHelper.squareInputs(DriveHelper.applyDeadband(-y, joystickDeadband)), 
-      DriveHelper.squareInputs(DriveHelper.applyDeadband(x, joystickDeadband))
-    );
 
     ballTracker.giveRobotPose(driveBase.getPose());
   }

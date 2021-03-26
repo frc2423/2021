@@ -1,7 +1,6 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.devices.IMotor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class Intake {
@@ -25,8 +24,6 @@ public class Intake {
     public void init() {
         running = false;
         intakeValve = new DoubleSolenoid(2, 3);
-        motor = Manager.getDevice("intakeMotor", IMotor.class);
-        greenWheel = Manager.getDevice("greenWheel", IMotor.class);
         stop();
     }
 

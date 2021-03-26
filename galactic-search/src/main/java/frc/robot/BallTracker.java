@@ -3,7 +3,6 @@ package frc.robot;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonTrackedTarget;
 import org.photonvision.PhotonUtils;
-import org.photonvision.SimVisionTarget;
 
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj.geometry.Pose2d;

@@ -129,7 +129,8 @@ public class Robot extends TimedRobot {
     rb_motor.set(rightSpeed);
   }
 
-  /** This function is called periodically during operator control. */
+  /** This func 
+   * tion is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
     double x = xboxController.getX(Hand.kRight);

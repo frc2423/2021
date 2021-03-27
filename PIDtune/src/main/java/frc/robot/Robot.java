@@ -153,8 +153,10 @@ public class Robot extends TimedRobot {
       System.out.println("setPoint: " +  getSetPoint());
       leadPidController.setReference(getSetPoint(), ControlType.kVelocity);
     }
+    NtHelper.setDouble("/pid/encoderPosition", leadEncoder.getPosition());
     NtHelper.setDouble("/pid/encoderCount", getEncoderCount());
     NtHelper.setDouble("/pid/encoderConversionFactor", leadEncoder.getPositionConversionFactor());
     NtHelper.setDouble("/pid/velocity", leadEncoder.getVelocity());
+
   }
 }

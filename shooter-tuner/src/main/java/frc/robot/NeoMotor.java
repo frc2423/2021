@@ -20,9 +20,17 @@ public class NeoMotor {
        setPercent(0);
     }
 
+    public void setSpeed(double speed) {
+        this.setSpeed(speed, false);
+    }
 
-    public void setSpeed(double speed){
-        pidController.setReference(speed / encoder.getVelocityConversionFactor(), ControlType.kVelocity);
+    public void setSpeed(double speed, boolean direct){
+        pidController.setReference(
+            direct ?
+                speed
+                : speed / encoder.getVelocityConversionFactor(),
+             ControlType.kVelocity
+        );
     }
 
     public double getSpeed(){

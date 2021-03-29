@@ -162,10 +162,8 @@ public class Robot extends TimedRobot {
     odometryHelper.resetOdometry(gyro.getAngle());
 
     String field = detectField();
-    follower.addTrajectory(field);
-    follower.initFollowing(field);
     intake.intakeDown();
-    setDefaultPids();
+    //setDefaultPids();
   }
 
   /** This function is called periodically during autonomous. */
@@ -177,7 +175,6 @@ public class Robot extends TimedRobot {
     tank(speeds[0], -speeds[1]);
     System.out.println(speeds[0] + "  " + speeds[1]);
 
-    follower.follow();
     intake.intake();
   }
 
@@ -186,8 +183,7 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     resetDrive();
 
-    driveBase.begin();
-    setDefaultPids();
+    //setDefaultPids();
   }
 
   public void tank(double leftFeetPerSecond, double rightFeetPerSecond) {

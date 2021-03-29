@@ -75,6 +75,14 @@ public class Robot extends TimedRobot {
     return NtHelper.getBoolean("/shooter/runShooter", false);
   }
 
+  private boolean seesTarget() {
+    return NtHelper.getDouble("/limelight/tv", 0.0) == 1;
+  }
+
+  private double getTargetOffset() {
+    return NtHelper.getDouble("/limelight/tx", 0.0);
+  }
+
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {

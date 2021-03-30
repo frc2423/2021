@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.CameraServer;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -29,7 +31,7 @@ public class Robot extends TimedRobot {
   private NeoMotor frMotor;
   private NeoMotor blMotor;
   private NeoMotor brMotor;
-  private XboxController xboxController;
+  private XboxController xboxController = new XboxController(0);
   private DriveRateLimiter speedLimiter = new DriveRateLimiter(0.7, 1.2);
   private DriveRateLimiter turnLimiter = new DriveRateLimiter(2, 3.5);
 
@@ -69,6 +71,7 @@ public class Robot extends TimedRobot {
     shooterTopWheel.setConversionFactor(.16, 1);
     shooterTopWheel.setPidf(.05, .0001, 0, 0);
 
+    CameraServer.getInstance().startAutomaticCapture();
   }
 
   public void arcade(double speed, double turn) {

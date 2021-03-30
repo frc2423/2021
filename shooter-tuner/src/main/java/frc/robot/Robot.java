@@ -123,6 +123,21 @@ public class Robot extends TimedRobot {
     arcade(speed * 0.8, turn * 0.45);
   }
 
+  private void driveAutoAim() {
+    if (seesTarget()) {
+      double targetOffset = getTargetOffset();
+      if (targetOffset < -0.5) {
+        arcade(0.0, -0.35);
+      } else if (targetOffset > 0.5) {
+        arcade(0.0, 0.35);
+      } else {
+        arcade(0.0, 0.0);
+      }
+    } else {
+      arcade(0.0, 0.0);
+    }
+  }
+
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
@@ -159,6 +174,12 @@ public class Robot extends TimedRobot {
       shooterFeederMotor.setPercent(0);
       shooterBottomWheel.setPercent(0);
       shooterTopWheel.setPercent(0);
+    }
+
+    if (shooterAutoAim()) {
+      driveAutoAim();
+    } else {
+      driveJoystick();
     }
   }
 }

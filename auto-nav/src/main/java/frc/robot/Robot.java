@@ -5,8 +5,6 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
@@ -127,11 +125,8 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    odometryHelper.updateOdometry(gyro.getAngle(), leftEncoder.getPosition(), rightEncoder.getPosition());
-    System.out.println(" Pos X "+ odometryHelper.getCurrentPose().getX()+ " Pos Y "+ odometryHelper.getCurrentPose().getY());
     double[] speeds = trajectoryHelper.getTrajectorySpeeds(trajectory, odometryHelper.getCurrentPose(), timer.get());
-    tank(speeds[0], -speeds[1]);
-    System.out.println(speeds[0] + "  " + speeds[1]);
+    tank(-speeds[0], speeds[1]);
   }
 
   /** This function is called once when teleop is enabled. */
@@ -169,7 +164,7 @@ public class Robot extends TimedRobot {
     double y = xboxController.getY(Hand.kRight);
     double turn = DriveHelper.applyDeadband(x);
     double speed = DriveHelper.applyDeadband(-y);
-    arcadePercent(speed, turn);
+    arcade(speed, turn);
   }
 
   @Override
@@ -191,6 +186,13 @@ public class Robot extends TimedRobot {
     leftEncoder.setPosition(0.0);
     rightEncoder.setPosition(0.0);
     gyro.reset();
+  }
+
+  public void robotPeriodic() {
+    odometryHelper.updateOdometry(gyro.getAngle(), leftEncoder.getPosition(), rightEncoder.getPosition());
+    NtHelper.setDouble("/robot/x", odometryHelper.getXFeet());
+    NtHelper.setDouble("/robot/y", odometryHelper.getYFeet());
+    NtHelper.setDouble("/robot/angle", gyro.getAngle());
   }
 
   public void resetDrive() {

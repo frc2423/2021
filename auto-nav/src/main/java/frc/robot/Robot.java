@@ -57,7 +57,7 @@ public class Robot extends TimedRobot {
 
   private XboxController xboxController;
 
-  String trajectoryName = "Straight";
+  String trajectoryName = "Slalom";
 
   private final Timer timer = new Timer();
   private Trajectory trajectory;
@@ -119,14 +119,14 @@ public class Robot extends TimedRobot {
     resetDrive();
     timer.reset();
     timer.start();
-    odometryHelper.resetOdometry(gyro.getAngle());
+    odometryHelper.resetOdometry(trajectory.getInitialPose());
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
     double[] speeds = trajectoryHelper.getTrajectorySpeeds(trajectory, odometryHelper.getCurrentPose(), timer.get());
-    tank(-speeds[0], speeds[1]);
+    tank(speeds[0], speeds[1]);
   }
 
   /** This function is called once when teleop is enabled. */

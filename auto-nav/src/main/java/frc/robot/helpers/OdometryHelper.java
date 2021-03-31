@@ -34,6 +34,9 @@ public class OdometryHelper {
         Rotation2d rotation = Rotation2d.fromDegrees(-angle);
         odometry.resetPosition(new Pose2d(), rotation);
     }
+     public void resetOdometry(Pose2d pose) {
+        odometry.resetPosition(pose, pose.getRotation());
+     }
 
     public void updateOdometry(double angle, double leftDistanceFeet, double rightDistanceFeet) {
         Rotation2d rotation = Rotation2d.fromDegrees(-angle);

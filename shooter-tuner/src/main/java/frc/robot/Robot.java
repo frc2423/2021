@@ -129,10 +129,12 @@ public class Robot extends TimedRobot {
   private void driveAutoAim() {
     if (seesTarget()) {
       double targetOffset = getTargetOffset();
-      if (targetOffset < -0.5) {
-        arcade(0.0, -0.35);
+      if (Math.abs(targetOffset) < 2.5){
+        arcade(0.0, 0.0);
+      } else if (targetOffset < -0.5) {
+        arcade(0.0, -0.08);
       } else if (targetOffset > 0.5) {
-        arcade(0.0, 0.35);
+        arcade(0.0, 0.08);
       } else {
         arcade(0.0, 0.0);
       }

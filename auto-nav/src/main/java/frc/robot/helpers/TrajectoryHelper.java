@@ -22,6 +22,10 @@ public class TrajectoryHelper {
         );
     }
 
+    public DifferentialDriveKinematics getKinematics(){
+        return kinematics;
+    }
+
     public static Trajectory getTrajectory(String trajectoryName) {
         Trajectory trajectory = new Trajectory();
         trajectoryName = RobotBase.isReal() 

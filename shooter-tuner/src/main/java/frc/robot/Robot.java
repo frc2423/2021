@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.AnalogInput;
 import java.util.ArrayList;
+import edu.wpi.first.wpilibj.CameraServer;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -31,7 +33,7 @@ public class Robot extends TimedRobot {
   private NeoMotor frMotor;
   private NeoMotor blMotor;
   private NeoMotor brMotor;
-  private XboxController xboxController;
+  private XboxController xboxController = new XboxController(0);
   private DriveRateLimiter speedLimiter = new DriveRateLimiter(0.7, 1.2);
   private DriveRateLimiter turnLimiter = new DriveRateLimiter(2, 3.5);
 
@@ -83,6 +85,8 @@ public class Robot extends TimedRobot {
     ballReadings = new ArrayList<Boolean>();
     ballSensor = new AnalogInput(0);
     operatorController = new XboxController(0);
+    
+    CameraServer.getInstance().startAutomaticCapture();
   }
 
   public void arcade(double speed, double turn) {
@@ -137,6 +141,23 @@ public class Robot extends TimedRobot {
     arcade(speed * 0.8, turn * 0.45);
   }
 
+  private void driveAutoAim() {
+    if (seesTarget()) {
+      double targetOffset = getTargetOffset();
+      if (Math.abs(targetOffset) < 2.5){
+        arcade(0.0, 0.0);
+      } else if (targetOffset < -0.5) {
+        arcade(0.0, -0.08);
+      } else if (targetOffset > 0.5) {
+        arcade(0.0, 0.08);
+      } else {
+        arcade(0.0, 0.0);
+      }
+    } else {
+      arcade(0.0, 0.0);
+    }
+  }
+
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
@@ -162,6 +183,12 @@ public class Robot extends TimedRobot {
       shooterFeederMotor.setPercent(0);
       shooterBottomWheel.setPercent(0);
       shooterTopWheel.setPercent(0);
+    }
+
+    if (shooterAutoAim()) {
+      driveAutoAim();
+    } else {
+      driveJoystick();
     }
   }
 

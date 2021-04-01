@@ -22,22 +22,36 @@ import frc.robot.helpers.NtHelper;
 import com.kauailabs.navx.frc.AHRS;
 
 import java.util.HashMap;
+import java.util.List;
 import java.nio.file.Path;
 
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
+import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
+
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 
 import frc.robot.helpers.TrajectoryHelper;
 import frc.robot.helpers.OdometryHelper;
+import frc.robot.helpers.TrajectoryGeneration;
 import frc.robot.constants.Constants;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import frc.robot.helpers.TrajectoryGeneration;
+
+import frc.robot.helpers.Pose;
+import frc.robot.helpers.Rot;
+import frc.robot.helpers.Translate;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -45,7 +59,7 @@ import frc.robot.constants.Constants;
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
+public class TrajectoryExample extends TimedRobot {
 
 
   private CANPIDController leftPidController;
@@ -57,13 +71,13 @@ public class Robot extends TimedRobot {
 
   private XboxController xboxController;
 
-  String trajectoryName = "Slalom";
+  String trajectoryName = "straight";
 
   private final Timer timer = new Timer();
   private Trajectory trajectory;
   private TrajectoryHelper trajectoryHelper = new TrajectoryHelper(Constants.TRACK_WIDTH);
   private OdometryHelper odometryHelper;
-
+  private Trajectory exampleTrajectory;
   @Override
   public void robotInit() {
     xboxController = new XboxController(0);
@@ -98,7 +112,19 @@ public class Robot extends TimedRobot {
     setPids(leftPidController);
     setPids(rightPidController);
 
-    trajectory = TrajectoryHelper.getTrajectory(trajectoryName);
+    //trajectory = TrajectoryHelper.getTrajectory(trajectoryName);
+    TrajectoryGeneration.setConfig(Constants.MAX_SPEED, Constants.MAX_ACCLERATION, trajectoryHelper);
+
+    //giving stuff in ft
+    exampleTrajectory = TrajectoryGeneration.Generate(
+      new Pose(0,0, new Rot(0)), //start
+      new Pose(3, 0, new Rot(0)),//end
+      List.of( //waypoints
+          new Translate(1, 0),
+          new Translate(2, 0)
+      )
+    );
+
   }
 
   private void setPids(CANPIDController pidController) {
@@ -119,20 +145,14 @@ public class Robot extends TimedRobot {
     resetDrive();
     timer.reset();
     timer.start();
-    odometryHelper.resetOdometry(trajectory.getInitialPose());
+    odometryHelper.resetOdometry(exampleTrajectory.getInitialPose());
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    double[] speeds = trajectoryHelper.getTrajectorySpeeds(trajectory, odometryHelper.getCurrentPose(), timer.get());
+    double[] speeds = trajectoryHelper.getTrajectorySpeeds(exampleTrajectory, odometryHelper.getCurrentPose(), timer.get());
     tank(speeds[0], speeds[1]);
-  }
-
-  /** This function is called once when teleop is enabled. */
-  @Override
-  public void teleopInit() {
-    resetDrive();
   }
 
   public void tank(double leftFeetPerSecond, double rightFeetPerSecond) {
@@ -147,52 +167,11 @@ public class Robot extends TimedRobot {
     tank(leftSpeed, rightSpeed);
   }
 
-  public void tankPercent(double left, double right) {
-    leftPidController.setReference(left, ControlType.kDutyCycle);
-    rightPidController.setReference(right, ControlType.kDutyCycle);
-  }
-
-  public void arcadePercent(double speed, double turn) {
-    double[] speeds = DriveHelper.getArcadeSpeeds(speed, turn, false);
-    tankPercent(speeds[0], speeds[1]);
-  }
-
   /** This function is called periodically during operator control. */
-  @Override
-  public void teleopPeriodic() {
-    double x = xboxController.getX(Hand.kRight);
-    double y = xboxController.getY(Hand.kRight);
-    double turn = DriveHelper.applyDeadband(x);
-    double speed = DriveHelper.applyDeadband(-y);
-    arcade(speed, turn);
-  }
-
-  @Override
-  public void testInit() {
-    resetDrive();
-  }
-
-  @Override
-  public void testPeriodic() {
-    double x = xboxController.getX(Hand.kRight);
-    double y = xboxController.getY(Hand.kRight);
-    //arcade(-y, x);
-    System.out.println("right " + rightEncoder.getPosition());
-    NtHelper.setDouble("/rightPosition", rightEncoder.getPosition());
-    NtHelper.setDouble("/leftPosition", leftEncoder.getPosition());
-  }
-
   public void resetDrive(Pose2d pose) {
     leftEncoder.setPosition(0.0);
     rightEncoder.setPosition(0.0);
     gyro.reset();
-  }
-
-  public void robotPeriodic() {
-    odometryHelper.updateOdometry(gyro.getAngle(), leftEncoder.getPosition(), rightEncoder.getPosition());
-    NtHelper.setDouble("/robot/x", odometryHelper.getXFeet());
-    NtHelper.setDouble("/robot/y", odometryHelper.getYFeet());
-    NtHelper.setDouble("/robot/angle", gyro.getAngle());
   }
 
   public void resetDrive() {

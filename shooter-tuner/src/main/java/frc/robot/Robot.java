@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.AnalogInput;
+import java.util.ArrayList;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -32,6 +34,15 @@ public class Robot extends TimedRobot {
   private XboxController xboxController;
   private DriveRateLimiter speedLimiter = new DriveRateLimiter(0.7, 1.2);
   private DriveRateLimiter turnLimiter = new DriveRateLimiter(2, 3.5);
+
+  private int numBalls = 0;
+  private ArrayList<Boolean> ballReadings;
+  private AnalogInput ballSensor;
+  public enum StorageStates {
+    NOTHING, SEESBALL, FEEDBALL, EJECT
+  }
+  private StorageStates storageState = StorageStates.NOTHING;
+  private XboxController operatorController;
 
 
   @Override
@@ -69,6 +80,9 @@ public class Robot extends TimedRobot {
     shooterTopWheel.setConversionFactor(.16, 1);
     shooterTopWheel.setPidf(.05, .0001, 0, 0);
 
+    ballReadings = new ArrayList<Boolean>();
+    ballSensor = new AnalogInput(0);
+    operatorController = new XboxController(0);
   }
 
   public void arcade(double speed, double turn) {
@@ -132,23 +146,12 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
 
     if (runIntake()) {
-      intakeMotor.setPercent(.5);
+      intakeStates();
       intakeValve.set(DoubleSolenoid.Value.kReverse);
     } else {
       intakeMotor.setPercent(0);
-      intakeValve.set(DoubleSolenoid.Value.kForward);
-    }
-
-    if (runIntake() || runBelt()) {
-      greenWheel.setPercent(0.5);
-    } else {
       greenWheel.setPercent(0);
-    }
-
-    if (runBelt()) {
-      beltMotor.setPercent(0.5);
-    } else {
-      beltMotor.setPercent(0);
+      intakeValve.set(DoubleSolenoid.Value.kForward);
     }
 
     if (runShooter()) {
@@ -159,6 +162,67 @@ public class Robot extends TimedRobot {
       shooterFeederMotor.setPercent(0);
       shooterBottomWheel.setPercent(0);
       shooterTopWheel.setPercent(0);
+    }
+  }
+
+  private boolean seesBall() {
+    boolean ballReading = ballSensor.getValue() > 500;
+    ballReadings.remove(0);
+    ballReadings.add(ballReading);
+
+    int trueReadings = 0;
+    int falseReadings = 0;
+
+    for (boolean reading : ballReadings) {
+      if (reading) {
+        trueReadings++;
+      } else {
+        falseReadings++;
+      }
+    }
+    return trueReadings > falseReadings;
+  }
+
+  private void intakeStates() {
+    if (storageState == StorageStates.NOTHING) {
+      // do something
+      beltMotor.setPercent(0.0);
+      greenWheel.setPercent(0.0);
+
+      // transitions
+      if (operatorController.getAButton()){
+        storageState = StorageStates.EJECT;
+      }
+      else if (seesBall() && numBalls < 5) {
+        storageState = StorageStates.SEESBALL;
+      }
+    
+    } else if (storageState == StorageStates.SEESBALL) {
+      // do something
+      numBalls++;
+
+      // transitions
+      storageState = StorageStates.FEEDBALL;
+    
+    } else if (storageState == StorageStates.FEEDBALL) {
+      // do something
+      if (numBalls < 5) {
+        beltMotor.setPercent(0.5);
+        greenWheel.setPercent(0.5);
+      } else {
+        beltMotor.setPercent(0.0);
+        greenWheel.setPercent(0.0);
+      }
+
+      // transitions
+      if (!seesBall()) {
+        storageState = StorageStates.NOTHING;
+      }
+    
+    } else if (storageState == StorageStates.EJECT) {
+      if (!operatorController.getAButton()){
+        storageState = StorageStates.NOTHING;
+      }
     }
   }
 }

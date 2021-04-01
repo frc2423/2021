@@ -48,6 +48,11 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import frc.robot.helpers.TrajectoryGeneration;
 
+import frc.robot.helpers.Pose;
+import frc.robot.helpers.Rot;
+import frc.robot.helpers.Translate;
+
+
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -72,7 +77,6 @@ public class TrajectoryExample extends TimedRobot {
   private Trajectory trajectory;
   private TrajectoryHelper trajectoryHelper = new TrajectoryHelper(Constants.TRACK_WIDTH);
   private OdometryHelper odometryHelper;
-  private TrajectoryConfig config;
   private Trajectory exampleTrajectory;
   @Override
   public void robotInit() {
@@ -111,12 +115,13 @@ public class TrajectoryExample extends TimedRobot {
     //trajectory = TrajectoryHelper.getTrajectory(trajectoryName);
     TrajectoryGeneration.setConfig(Constants.MAX_SPEED, Constants.MAX_ACCLERATION, trajectoryHelper);
 
+    //giving stuff in ft
     exampleTrajectory = TrajectoryGeneration.Generate(
-      new Pose2d(0,0, new Rotation2d(0)), //start
-      new Pose2d(3, 0, new Rotation2d(0)),//end
+      new Pose(0,0, new Rot(0)), //start
+      new Pose(3, 0, new Rot(0)),//end
       List.of( //waypoints
-          new Translation2d(1, 0),
-          new Translation2d(2, 0)
+          new Translate(1, 0),
+          new Translate(2, 0)
       )
     );
 

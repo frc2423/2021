@@ -2,6 +2,8 @@ package frc.robot.helpers;
 import frc.robot.helpers.TrajectoryHelper;
 import frc.robot.helpers.OdometryHelper;
 import frc.robot.constants.Constants;
+import frc.robot.helpers.Pose;
+import frc.robot.helpers.Translate;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 
@@ -45,36 +47,38 @@ public class TrajectoryGeneration {
     //     // Pass config
     //     config
     // );
-    public static Trajectory Generate(Pose2d start, Pose2d end, List<Translation2d> waypointsFeet){
-        Pose2d startMeters = translatePose2dFeetToMeters(start);
-        Pose2d endMeters = translatePose2dFeetToMeters(end);
-        List<Translation2d> waypointsMeters = translateWaypoints(waypointsFeet);
+    public static Trajectory Generate(Pose start, Pose end, List<Translate> waypointsInit){
+        List<Translation2d> waypoints = translateWaypoints(waypointsInit);
         Trajectory traj = TrajectoryGenerator.generateTrajectory(
             // path
-            startMeters, waypointsMeters, endMeters,
+            start.getPose(), waypoints, end.getPose(),
             // Pass config
             config
         );
         return traj;
     }
 
-    private static Pose2d translatePose2dFeetToMeters(Pose2d pose) {
-        double x = Units.feetToMeters(pose.getX());
-        double y = Units.feetToMeters(pose.getY());
-        Rotation2d rot = pose.getRotation(); 
-        return new Pose2d(x, y, rot);
+    public static Trajectory Generate(List<Pose> waypointsInitial){
+       // List<Translation2d> waypointsMeters = translateWaypoints(waypointsFeet);
+        List<Pose2d> waypoints = PoseToPose2d(waypointsInitial);
+        Trajectory traj = TrajectoryGenerator.generateTrajectory(
+            waypoints, config
+        );
+        return traj;
     }
 
-    private static Translation2d translateTranslation2dFeetToMeters(Translation2d tran) {
-        double x = Units.feetToMeters(tran.getX());
-        double y = Units.feetToMeters(tran.getY());
-        return new Translation2d(x, y);
-    }
-
-    private static List<Translation2d> translateWaypoints(List<Translation2d> initial){
+    private static List<Translation2d> translateWaypoints(List<Translate> initial){
         List<Translation2d> waypoints = new ArrayList<Translation2d>();
         initial.forEach((point) -> {
-            waypoints.add(translateTranslation2dFeetToMeters(point));
+            point.getTranslation();
+        });
+        return waypoints;
+    }
+
+    private static List<Pose2d> PoseToPose2d(List<Pose> initial){
+        List<Pose2d> waypoints = new ArrayList<Pose2d>();
+        initial.forEach((point) -> {
+            point.getPose();
         });
         return waypoints;
     }

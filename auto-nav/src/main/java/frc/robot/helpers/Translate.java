@@ -22,8 +22,8 @@ public class Translate {
     private double y;
 
     public Translate(double xFT, double yFT){
-        x = Units.feetToMeters(xFT);
-        y = Units.feetToMeters(yFT);
+        x = Units.feetToMeters(xFT* 2.5);
+        y = Units.feetToMeters(yFT * 2.5);
     }
     
     public Translation2d getTranslation() {

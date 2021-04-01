@@ -70,7 +70,7 @@ public class TrajectoryGeneration {
     private static List<Translation2d> translateWaypoints(List<Translate> initial){
         List<Translation2d> waypoints = new ArrayList<Translation2d>();
         initial.forEach((point) -> {
-            point.getTranslation();
+            waypoints.add(point.getTranslation());
         });
         return waypoints;
     }
@@ -78,7 +78,7 @@ public class TrajectoryGeneration {
     private static List<Pose2d> PoseToPose2d(List<Pose> initial){
         List<Pose2d> waypoints = new ArrayList<Pose2d>();
         initial.forEach((point) -> {
-            point.getPose();
+            waypoints.add(point.getPose());
         });
         return waypoints;
     }

@@ -42,10 +42,11 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 import frc.robot.helpers.TrajectoryHelper;
 import frc.robot.helpers.OdometryHelper;
+import frc.robot.helpers.TrajectoryGeneration;
 import frc.robot.constants.Constants;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
-
+import frc.robot.helpers.TrajectoryGeneration;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -108,24 +109,15 @@ public class TrajectoryExample extends TimedRobot {
     setPids(rightPidController);
 
     //trajectory = TrajectoryHelper.getTrajectory(trajectoryName);
+    TrajectoryGeneration.setConfig(Constants.MAX_SPEED, Constants.MAX_ACCLERATION, trajectoryHelper);
 
-    config = new TrajectoryConfig( // kmaxSpeed, kmaxAccel
-      Units.feetToMeters(Constants.MAX_SPEED),  Units.feetToMeters(Constants.MAX_ACCLERATION)
-    );
-    config.setKinematics(trajectoryHelper.getKinematics());
-
-    exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-        // Start at the origin facing the +X direction
-        new Pose2d(0, 0, new Rotation2d(0)),
-        // Pass through these two interior waypoints
-        List.of(
-            new Translation2d(1, 0),
-            new Translation2d(2, 0)
-        ),
-        // End 3 meters straight ahead of where we started, facing forward
-        new Pose2d(3, 0, new Rotation2d(0)),
-        // Pass config
-        config
+    exampleTrajectory = TrajectoryGeneration.Generate(
+      new Pose2d(0,0, new Rotation2d(0)), //start
+      new Pose2d(3, 0, new Rotation2d(0)),//end
+      List.of( //waypoints
+          new Translation2d(1, 0),
+          new Translation2d(2, 0)
+      )
     );
 
   }

@@ -41,11 +41,9 @@ public class Robot extends TimedRobot {
   private ArrayList<Boolean> ballReadings;
   private AnalogInput ballSensor;
   public enum StorageStates {
-    NOTHING, SEESBALL, FEEDBALL, EJECT
+    NOTHING, SEESBALL, FEEDBALL
   }
   private StorageStates storageState = StorageStates.NOTHING;
-  private XboxController operatorController;
-
 
   @Override
   public void robotInit() {
@@ -84,8 +82,6 @@ public class Robot extends TimedRobot {
 
     ballReadings = new ArrayList<Boolean>();
     ballSensor = new AnalogInput(0);
-    operatorController = new XboxController(0);
-    
     CameraServer.getInstance().startAutomaticCapture();
   }
 
@@ -217,9 +213,6 @@ public class Robot extends TimedRobot {
       greenWheel.setPercent(0.0);
 
       // transitions
-      if (operatorController.getAButton()){
-        storageState = StorageStates.EJECT;
-      }
       else if (seesBall() && numBalls < 5) {
         storageState = StorageStates.SEESBALL;
       }
@@ -246,10 +239,6 @@ public class Robot extends TimedRobot {
         storageState = StorageStates.NOTHING;
       }
     
-    } else if (storageState == StorageStates.EJECT) {
-      if (!operatorController.getAButton()){
-        storageState = StorageStates.NOTHING;
-      }
     }
   }
 }

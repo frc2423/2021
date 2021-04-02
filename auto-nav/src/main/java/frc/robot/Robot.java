@@ -19,6 +19,8 @@ import com.revrobotics.CANEncoder;
 import frc.robot.helpers.DriveHelper;
 import frc.robot.helpers.NtHelper;
 
+import java.util.ArrayList;
+
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
@@ -55,6 +57,7 @@ public class Robot extends TimedRobot {
   private OdometryHelper odometryHelper;
   private TrajectoryHelper trajectoryHelper = new TrajectoryHelper(Constants.TRACK_WIDTH);
   private Trajectories trajectories = new Trajectories(trajectoryHelper);
+  private int bounceCount = 0;
 
   @Override
   public void robotInit() {
@@ -92,7 +95,8 @@ public class Robot extends TimedRobot {
 
     intakeValve.set(DoubleSolenoid.Value.kForward);
 
-    trajectory = trajectories.getBarrel();
+    trajectory = trajectories.getBounce(bounceCount);
+
     NtHelper.setString("/field/game", "Barrel Racing Path");
     NtHelper.setDoubleArray("/field/trajectory/xs", trajectoryHelper.getTrajectoryXs(trajectory));
     NtHelper.setDoubleArray("/field/trajectory/ys", trajectoryHelper.getTrajectoryYs(trajectory));
@@ -126,12 +130,27 @@ public class Robot extends TimedRobot {
     odometryHelper.resetOdometry(trajectory.getInitialPose());
   }
 
+  private String pathName = "bounce";
+  private double bounceInversion = 1;
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
+    if (pathName == "bounce") {//if bounce 
+      if(trajectoryHelper.hasCompletedTrajectory(trajectory, timer.get())){
+        bounceCount++;
+        trajectory = trajectories.getBounce(bounceCount);
+        timer.reset();
+        timer.start();
+        if (bounceCount % 2 == 1) { //odd
+          bounceInversion = -1;
+        } else { //even
+          bounceInversion = 1;
+        }
+      }
+    }
     NtHelper.setDouble("/field/trajectory/elapsedTime", timer.get());
     double[] speeds = trajectoryHelper.getTrajectorySpeeds(trajectory, odometryHelper.getCurrentPose(), timer.get());
-    tank(speeds[0], speeds[1]);
+    tank(speeds[0] * bounceInversion, speeds[1] * bounceInversion);
   }
 
   /** This function is called once when teleop is enabled. */

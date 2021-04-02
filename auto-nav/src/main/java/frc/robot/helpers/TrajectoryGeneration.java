@@ -28,6 +28,17 @@ public class TrajectoryGeneration {
 
     }
 
+    public static TrajectoryConfig getConfig(){
+        return config;
+    }
+
+    public static void switchReverseConfig() {
+        config.setReversed(!config.isReversed());
+    }
+
+    public static void reverseConfig(boolean val) {
+        config.setReversed(val);
+    }
 
       // config = new TrajectoryConfig( // kmaxSpeed, kmaxAccel
     //   Units.feetToMeters(Constants.MAX_SPEED),  Units.feetToMeters(Constants.MAX_ACCLERATION)
@@ -48,7 +59,20 @@ public class TrajectoryGeneration {
     //     config
     // );
     public static Trajectory Generate(Pose start, Pose end, List<Translate> waypointsInit){
+        config.setReversed(false);
         List<Translation2d> waypoints = translateWaypoints(waypointsInit);
+        Trajectory traj = TrajectoryGenerator.generateTrajectory(
+            // path
+            start.getPose(), waypoints, end.getPose(),
+            // Pass config
+            config
+        );
+        return traj;
+    }
+
+    public static Trajectory GenerateReversed(Pose start, Pose end, List<Translate> waypointsInit){
+        List<Translation2d> waypoints = translateWaypoints(waypointsInit);
+        config.setReversed(true);
         Trajectory traj = TrajectoryGenerator.generateTrajectory(
             // path
             start.getPose(), waypoints, end.getPose(),

@@ -213,7 +213,7 @@ public class Robot extends TimedRobot {
       greenWheel.setPercent(0.0);
 
       // transitions
-      if (seesBall() && numBalls < 5) {
+      if (seesBall()) {
         storageState = StorageStates.SEESBALL;
       }
     
@@ -226,13 +226,8 @@ public class Robot extends TimedRobot {
     
     } else if (storageState == StorageStates.FEEDBALL) {
       // do something
-      if (numBalls < 5) {
-        beltMotor.setPercent(0.5);
-        greenWheel.setPercent(0.5);
-      } else {
-        beltMotor.setPercent(0.0);
-        greenWheel.setPercent(0.0);
-      }
+      beltMotor.setPercent(0.5);
+      greenWheel.setPercent(0.5);
 
       // transitions
       if (!seesBall()) {

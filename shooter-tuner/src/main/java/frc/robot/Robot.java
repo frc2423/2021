@@ -213,7 +213,7 @@ public class Robot extends TimedRobot {
       greenWheel.setPercent(0.0);
 
       // transitions
-      else if (seesBall() && numBalls < 5) {
+      if (seesBall() && numBalls < 5) {
         storageState = StorageStates.SEESBALL;
       }
     

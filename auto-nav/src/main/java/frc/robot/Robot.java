@@ -131,7 +131,7 @@ public class Robot extends TimedRobot {
           new Translate(9.5, 1),
           new Translate(9, 0),
           new Translate(4,0),
-          new Translate(3.5, 1)
+          new Translate(3.5, 2)
       )
     );
   }

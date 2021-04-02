@@ -21,35 +21,14 @@ import frc.robot.helpers.NtHelper;
 
 import com.kauailabs.navx.frc.AHRS;
 
-import java.util.HashMap;
-import java.nio.file.Path;
-
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.controller.RamseteController;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import frc.robot.helpers.TrajectoryGeneration;
 import frc.robot.constants.Constants;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
-import frc.robot.helpers.TrajectoryGeneration;
-import java.util.List;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-
-
-import frc.robot.helpers.Pose;
-import frc.robot.helpers.Rot;
-import frc.robot.helpers.Translate;
-
 
 import frc.robot.helpers.TrajectoryHelper;
 import frc.robot.helpers.OdometryHelper;
-import frc.robot.constants.Constants;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -70,12 +49,12 @@ public class Robot extends TimedRobot {
   private XboxController xboxController;
   private DoubleSolenoid intakeValve = new DoubleSolenoid(2, 3);
 
-  String trajectoryName = "Slalom";
 
   private final Timer timer = new Timer();
   private Trajectory trajectory;
-  private TrajectoryHelper trajectoryHelper = new TrajectoryHelper(Constants.TRACK_WIDTH);
   private OdometryHelper odometryHelper;
+  private TrajectoryHelper trajectoryHelper = new TrajectoryHelper(Constants.TRACK_WIDTH);
+  private Trajectories trajectories = new Trajectories(trajectoryHelper);
 
   @Override
   public void robotInit() {
@@ -113,27 +92,10 @@ public class Robot extends TimedRobot {
 
     intakeValve.set(DoubleSolenoid.Value.kForward);
 
-    //trajectory = TrajectoryHelper.getTrajectory(trajectoryName);
-    TrajectoryGeneration.setConfig(Constants.MAX_SPEED, Constants.MAX_ACCLERATION, trajectoryHelper);
-
-    //giving stuff in ft
-    trajectory = TrajectoryGeneration.Generate(
-     new Pose(2,0, new Rot(0)), //start
-     new Pose(1, 2, new Rot(180)),//end
-      List.of( //waypoints
-         // new Translate(4, 2),
-          new Translate(4.5, 2),
-          new Translate(9, 2),
-          new Translate(10,0),
-          new Translate(12, 0),
-          new Translate(12, 2),
-          new Translate(10, 2),
-          new Translate(9.5, 1),
-          new Translate(9, 0),
-          new Translate(4,0),
-          new Translate(3.5, 2)
-      )
-    );
+    trajectory = trajectories.getSlalom();
+    NtHelper.setString("/field/game", "Slalom Path");
+    NtHelper.setDoubleArray("/field/trajectory/xs", trajectoryHelper.getTrajectoryXs(trajectory));
+    NtHelper.setDoubleArray("/field/trajectory/ys", trajectoryHelper.getTrajectoryYs(trajectory));
   }
 
   @Override

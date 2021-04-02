@@ -60,4 +60,27 @@ public class TrajectoryHelper {
         return elapsedTimeSeconds > trajectory.getTotalTimeSeconds();
     }
     
+    public double[] getTrajectoryXs(Trajectory trajectory) {
+        double[] xs = new double[200];
+        double totalTime = trajectory.getTotalTimeSeconds();
+        for (int i = 0; i < 200; i++) {
+            double time = (totalTime / 200) * i;
+            Trajectory.State reference = trajectory.sample(time);
+            Pose2d pose = reference.poseMeters;
+            xs[i] = Units.metersToFeet(pose.getX());
+        }
+        return xs;
+    }
+
+    public double[] getTrajectoryYs(Trajectory trajectory) {
+        double[] ys = new double[200];
+        double totalTime = trajectory.getTotalTimeSeconds();
+        for (int i = 0; i < 200; i++) {
+            double time = (totalTime / 200) * i;
+            Trajectory.State reference = trajectory.sample(time);
+            Pose2d pose = reference.poseMeters;
+            ys[i] = Units.metersToFeet(pose.getY());
+        }
+        return ys;
+    }
 }

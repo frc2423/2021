@@ -91,4 +91,13 @@ public class NtHelper {
     public static void setStringArray(String key, String[] value) {
         getEntry(key).setStringArray(value);
     }
+
+    /**
+     * Sets the current value to network tables
+     * @param key key to set
+     * @param value new value for key
+     */
+    public static void setDoubleArray(String key, double[] value) {
+        getEntry(key).setDoubleArray(value);
+    }
 }

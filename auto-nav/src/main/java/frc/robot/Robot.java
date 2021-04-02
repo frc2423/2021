@@ -93,9 +93,11 @@ public class Robot extends TimedRobot {
     intakeValve.set(DoubleSolenoid.Value.kForward);
 
     trajectory = trajectories.getSlalom();
-    NtHelper.setString("/field/game", "Slalom Path");
+    NtHelper.setString("/field/game", "Barrel Racing Path");
     NtHelper.setDoubleArray("/field/trajectory/xs", trajectoryHelper.getTrajectoryXs(trajectory));
     NtHelper.setDoubleArray("/field/trajectory/ys", trajectoryHelper.getTrajectoryYs(trajectory));
+    NtHelper.setDouble("/field/trajectory/totalTime", trajectoryHelper.getTotalTime(trajectory));
+    resetDrive();
   }
 
   @Override
@@ -127,6 +129,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
+    NtHelper.setDouble("/field/trajectory/elapsedTime", timer.get());
     double[] speeds = trajectoryHelper.getTrajectorySpeeds(trajectory, odometryHelper.getCurrentPose(), timer.get());
     tank(speeds[0], speeds[1]);
   }
@@ -188,6 +191,7 @@ public class Robot extends TimedRobot {
     leftEncoder.setPosition(0.0);
     rightEncoder.setPosition(0.0);
     gyro.reset();
+    odometryHelper.updateOdometry(gyro.getAngle(), leftEncoder.getPosition(), rightEncoder.getPosition());
   }
 
   public void robotPeriodic() {

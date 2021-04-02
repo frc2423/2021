@@ -12,6 +12,6 @@ public class Constants {
     public static double REAL_DRIVE_KI = 0.00001;
     public static double REAL_DRIVE_KD = 0.0;
     public static double REAL_DRIVE_KF = 0.08;
-    public static double MAX_ACCLERATION = 3.0; //feet per second squared
+    public static double MAX_ACCLERATION = 4.0; //feet per second squared
 }
 

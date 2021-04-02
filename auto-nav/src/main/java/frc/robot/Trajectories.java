@@ -21,22 +21,30 @@ public class Trajectories {
 
     private void generateSlalom() {
         slalom = TrajectoryGeneration.Generate(
-            new Pose(2,0, new Rot(0)), //start
-            new Pose(1, 2, new Rot(180)),//end
+            new Pose(1.33333,1, new Rot(0)), //start
+            new Pose(1, 3.25, new Rot(180)),//end
             List.of( //waypoints
                 // new Translate(4, 2),
-                new Translate(4.5, 2),
-                new Translate(9, 2),
-                new Translate(10,0),
-                new Translate(12, 0),
-                new Translate(12, 2),
-                new Translate(10, 2),
-                new Translate(9.5, 1),
-                new Translate(9, 0),
-                new Translate(4,0),
-                new Translate(3.5, 2)
+                new Translate(2.6, 1.3),
+                new Translate(4, 3),
+                new Translate(6, 3.7),
+                new Translate(7.5, 3.5),
+                new Translate(8.7, 2.7),
+                new Translate(9.5, 1.5),
+                new Translate(10.3, 1.0),
+                new Translate(11, 1.5),
+                
+                new Translate(11, 3),
+                // new Translate(12, 3.3),
+
+                new Translate(9.7, 2.7),
+                new Translate(8.4, 1),
+                new Translate(4, 1),
+                new Translate(3, 2.5),
+                new Translate(2, 3.25)
+       
             )
-            );
+        );
     }
 
     public Trajectory getSlalom() {

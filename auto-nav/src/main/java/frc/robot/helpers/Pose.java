@@ -23,7 +23,7 @@ public class Pose {
     private Rotation2d rot; //negates the input value
 
     public Pose(double xFt, double yFt, Rot rotValue){
-        x = Units.feetToMeters(xFt * 2.5);
+        x = Units.feetToMeters(xFt* 2.5);
         y = Units.feetToMeters(yFt * 2.5);
         rot = rotValue.getRotation();
     }

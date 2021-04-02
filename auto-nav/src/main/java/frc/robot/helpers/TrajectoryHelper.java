@@ -59,6 +59,10 @@ public class TrajectoryHelper {
     public boolean hasCompletedTrajectory(Trajectory trajectory, double elapsedTimeSeconds) {
         return elapsedTimeSeconds > trajectory.getTotalTimeSeconds();
     }
+
+    public double getTotalTime(Trajectory trajectory) {
+        return trajectory.getTotalTimeSeconds();
+    }
     
     public double[] getTrajectoryXs(Trajectory trajectory) {
         double[] xs = new double[200];

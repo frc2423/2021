@@ -37,7 +37,6 @@ public class Robot extends TimedRobot {
   private DriveRateLimiter speedLimiter = new DriveRateLimiter(0.7, 1.2);
   private DriveRateLimiter turnLimiter = new DriveRateLimiter(2, 3.5);
 
-  private int numBalls = 0;
   private ArrayList<Boolean> ballReadings;
   private AnalogInput ballSensor;
   public enum StorageStates {
@@ -81,6 +80,9 @@ public class Robot extends TimedRobot {
     shooterTopWheel.setPidf(.05, .0001, 0, 0);
 
     ballReadings = new ArrayList<Boolean>();
+    for (int i = 0; i < 25; i++) {
+      ballReadings.add(false);
+    }
     ballSensor = new AnalogInput(0);
     CameraServer.getInstance().startAutomaticCapture();
   }
@@ -164,7 +166,9 @@ public class Robot extends TimedRobot {
 
     if (runIntake()) {
       intakeStates();
+      intakeMotor.setPercent(.5);
       intakeValve.set(DoubleSolenoid.Value.kReverse);
+      greenWheel.setPercent(0.5);
     } else {
       intakeMotor.setPercent(0);
       greenWheel.setPercent(0);
@@ -175,6 +179,7 @@ public class Robot extends TimedRobot {
       shooterFeederMotor.setSpeed(getShooterFeederMotor(), true);
       shooterBottomWheel.setSpeed(getShooterBottomMotor(), true);
       shooterTopWheel.setSpeed(getShooterTopMotor(), true);
+      beltMotor.setPercent(.5);
     } else {
       shooterFeederMotor.setPercent(0);
       shooterBottomWheel.setPercent(0);
@@ -186,6 +191,9 @@ public class Robot extends TimedRobot {
     } else {
       driveJoystick();
     }
+
+    NtHelper.setString("/shooter/intakeState", storageState.toString());
+    NtHelper.setDouble("/shooter/ballSensor", ballSensor.getValue());
   }
 
   private boolean seesBall() {
@@ -210,7 +218,6 @@ public class Robot extends TimedRobot {
     if (storageState == StorageStates.NOTHING) {
       // do something
       beltMotor.setPercent(0.0);
-      greenWheel.setPercent(0.0);
 
       // transitions
       if (seesBall()) {
@@ -218,8 +225,6 @@ public class Robot extends TimedRobot {
       }
     
     } else if (storageState == StorageStates.SEESBALL) {
-      // do something
-      numBalls++;
 
       // transitions
       storageState = StorageStates.FEEDBALL;
@@ -227,7 +232,6 @@ public class Robot extends TimedRobot {
     } else if (storageState == StorageStates.FEEDBALL) {
       // do something
       beltMotor.setPercent(0.5);
-      greenWheel.setPercent(0.5);
 
       // transitions
       if (!seesBall()) {

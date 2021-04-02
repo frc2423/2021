@@ -92,7 +92,7 @@ public class Robot extends TimedRobot {
 
     intakeValve.set(DoubleSolenoid.Value.kForward);
 
-    trajectory = trajectories.getSlalom();
+    trajectory = trajectories.getBarrel();
     NtHelper.setString("/field/game", "Barrel Racing Path");
     NtHelper.setDoubleArray("/field/trajectory/xs", trajectoryHelper.getTrajectoryXs(trajectory));
     NtHelper.setDoubleArray("/field/trajectory/ys", trajectoryHelper.getTrajectoryYs(trajectory));

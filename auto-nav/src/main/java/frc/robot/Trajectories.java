@@ -13,10 +13,12 @@ import java.util.List;
 public class Trajectories {
 
     private Trajectory slalom;
+    private Trajectory barrel;
 
     public Trajectories(TrajectoryHelper trajectoryHelper) {
         TrajectoryGeneration.setConfig(Constants.MAX_SPEED, Constants.MAX_ACCLERATION, trajectoryHelper);
         generateSlalom();
+        generateBarrel();
     }
 
     private void generateSlalom() {
@@ -49,5 +51,37 @@ public class Trajectories {
 
     public Trajectory getSlalom() {
         return slalom;
+    }
+
+    private void generateBarrel() {
+        barrel = TrajectoryGeneration.Generate(
+            new Pose(1.5,2.75, new Rot(0)), //start
+            new Pose(1, 3.25, new Rot(180)),//end
+            List.of( //waypoints
+                //first loop
+                new Translate(4, 3.25),
+                new Translate(5.25, 2.75),
+                new Translate(5.5, 2.85),
+                new Translate(5, 1.45),
+                new Translate(4.5, 2.85),
+                new Translate(4.75, 2.5),
+                
+                //second loop
+                new Translate(8, 3.25),
+                new Translate(9, 4),
+                new Translate(8, 4.6),
+                new Translate(7.3, 4.5),
+                new Translate(8, 2.5),
+
+                //third loop
+                new Translate(10, 1.5),
+                new Translate(10.75, 2),
+                new Translate(10.25, 3.8)
+            )
+        );
+    }
+
+    public Trajectory getBarrel() {
+        return barrel;
     }
 }

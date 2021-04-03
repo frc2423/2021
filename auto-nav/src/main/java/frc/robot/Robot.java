@@ -58,6 +58,7 @@ public class Robot extends TimedRobot {
   private TrajectoryHelper trajectoryHelper = new TrajectoryHelper(Constants.TRACK_WIDTH);
   private Trajectories trajectories = new Trajectories(trajectoryHelper);
   private int bounceCount = 0;
+  private double bounceElapsedTime = 0;
 
   @Override
   public void robotInit() {
@@ -95,12 +96,17 @@ public class Robot extends TimedRobot {
 
     intakeValve.set(DoubleSolenoid.Value.kForward);
 
-    trajectory = trajectories.getBounce(bounceCount);
+    NtHelper.setString("/field/game", "Bounce Path");
 
-    NtHelper.setString("/field/game", "Barrel Racing Path");
-    NtHelper.setDoubleArray("/field/trajectory/xs", trajectoryHelper.getTrajectoryXs(trajectory));
-    NtHelper.setDoubleArray("/field/trajectory/ys", trajectoryHelper.getTrajectoryYs(trajectory));
-    NtHelper.setDouble("/field/trajectory/totalTime", trajectoryHelper.getTotalTime(trajectory));
+    double totalTime = 0;
+
+    for (int i = 0; i < 4; i++) {
+      NtHelper.setDoubleArray("/field/trajectory" + i + "/xs", trajectoryHelper.getTrajectoryXs(trajectories.getBounce(i)));
+      NtHelper.setDoubleArray("/field/trajectory" + i + "/ys", trajectoryHelper.getTrajectoryYs(trajectories.getBounce(i)));
+      totalTime += trajectories.getBounce(i).getTotalTimeSeconds();
+    }
+
+    NtHelper.setDouble("/field/trajectory/totalTime", totalTime);
     resetDrive();
   }
 
@@ -127,30 +133,33 @@ public class Robot extends TimedRobot {
     resetDrive();
     timer.reset();
     timer.start();
+    bounceCount = 0;
+    bounceElapsedTime = 0;
+    trajectory = trajectories.getBounce(0);
     odometryHelper.resetOdometry(trajectory.getInitialPose());
   }
 
-  private String pathName = "bounce";
-  private double bounceInversion = 1;
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    if (pathName == "bounce") {//if bounce 
-      if(trajectoryHelper.hasCompletedTrajectory(trajectory, timer.get())){
-        bounceCount++;
-        trajectory = trajectories.getBounce(bounceCount);
-        timer.reset();
-        timer.start();
-        if (bounceCount % 2 == 1) { //odd
-          bounceInversion = -1;
-        } else { //even
-          bounceInversion = 1;
-        }
-      }
+
+    if (trajectory == null) {
+      tank(0, 0);
+      return;
     }
-    NtHelper.setDouble("/field/trajectory/elapsedTime", timer.get());
+
+    if (trajectoryHelper.hasCompletedTrajectory(trajectory, timer.get())){
+      bounceCount++;
+      trajectory = trajectories.getBounce(bounceCount);
+      bounceElapsedTime += timer.get();
+      timer.reset();
+      timer.start();
+      odometryHelper.resetOdometry(trajectory.getInitialPose());
+    }
+
+    NtHelper.setDouble("/field/trajectory/elapsedTime", bounceElapsedTime + timer.get());
     double[] speeds = trajectoryHelper.getTrajectorySpeeds(trajectory, odometryHelper.getCurrentPose(), timer.get());
-    tank(speeds[0] * bounceInversion, speeds[1] * bounceInversion);
+    tank(speeds[0], speeds[1]);
   }
 
   /** This function is called once when teleop is enabled. */

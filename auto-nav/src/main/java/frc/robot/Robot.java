@@ -154,7 +154,6 @@ public class Robot extends TimedRobot {
       bounceElapsedTime += timer.get();
       timer.reset();
       timer.start();
-      odometryHelper.resetOdometry(trajectory.getInitialPose());
     }
 
     NtHelper.setDouble("/field/trajectory/elapsedTime", bounceElapsedTime + timer.get());

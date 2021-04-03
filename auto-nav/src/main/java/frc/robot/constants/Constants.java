@@ -1,7 +1,7 @@
 package frc.robot.constants;
 
 public class Constants {
-    public static double MAX_SPEED = 8.0; // feet per second
+    public static double MAX_SPEED = 9; // feet per second
     public static double TRACK_WIDTH = 1.9375;
     // public static double TRACK_WIDTH = 1.875; // 22.5 in (measured)
     public static double WHEEL_RADIUS = 0.25;
@@ -12,6 +12,6 @@ public class Constants {
     public static double REAL_DRIVE_KI = 0.00001;
     public static double REAL_DRIVE_KD = 0.0;
     public static double REAL_DRIVE_KF = 0.08;
-    public static double MAX_ACCLERATION = 4.0; //feet per second squared
+    public static double MAX_ACCLERATION = 5.0; //feet per second squared
 }
 

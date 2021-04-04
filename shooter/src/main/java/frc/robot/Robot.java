@@ -43,10 +43,10 @@ public class Robot extends TimedRobot {
     NOTHING, SEESBALL, FEEDBALL
   }
   public enum ShooterStates {
-    NOTHING, INTAKE, AIM, REVSHOOTER, SHOOT
+    DRIVE, INTAKE, AIM, REVSHOOTER, SHOOT
   }
   private StorageStates storageState = StorageStates.NOTHING;
-  private ShooterStates shooterState = ShooterStates.NOTHING;
+  private ShooterStates shooterState = ShooterStates.DRIVE;
 
   private double shootTopSpeed = 0.0;
   private double shootBottomSpeed = 0.0;
@@ -103,49 +103,12 @@ public class Robot extends TimedRobot {
     brMotor.setPercent(rightSpeed);
   }
 
-  private boolean runIntake() {
-    return NtHelper.getBoolean("/shooter/intake", false);
-  }
-
-  private boolean runBelt() {
-    return NtHelper.getBoolean("/shooter/storageMotor", false);
-  }
-
-  private double getShooterFeederMotor() {
-    return NtHelper.getDouble("/shooter/shooterFeederMotor", 0.0);
-  }
-
-  private double getShooterBottomMotor() {
-    return NtHelper.getDouble("/shooter/shooterBottomMotor", 0.0);
-  }
-
-  private double getShooterTopMotor() {
-    return NtHelper.getDouble("/shooter/shooterTopMotor", 0.0);
-  }
-
-  private boolean runShooter() {
-    if (NtHelper.getBoolean("/shooter/zoneOne", false)) {
-      return true;
-    } else if (NtHelper.getBoolean("/shooter/zoneTwo", false)) {
-      return true;
-    } else if (NtHelper.getBoolean("/shooter/zoneThree", false)) {
-      return true;
-    } else if (NtHelper.getBoolean("/shooter/zoneFour", false)) {
-      return true;
-    }
-    return false;
-  }
-
   private boolean seesTarget() {
     return NtHelper.getDouble("/limelight/tv", 0.0) == 1;
   }
 
   private double getTargetOffset() {
     return NtHelper.getDouble("/limelight/tx", 0.0);
-  }
-
-  private boolean shooterAutoAim() {
-    return NtHelper.getBoolean("/shooter/autoAim", false);
   }
 
   private void driveJoystick() {
@@ -190,12 +153,8 @@ public class Robot extends TimedRobot {
 
     setShooterSpeeds();
     shooterStates();
+    //driveJoystick();
 
-    if (shooterAutoAim()) {
-      driveAutoAim();
-    } else {
-      driveJoystick();
-    }
 
     NtHelper.setString("/shooter/intakeState", storageState.toString());
     NtHelper.setDouble("/shooter/ballSensor", ballSensor.getValue());
@@ -247,32 +206,66 @@ public class Robot extends TimedRobot {
   }
 
   private void setShooterSpeeds() {
-    if (NtHelper.getBoolean("/shooter/zoneOne", false)) {
-      shootFeederSpeed = 10.0;
-      shootTopSpeed = 10.0;
-      shootBottomSpeed = 10.0;
-    } else if (NtHelper.getBoolean("/shooter/zoneTwo", false)) {
-      shootFeederSpeed = 20.0;
-      shootTopSpeed = 20.0;
-      shootBottomSpeed = 20.0;
-    } else if (NtHelper.getBoolean("/shooter/zoneThree", false)) {
-      shootFeederSpeed = 30.0;
-      shootTopSpeed = 30.0;
-      shootBottomSpeed = 30.0;
-    } else if (NtHelper.getBoolean("/shooter/zoneFour", false)) {
-      shootFeederSpeed = 40.0;
-      shootTopSpeed = 40.0;
-      shootBottomSpeed = 40.0;
+    switch(getMode()) {
+      case "Green Zone":
+        shootFeederSpeed = 30.0;
+        shootTopSpeed = 35.0;
+        shootBottomSpeed = 10.0;
+        break;
+
+      case "Yellow Zone":
+      case "Blue Zone":
+      case "Red Zone":
+        shootFeederSpeed = 11.0;
+        shootTopSpeed = 27.0;
+        shootBottomSpeed = 23.0;
+        break;
+      
+      default:
+        shootFeederSpeed = 0.0;
+        shootTopSpeed = 0.0;
+        shootBottomSpeed = 0.0;
     }
   }
 
+  private String getMode() {
+    return NtHelper.getString("/shooter/mode", "Drive");
+  }
+
+  private Boolean isShootingMode() {
+    String mode = getMode();
+    return (
+      mode == "Green Zone"
+      || mode == "Yellow Zone"
+      || mode == "Blue Zone"
+      || mode == "Red Zone"
+    );
+  }
+
+  private void stopIntake() {
+    intakeMotor.setPercent(0);
+    greenWheel.setPercent(0);
+    intakeValve.set(DoubleSolenoid.Value.kForward);
+    beltMotor.setPercent(0);
+  }
+
+  private void stopShooter() {
+    shooterFeederMotor.setSpeed(0);
+    shooterBottomWheel.setSpeed(0);
+    shooterTopWheel.setSpeed(0);
+  }
+
   private void shooterStates() {
+    String mode = getMode();
     switch(shooterState) {
-      case NOTHING:
-        if (runIntake()) {
+      case DRIVE:
+        stopIntake();
+        stopShooter();
+        driveJoystick();
+        if (mode == "Collect Balls") {
           shooterState = ShooterStates.INTAKE;
-        } else if (runShooter()) {
-          shooterState = ShooterStates.REVSHOOTER;
+        } else if (isShootingMode()) {
+          shooterState = ShooterStates.AIM;
         }
         break;
       
@@ -281,27 +274,25 @@ public class Robot extends TimedRobot {
         intakeMotor.setPercent(.5);
         intakeValve.set(DoubleSolenoid.Value.kReverse);
         greenWheel.setPercent(0.5);
-
-        if (!runIntake()) {
-          shooterState = ShooterStates.NOTHING;
-          intakeMotor.setPercent(0);
-          greenWheel.setPercent(0);
-          intakeValve.set(DoubleSolenoid.Value.kForward);
-        } else if (runShooter()) {
+        stopShooter();
+        driveJoystick();
+        if (mode == "Drive") {
+          shooterState = ShooterStates.DRIVE;
+        } else if (isShootingMode()) {
           shooterState = ShooterStates.AIM;
-          intakeMotor.setPercent(0);
-          greenWheel.setPercent(0);
-          intakeValve.set(DoubleSolenoid.Value.kForward);
         }
         break;
 
       case AIM:
         driveAutoAim();
-
+        stopIntake();
+        stopShooter();
         if (atTarget()) {
           shooterState = ShooterStates.REVSHOOTER;
-        } else if (!runShooter()) {
-          shooterState = ShooterStates.NOTHING;
+        } else if (mode == "Drive") {
+          shooterState = ShooterStates.DRIVE;
+        } else if (mode == "Collect Balls") {
+          shooterState = ShooterStates.INTAKE;
         }
         break;
       
@@ -309,14 +300,13 @@ public class Robot extends TimedRobot {
         shooterFeederMotor.setSpeed(shootFeederSpeed, true);
         shooterBottomWheel.setSpeed(shootBottomSpeed, true);
         shooterTopWheel.setSpeed(shootTopSpeed, true);
-
-        if (shooterTopWheel.getSpeed() == shootTopSpeed) {
+        stopIntake();
+        if (shooterTopWheel.getSpeed() > 0.9 * shootTopSpeed) {
           shooterState = ShooterStates.SHOOT;
-        } else if (!runShooter()) {
-          shooterState = ShooterStates.NOTHING;
-          shooterFeederMotor.setPercent(0);
-          shooterBottomWheel.setPercent(0);
-          shooterTopWheel.setPercent(0);
+        } else if (mode == "Drive") {
+          shooterState = ShooterStates.DRIVE;
+        } else if (mode == "Collect Balls") {
+          shooterState = ShooterStates.INTAKE;
         }
         break;
       case SHOOT:
@@ -324,12 +314,15 @@ public class Robot extends TimedRobot {
         shooterBottomWheel.setSpeed(shootBottomSpeed, true);
         shooterTopWheel.setSpeed(shootTopSpeed, true);
         beltMotor.setPercent(.5);
-
-        if (!runShooter()) {
-          shooterState = ShooterStates.NOTHING;
-          shooterFeederMotor.setPercent(0);
-          shooterBottomWheel.setPercent(0);
-          shooterTopWheel.setPercent(0);
+        intakeMotor.setPercent(0);
+        greenWheel.setPercent(0);
+        intakeValve.set(DoubleSolenoid.Value.kForward);
+        arcade(0, 0);
+        
+        if (mode == "Drive") {
+          shooterState = ShooterStates.DRIVE;
+        } else if (mode == "Collect Balls") {
+          shooterState = ShooterStates.INTAKE;
         }
         break;
     }

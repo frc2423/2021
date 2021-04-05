@@ -19,6 +19,8 @@ import frc.robot.DriveRateLimiter;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -37,8 +39,10 @@ public class Robot extends TimedRobot {
   private CANPIDController lf_pidController;
   private CANPIDController rb_pidController;
   private CANPIDController rf_pidController;
+  private DoubleSolenoid intakeValve = new DoubleSolenoid(2, 3);
 
   private XboxController xboxController;
+  private XboxController xboxController2 = new XboxController(1);
 
   private double defaultP = 0.0001;
   private double defaultI = 0.0;
@@ -95,6 +99,8 @@ public class Robot extends TimedRobot {
 
     System.out.println("robotInit");
 
+    intakeValve.set(DoubleSolenoid.Value.kForward);
+
   }
 
   private void setPids(CANPIDController pidController) {
@@ -121,13 +127,15 @@ public class Robot extends TimedRobot {
     rb_motor.set(right);
   }
 
-  public void arcade(double speed, double turn) {
+  public void arcade(double speed, double turn, boolean swing) {
     double[] speeds = DriveHelper.getArcadeSpeeds(speed, turn, false);
-    double leftSpeed = speeds[0];
-    double rightSpeed = speeds[1];
+    double min = swing ? 0 : -1;
+    double leftSpeed = Math.max(min, speeds[0]);
+    double rightSpeed = Math.max(min, speeds[1]);
     lb_motor.set(leftSpeed);
     rb_motor.set(rightSpeed);
   }
+
 
   /** This func 
    * tion is called periodically during operator control. */
@@ -135,8 +143,11 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     double x = xboxController.getX(Hand.kRight);
     double y = xboxController.getY(Hand.kLeft);
+    // double x = xboxController.getRawAxis(0);
+    // double y = xboxController2.getRawAxis(1);
     double turn = turnLimiter.calculate(DriveHelper.applyDeadband(x));
     double speed = speedLimiter.calculate(DriveHelper.applyDeadband(-y));
-    arcade(speed * 0.8, turn * 0.45);
+    // arcade(speed * 0.8, turn * 0.45);
+    arcade(speed * 0.8, turn * 0.38, false);
   }
 }

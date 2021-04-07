@@ -37,6 +37,9 @@ public class Robot extends TimedRobot {
   private DriveRateLimiter speedLimiter = new DriveRateLimiter(0.7, 1.2);
   private DriveRateLimiter turnLimiter = new DriveRateLimiter(2, 3.5);
 
+  private DriveRateLimiter topWheelLimiter = new DriveRateLimiter(10, 10);
+  private DriveRateLimiter bottomWheelLimiter = new DriveRateLimiter(10, 10);
+
   private ArrayList<Boolean> ballReadings;
   private AnalogInput ballSensor;
   public enum StorageStates {
@@ -120,24 +123,26 @@ public class Robot extends TimedRobot {
   }
 
   private void driveAutoAim() {
+    double maxOffset = 2.5;
+    double minOffset = 1.0;
+    double maxTurn = 0.08;
+    double minTurn = 0.02;
     if (seesTarget()) {
       double targetOffset = getTargetOffset();
-      if (Math.abs(targetOffset) < 2.5){
-        arcade(0.0, 0.0);
-      } else if (targetOffset < -0.5) {
-        arcade(0.0, -0.08);
-      } else if (targetOffset > 0.5) {
-        arcade(0.0, 0.08);
+      if (Math.abs(targetOffset) > maxOffset) {
+        arcade(0.0, targetOffset < 0 ? -maxTurn : maxTurn);
       } else {
-        arcade(0.0, 0.0);
+        double turn = minTurn + (maxTurn - minTurn) * (Math.abs(targetOffset) - minOffset) / (maxOffset - minOffset);
+        arcade(0.0, targetOffset < 0 ? -turn : turn);
       }
     } else {
-      arcade(0.0, 0.0);
+      arcade(0, 0);
     }
   }
 
   private boolean atTarget() {
-    if (seesTarget() && Math.abs(getTargetOffset()) < 2.5) {
+    double minOffset = 1.0;
+    if (seesTarget() && Math.abs(getTargetOffset()) < minOffset) {
       return true;
     }
     return false;
@@ -201,7 +206,7 @@ public class Robot extends TimedRobot {
     
     } else if (storageState == StorageStates.FEEDBALL) {
       // do something
-      beltMotor.setPercent(0.5);
+      beltMotor.setPercent(0.4);
 
       // transitions
       if (!seesBall()) {
@@ -297,6 +302,8 @@ public class Robot extends TimedRobot {
         stopShooter();
         if (atTarget()) {
           shooterState = ShooterStates.REVSHOOTER;
+          topWheelLimiter.reset(0);
+          bottomWheelLimiter.reset(0);
         } else if (mode.equals("Drive")) {
           shooterState = ShooterStates.DRIVE;
         } else if (mode.equals("Collect Balls")) {
@@ -305,10 +312,13 @@ public class Robot extends TimedRobot {
         break;
       
       case REVSHOOTER:
+        double limitedBottomSpeed = bottomWheelLimiter.calculate(shootBottomSpeed);
+        double limitedTopSpeed = topWheelLimiter.calculate(shootTopSpeed);
         shooterFeederMotor.setSpeed(shootFeederSpeed, true);
-        shooterBottomWheel.setSpeed(shootBottomSpeed, true);
-        shooterTopWheel.setSpeed(shootTopSpeed, true);
+        shooterBottomWheel.setSpeed(limitedBottomSpeed, true);
+        shooterTopWheel.setSpeed(limitedTopSpeed, true);
         stopIntake();
+        driveAutoAim();
         if (-shooterTopWheel.getSpeed() > 0.9 * shootTopSpeed) {
           shooterState = ShooterStates.SHOOT;
         } else if (mode.equals("Drive")) {
@@ -321,7 +331,7 @@ public class Robot extends TimedRobot {
         shooterFeederMotor.setSpeed(shootFeederSpeed, true);
         shooterBottomWheel.setSpeed(shootBottomSpeed, true);
         shooterTopWheel.setSpeed(shootTopSpeed, true);
-        beltMotor.setPercent(.5);
+        beltMotor.setPercent(.4);
         intakeMotor.setPercent(0);
         greenWheel.setPercent(0);
         intakeValve.set(DoubleSolenoid.Value.kForward);

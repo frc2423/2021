@@ -9,17 +9,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANEncoder;
 
-import frc.robot.DriveHelper;
-import frc.robot.DriveRateLimiter;
-
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+
+import frc.team2423.util.RateLimiter;
+import frc.team2423.util.DriveHelper;
 
 
 /**
@@ -54,8 +53,8 @@ public class Robot extends TimedRobot {
   private double maxSpeed = 9.0;  // feet per second
   private double conversionFactor = ftPerRev / countsPerRev;
 
-  private DriveRateLimiter speedLimiter = new DriveRateLimiter(0.7, 1.2);
-  private DriveRateLimiter turnLimiter = new DriveRateLimiter(2, 3.5);
+  private RateLimiter speedLimiter = new RateLimiter(0.7, 1.2);
+  private RateLimiter turnLimiter = new RateLimiter(2, 3.5);
 
 
   @Override

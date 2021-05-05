@@ -7,8 +7,10 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.ColorSensorV3;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANEncoder;
@@ -17,8 +19,9 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
-import frc.team2423.util.RateLimiter;
+import frc.team2423.util.RateLimiter; // :)
 import frc.team2423.util.DriveHelper;
+import frc.team2423.util.NtHelper;
 
 
 /**
@@ -28,92 +31,12 @@ import frc.team2423.util.DriveHelper;
  * project.
  */
 public class Robot extends TimedRobot {
-
-  private CANSparkMax lb_motor;
-  private CANSparkMax lf_motor;
-  private CANSparkMax rb_motor;
-  private CANSparkMax rf_motor;
-
-  private CANPIDController lb_pidController;
-  private CANPIDController lf_pidController;
-  private CANPIDController rb_pidController;
-  private CANPIDController rf_pidController;
-  private DoubleSolenoid intakeValve = new DoubleSolenoid(2, 3);
-
-  private XboxController xboxController;
-  private XboxController xboxController2 = new XboxController(1);
-
-  private double defaultP = 0.0001;
-  private double defaultI = 0.0;
-  private double defaultD = 0.000015;
-  private double defaultF = 0.0;
-
-  private double countsPerRev = 16.35;
-  private double ftPerRev = 1.57;
-  private double maxSpeed = 9.0;  // feet per second
-  private double conversionFactor = ftPerRev / countsPerRev;
-
-  private RateLimiter speedLimiter = new RateLimiter(0.7, 1.2);
-  private RateLimiter turnLimiter = new RateLimiter(2, 3.5);
-
+  private ColorSensor colorSensor = new ColorSensor();
 
   @Override
   public void robotInit() {
-    xboxController = new XboxController(0);
-
-
-    lf_motor = new CANSparkMax(1, MotorType.kBrushless);
-    lb_motor = new CANSparkMax(4, MotorType.kBrushless);
-    rf_motor = new CANSparkMax(6, MotorType.kBrushless);
-    rb_motor = new CANSparkMax(5, MotorType.kBrushless);
-
-    lb_pidController = lb_motor.getPIDController();
-    lf_pidController = lf_motor.getPIDController();
-    rb_pidController = rb_motor.getPIDController();
-    rf_pidController = rf_motor.getPIDController();
-    
-
-    lf_motor.restoreFactoryDefaults();
-    lb_motor.restoreFactoryDefaults();
-    rf_motor.restoreFactoryDefaults();
-    rb_motor.restoreFactoryDefaults();
-
-    // setConversionFactor(lf_motor, conversionFactor);
-    // setConversionFactor(lb_motor, conversionFactor);
-    // setConversionFactor(rf_motor, conversionFactor);
-    // setConversionFactor(rb_motor, conversionFactor);
-
-    rf_motor.setInverted(true);
-    rb_motor.setInverted(true);
-
-    lf_motor.follow(lb_motor);
-    rf_motor.follow(rb_motor);
-    // rb_motor.follow(rf_motor);
-
-
-    // setPids(lf_motor);
-    setPids(lb_pidController);
-    // setPids(rf_motor);
-    setPids(rb_pidController);
-
-    System.out.println("robotInit");
-
-    intakeValve.set(DoubleSolenoid.Value.kForward);
 
   }
-
-  private void setPids(CANPIDController pidController) {
-    pidController.setP(defaultP);
-    pidController.setI(defaultI);
-    pidController.setD(defaultD);
-    pidController.setFF(defaultF);
-  }
-
-  private void setConversionFactor(CANSparkMax motor, double factor){
-    CANEncoder encoder = motor.getEncoder();
-    encoder.setPositionConversionFactor(factor);
-    encoder.setVelocityConversionFactor(factor / 60);
-}
 
   /** This function is called once when teleop is enabled. */
   @Override
@@ -121,32 +44,16 @@ public class Robot extends TimedRobot {
     System.out.println("teleopInit");
   }
 
-  public void tank(double left, double right) {
-    lb_motor.set(left);
-    rb_motor.set(right);
-  }
-
-  public void arcade(double speed, double turn, boolean swing) {
-    double[] speeds = DriveHelper.getArcadeSpeeds(speed, turn, false);
-    double min = swing ? 0 : -1;
-    double leftSpeed = Math.max(min, speeds[0]);
-    double rightSpeed = Math.max(min, speeds[1]);
-    lb_motor.set(leftSpeed);
-    rb_motor.set(rightSpeed);
-  }
-
-
   /** This func 
    * tion is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    double x = xboxController.getX(Hand.kRight);
-    double y = xboxController.getY(Hand.kLeft);
-    // double x = xboxController.getRawAxis(0);
-    // double y = xboxController2.getRawAxis(1);
-    double turn = turnLimiter.calculate(DriveHelper.applyDeadband(x));
-    double speed = speedLimiter.calculate(DriveHelper.applyDeadband(-y));
-    // arcade(speed * 0.8, turn * 0.45);
-    arcade(speed * 0.8, turn * 0.38, false);
+    Color color = colorSensor.getRawColor();
+    System.out.println(color);
+    double[] a = new double[3];
+    a[0] = color.red;
+    a[1] = color.green;
+    a[2] = color.blue;
+    NtHelper.setDoubleArray("robot/colorsensor", a);
   }
 }

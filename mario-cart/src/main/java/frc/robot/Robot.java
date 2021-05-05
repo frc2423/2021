@@ -62,5 +62,26 @@ public class Robot extends TimedRobot {
     NtHelper.setDouble("/robot/red", color.red);
     NtHelper.setDouble("/robot/green", color.green);
     NtHelper.setDouble("/robot/blue", color.blue);
+
+    if (colorSensor.isColor("blue")) {
+      NtHelper.setString("/robot/color", "blue");
+    } else  if (colorSensor.isColor("orange")) {
+      NtHelper.setString("/robot/color", "orange");
+
+    } else  if (colorSensor.isColor("lime")) {
+      NtHelper.setString("/robot/color", "lime");
+
+    } else  if (colorSensor.isColor("pink")) {
+      NtHelper.setString("/robot/color", "pink");
+
+    } else  if (colorSensor.isColor("yellow")) {
+      NtHelper.setString("/robot/color", "yellow");
+
+    } else  if (colorSensor.isColor("other")) {
+      NtHelper.setString("/robot/color", "other");
+
+    }
+
+
   }
 }

@@ -32,10 +32,15 @@ import frc.team2423.util.NtHelper;
  */
 public class Robot extends TimedRobot {
   private ColorSensor colorSensor = new ColorSensor();
-
+  
   @Override
   public void robotInit() {
-
+    colorSensor.addColor("orange", .469, .428, .102);
+    colorSensor.addColor("pink", .443, .360, .198);
+    colorSensor.addColor("lime", .191, .621, .188);
+    colorSensor.addColor("yellow", .365, .521, .114);
+    colorSensor.addColor("blue", .137, .390, .473);
+    colorSensor.addColor("other", .255, .473, .272);
   }
 
   /** This function is called once when teleop is enabled. */
@@ -54,6 +59,8 @@ public class Robot extends TimedRobot {
     a[0] = color.red;
     a[1] = color.green;
     a[2] = color.blue;
-    NtHelper.setDoubleArray("robot/colorsensor", a);
+    NtHelper.setDouble("/robot/red", color.red);
+    NtHelper.setDouble("/robot/green", color.green);
+    NtHelper.setDouble("/robot/blue", color.blue);
   }
 }

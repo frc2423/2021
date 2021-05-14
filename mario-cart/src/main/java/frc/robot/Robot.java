@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.Timer;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ColorSensorV3;
@@ -37,9 +38,20 @@ public class Robot extends TimedRobot {
   private XboxController joystick;
   private NeoMotor leftMotor;
   private NeoMotor rightMotor;
+  private Timer timer;
 
   private RateLimiter speedLimiter = new RateLimiter(0.7, 1.2);
   private RateLimiter turnLimiter = new RateLimiter(2, 3.5);
+
+  private double maxRegSpeed = 0.8;
+  private double maxSlowSpeed = 0.6;
+  private double maxFastSpeed = 1.0;
+  private double speedPercent = maxRegSpeed;
+
+  private enum SpeedStates {
+    SLOW, REGULAR, FAST
+  }
+  private SpeedStates currentState = SpeedStates.REGULAR;
   
   @Override
   public void robotInit() {
@@ -53,6 +65,7 @@ public class Robot extends TimedRobot {
     joystick = new XboxController(0);
     leftMotor = new NeoMotor(1, "tortellini");
     rightMotor = new NeoMotor(2, "princess peach");
+    timer = new Timer();
   }
 
   /** This function is called once when teleop is enabled. */
@@ -77,17 +90,33 @@ public class Robot extends TimedRobot {
 
     if (colorSensor.isColor("blue")) {
       NtHelper.setString("/robot/color", "blue");
+
     } else  if (colorSensor.isColor("orange")) {
       NtHelper.setString("/robot/color", "orange");
 
     } else  if (colorSensor.isColor("lime")) {
       NtHelper.setString("/robot/color", "lime");
+      speedPercent = maxSlowSpeed;
 
     } else  if (colorSensor.isColor("pink")) {
       NtHelper.setString("/robot/color", "pink");
 
     } else  if (colorSensor.isColor("yellow")) {
       NtHelper.setString("/robot/color", "yellow");
+      if (currentState == SpeedStates.REGULAR || currentState == SpeedStates.SLOW) {
+        timer.reset();
+        timer.start();
+        currentState = SpeedStates.FAST;
+      } else if (currentState == SpeedStates.FAST) {
+        if (timer.get() < 2) {
+          speedPercent = maxFastSpeed;
+        } else {
+          timer.stop();
+          timer.reset();
+          speedPercent = maxRegSpeed;
+          currentState = SpeedStates.REGULAR;
+        }
+      }
 
     } else  if (colorSensor.isColor("other")) {
       NtHelper.setString("/robot/color", "other");
@@ -104,7 +133,31 @@ public class Robot extends TimedRobot {
 
   public void arcade(double speed, double turn) {
     double[] speeds = DriveHelper.getArcadeSpeeds(speed, turn, false);
-    leftMotor.setPercent(speeds[0]);
-    rightMotor.setPercent(speeds[1]);
+    leftMotor.setPercent(speeds[0] * speedPercent);
+    rightMotor.setPercent(speeds[1] * speedPercent);
+  }
+
+  private SpeedStates getNextSpeedState(SpeedStates currentState, String color) {
+    if (currentState == SpeedStates.REGULAR) {
+      timer.reset();
+      timer.start();
+      return SpeedStates.FAST;
+    } else if (currentState == SpeedStates.FAST) {
+      if (timer.get() < 2) {
+        return SpeedStates.FAST;
+      } else if (color.equals("lime")) {
+        timer.reset();
+        return SpeedStates.SLOW;
+      } else {
+        timer.stop();
+        timer.reset();
+        return SpeedStates.REGULAR;
+      }
+    } else if (currentState == SpeedStates.SLOW) {
+      timer.reset();
+      timer.start();
+      return SpeedStates.FAST;
+    }
+    return SpeedStates.REGULAR;
   }
 }

@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import frc.team2423.util.RateLimiter; // :)
 import frc.team2423.util.DriveHelper;
 import frc.team2423.util.NtHelper;
+import frc.team2423.devices.NeoMotor;
 
 
 /**
@@ -32,6 +33,13 @@ import frc.team2423.util.NtHelper;
  */
 public class Robot extends TimedRobot {
   private ColorSensor colorSensor = new ColorSensor();
+
+  private XboxController joystick;
+  private NeoMotor leftMotor;
+  private NeoMotor rightMotor;
+
+  private RateLimiter speedLimiter = new RateLimiter(0.7, 1.2);
+  private RateLimiter turnLimiter = new RateLimiter(2, 3.5);
   
   @Override
   public void robotInit() {
@@ -41,6 +49,10 @@ public class Robot extends TimedRobot {
     colorSensor.addColor("yellow", .365, .521, .114);
     colorSensor.addColor("blue", .137, .390, .473);
     colorSensor.addColor("other", .255, .473, .272);
+
+    joystick = new XboxController(0);
+    leftMotor = new NeoMotor(1, "tortellini");
+    rightMotor = new NeoMotor(2, "princess peach");
   }
 
   /** This function is called once when teleop is enabled. */
@@ -82,6 +94,17 @@ public class Robot extends TimedRobot {
 
     }
 
+    double x = joystick.getX(Hand.kRight);
+    double y = joystick.getY(Hand.kLeft);
+    double turn = turnLimiter.calculate(DriveHelper.applyDeadband(x));
+    double speed = speedLimiter.calculate(DriveHelper.applyDeadband(-y));
+    arcade(speed, turn);
 
+  }
+
+  public void arcade(double speed, double turn) {
+    double[] speeds = DriveHelper.getArcadeSpeeds(speed, turn, false);
+    leftMotor.setPercent(speeds[0]);
+    rightMotor.setPercent(speeds[1]);
   }
 }

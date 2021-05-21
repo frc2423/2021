@@ -50,9 +50,10 @@ public class Robot extends TimedRobot {
 
   private enum SpeedStates {
     SLOW, REGULAR, FAST
-  }
+  };
   private SpeedStates currentState = SpeedStates.REGULAR;
-  
+  String currCcolor = "";
+
   @Override
   public void robotInit() {
     colorSensor.addColor("orange", .469, .428, .102);
@@ -63,8 +64,8 @@ public class Robot extends TimedRobot {
     colorSensor.addColor("other", .255, .473, .272);
 
     joystick = new XboxController(0);
-    leftMotor = new NeoMotor(1, "tortellini");
-    rightMotor = new NeoMotor(2, "princess peach");
+    leftMotor = new NeoMotor(3, "tortellini");
+    rightMotor = new NeoMotor(4, "princess peach");
     timer = new Timer();
   }
 
@@ -74,8 +75,7 @@ public class Robot extends TimedRobot {
     System.out.println("teleopInit");
   }
 
-  /** This func 
-   * tion is called periodically during operator control. */
+  /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
     Color color = colorSensor.getRawColor();
@@ -90,17 +90,17 @@ public class Robot extends TimedRobot {
 
     if (colorSensor.isColor("blue")) {
       NtHelper.setString("/robot/color", "blue");
-
+      currCcolor = "blue";
     } else  if (colorSensor.isColor("orange")) {
       NtHelper.setString("/robot/color", "orange");
-
+      currCcolor = "orange";
     } else  if (colorSensor.isColor("lime")) {
       NtHelper.setString("/robot/color", "lime");
       speedPercent = maxSlowSpeed;
-
+      currCcolor = "lime";
     } else  if (colorSensor.isColor("pink")) {
       NtHelper.setString("/robot/color", "pink");
-
+      currCcolor = "pink";
     } else  if (colorSensor.isColor("yellow")) {
       NtHelper.setString("/robot/color", "yellow");
       if (currentState == SpeedStates.REGULAR || currentState == SpeedStates.SLOW) {
@@ -117,11 +117,15 @@ public class Robot extends TimedRobot {
           currentState = SpeedStates.REGULAR;
         }
       }
-
+      currCcolor = "yellow";
     } else  if (colorSensor.isColor("other")) {
       NtHelper.setString("/robot/color", "other");
-
+      currCcolor = "other";
     }
+
+
+    SpeedStates nextState = getNextSpeedState(currentState, currCcolor);
+
 
     double x = joystick.getX(Hand.kRight);
     double y = joystick.getY(Hand.kLeft);

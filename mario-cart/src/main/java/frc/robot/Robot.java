@@ -41,11 +41,12 @@ public class Robot extends TimedRobot {
   private Timer timer;
 
   private RateLimiter speedLimiter = new RateLimiter(0.7, 1.2);
-  private RateLimiter turnLimiter = new RateLimiter(2, 3.5);
+  private RateLimiter turnLimiter = new RateLimiter(2, 3);
 
-  private double maxRegSpeed = 0.8;
-  private double maxSlowSpeed = 0.6;
-  private double maxFastSpeed = 1.0;
+  private double turnRateLimter = 0.5;
+  private double maxRegSpeed = 0.64;
+  private double maxSlowSpeed = 0.4;
+  private double maxFastSpeed = .8;
   private double speedPercent = maxRegSpeed;
 
   private enum SpeedStates {
@@ -66,7 +67,14 @@ public class Robot extends TimedRobot {
     joystick = new XboxController(0);
     leftMotor = new NeoMotor(3, "tortellini");
     rightMotor = new NeoMotor(4, "princess peach");
+    rightMotor.setInverted(true);
     timer = new Timer();
+  }
+
+  @Override
+  public void robotPeriodic() {
+    leftMotor.execute();
+    rightMotor.execute();
   }
 
   /** This function is called once when teleop is enabled. */
@@ -131,14 +139,18 @@ public class Robot extends TimedRobot {
     double y = joystick.getY(Hand.kLeft);
     double turn = turnLimiter.calculate(DriveHelper.applyDeadband(x));
     double speed = speedLimiter.calculate(DriveHelper.applyDeadband(-y));
-    arcade(speed, turn);
+    arcade(speed * .64, turn * .5 * .64);
 
   }
 
   public void arcade(double speed, double turn) {
     double[] speeds = DriveHelper.getArcadeSpeeds(speed, turn, false);
-    leftMotor.setPercent(speeds[0] * speedPercent);
-    rightMotor.setPercent(speeds[1] * speedPercent);
+    // leftMotor.setPercent(speeds[0] * speedPercent);
+    // rightMotor.setPercent(speeds[1] * speedPercent);
+    leftMotor.setPercent(speeds[0]);
+    rightMotor.setPercent(speeds[1] * .85);
+    NtHelper.setDouble("/robot/leftMotor", speeds[0]);
+    NtHelper.setDouble("/robot/rightMotor", speeds[1]);
   }
 
   private SpeedStates getNextSpeedState(SpeedStates currentState, String color) {
